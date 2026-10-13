@@ -9,6 +9,7 @@ import { AgentGraph } from '../agents/diagram/AgentGraph';
 import { AssignTaskForm } from '../tasks/AssignTaskForm';
 import { TaskTree } from '../tasks/TaskTree';
 import { useTaskTree } from '../tasks/taskQueries';
+import { existingMilestones, existingTags } from '../tasks/taskListModel';
 import { collectActiveAgentIds } from '../tasks/taskTreeModel';
 import { ProjectMembers } from './ProjectMembers';
 import { useProject } from './projectQueries';
@@ -62,6 +63,7 @@ function ProjectTeam({
 function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDto[] }) {
   const [isAssigning, setIsAssigning] = useState(false);
   const members = agents.filter((agent) => project.memberIds.includes(agent.id));
+  const tree = useTaskTree(project.id);
   return (
     <>
       <PageHeader
@@ -79,7 +81,13 @@ function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDt
         <ProjectTeam project={project} agents={agents} members={members} />
       </div>
       <Dialog open={isAssigning} title="Nueva tarea" onClose={() => setIsAssigning(false)}>
-        <AssignTaskForm projectId={project.id} members={members} onAssigned={() => setIsAssigning(false)} />
+        <AssignTaskForm
+          projectId={project.id}
+          members={members}
+          milestones={existingMilestones(tree.data ?? [])}
+          tags={existingTags(tree.data ?? [])}
+          onAssigned={() => setIsAssigning(false)}
+        />
       </Dialog>
     </>
   );
