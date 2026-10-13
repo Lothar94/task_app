@@ -1,6 +1,8 @@
 import type { TaskStatus } from '@fleet/shared';
 
 const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> = {
+  draft: { label: 'Borrador', className: 'border border-dashed border-zinc-500 text-zinc-300' },
+  queued: { label: 'En cola', className: 'bg-violet-500/20 text-violet-300' },
   pending: { label: 'Pendiente', className: 'bg-zinc-700 text-zinc-200' },
   running: { label: 'Trabajando', className: 'bg-sky-500/20 text-sky-300 animate-pulse' },
   waiting_subtasks: { label: 'Esperando subtareas', className: 'bg-amber-500/20 text-amber-300' },
@@ -11,6 +13,9 @@ const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> = 
 
 export const isTaskActive = (status: TaskStatus) =>
   status === 'pending' || status === 'running' || status === 'waiting_subtasks';
+
+/** Defined but not started yet: still editable and cancellable. */
+export const isTaskPlanned = (status: TaskStatus) => status === 'draft' || status === 'queued';
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
   const { label, className } = STATUS_STYLES[status];

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { EmptyState } from '../../components/ui';
 import { useNow } from '../../hooks/useNow';
 import { formatCost, formatDuration, formatInteger, formatTokens } from '../../lib/format';
+import { TaskLabels } from './TaskLabels';
 import { TaskNumber } from './taskLabel';
 import { isTaskActive, TaskStatusBadge } from './TaskStatusBadge';
 import { countDescendants, subtreeMetrics } from './taskTreeModel';
@@ -14,6 +15,9 @@ interface TaskTreeProps {
   agentNames: Map<string, string>;
   /** Narrow layout without the metric columns (sidebars). */
   compact?: boolean;
+  /** Render the nodes in the given order instead of newest first. */
+  keepOrder?: boolean;
+  hideHeader?: boolean;
 }
 
 type RowProps = Omit<TaskTreeProps, 'nodes'> & { node: TaskNodeDto; depth: number };
@@ -111,6 +115,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
               {agentNames.get(node.agentId) ?? 'Agente eliminado'}
               {descendants > 0 && ` · ${descendants} subtarea${descendants === 1 ? '' : 's'}`}
             </span>
+            {depth === 0 && <TaskLabels milestone={node.milestone} tags={node.tags} />}
           </span>
         </Link>
         {!compact && (
@@ -156,13 +161,20 @@ function HeaderRow() {
 }
 
 /** Tasks with their delegated subtasks nested and collapsible; active branches start expanded. */
-export function TaskTree({ projectId, nodes, agentNames, compact = false }: TaskTreeProps) {
+export function TaskTree({
+  projectId,
+  nodes,
+  agentNames,
+  compact = false,
+  keepOrder = false,
+  hideHeader = false,
+}: TaskTreeProps) {
   if (nodes.length === 0) return <EmptyState>Todavía no hay tareas.</EmptyState>;
   return (
     <div>
-      {!compact && <HeaderRow />}
+      {!compact && !hideHeader && <HeaderRow />}
       <ul className="divide-y divide-zinc-800/60">
-        {[...nodes].reverse().map((node) => (
+        {(keepOrder ? nodes : [...nodes].reverse()).map((node) => (
           <TaskRow
             key={node.id}
             node={node}
