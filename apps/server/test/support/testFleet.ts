@@ -65,11 +65,11 @@ export async function createTeamProject(fleet: ReturnType<typeof createTestFleet
   return { cto, members, project };
 }
 
-export async function eventually(assertion: () => void, timeoutMs = 2000): Promise<void> {
+export async function eventually(assertion: () => void | Promise<void>, timeoutMs = 2000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     try {
-      assertion();
+      await assertion();
       return;
     } catch (error) {
       if (Date.now() > deadline) throw error;

@@ -148,7 +148,9 @@ describe('task planning API', () => {
 
       expect(dequeued.json()).toMatchObject({ status: 'draft', queuePosition: null });
       expect((await get(b)).queuePosition).toBe(1);
-      expect((await post(`/api/tasks/${a}/dequeue`)).statusCode).toBe(409);
+      const again = await post(`/api/tasks/${a}/dequeue`);
+      expect(again.statusCode).toBe(409);
+      expect(again.json().error).toBe(`Task "${a}" is not queued`);
       const enqueued = await post(`/api/tasks/${a}/enqueue`);
       expect(enqueued.json()).toMatchObject({ status: 'queued', queuePosition: 2 });
     });
@@ -184,8 +186,8 @@ describe('task planning API', () => {
       const second = await createId({ start: 'queue', title: 'second' });
       await eventually(async () => expect((await get(first)).status).toBe('running'));
 
-      await post(`/api/tasks/${first}/cancel`);
       release();
+      await post(`/api/tasks/${first}/cancel`);
 
       await eventually(async () => expect((await get(second)).status).toBe('completed'));
       expect((await get(first)).status).toBe('cancelled');
