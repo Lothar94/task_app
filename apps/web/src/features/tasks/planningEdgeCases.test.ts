@@ -125,27 +125,23 @@ describe('task list model (QA)', () => {
     ]);
   });
 
-  // DEFECT QA-W1: groups bucket milestones by exact text, but suggestions (existingMilestones) and
-  // the milestone sort treat "V1" and "v1" as the same value, and the server stores both spellings.
-  it.fails('groups milestones that differ only in case into one group (QA-W1)', () => {
+  // Regression QA-W1: groups, suggestions and sorting must treat "V1" and "v1" as the same milestone.
+  it('groups milestones that differ only in case into one group (QA-W1)', () => {
     const roots = [task(1, { milestone: 'v1' }), task(2, { milestone: 'V1' })];
     expect(existingMilestones(roots)).toHaveLength(1);
     expect(buildTaskList(roots, view({ groupBy: 'milestone' }))).toHaveLength(1);
   });
 
-  // DEFECT QA-W2: tag filter matches with `localeCompare(..., {sensitivity:'base'})`, i.e. ignoring
-  // accents ("café" == "cafe"), but tag groups and the server only fold case. Filtering by "cafe"
-  // shows a task whose tag is "café", yet grouping puts them in different groups.
-  it.fails('uses the same tag equivalence for filtering and grouping (QA-W2)', () => {
+  // Regression QA-W2: filtering and grouping share one tag equivalence (case-insensitive, accent-sensitive).
+  it('uses the same tag equivalence for filtering and grouping (QA-W2)', () => {
     const roots = [task(1, { tags: ['café'] }), task(2, { tags: ['cafe'] })];
     const filtered = buildTaskList(roots, view({ tag: 'cafe' }))[0]?.nodes ?? [];
     const grouped = buildTaskList(roots, view({ groupBy: 'tag' }));
     expect(grouped.length === 1).toBe(filtered.length === 2);
   });
 
-  // DEFECT QA-W3: the group label takes the spelling of the first task in the current sort order,
-  // whereas the suggestions take the spelling of the first task in the original order.
-  it.fails('uses the same tag spelling in group labels and suggestions (QA-W3)', () => {
+  // Regression QA-W3: group labels and suggestions show the same spelling of a tag.
+  it('uses the same tag spelling in group labels and suggestions (QA-W3)', () => {
     const roots = [task(1, { tags: ['Bug'] }), task(2, { tags: ['bug'] })];
     const label = buildTaskList(roots, view({ groupBy: 'tag' }))[0]?.label;
     expect(label).toBe(existingTags(roots)[0]);
