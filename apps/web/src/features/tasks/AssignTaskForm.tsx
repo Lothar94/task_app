@@ -1,8 +1,8 @@
-import type { AgentDto, TaskDto, TaskStartMode } from '@fleet/shared';
+import type { AgentDto, TaskDto } from '@fleet/shared';
 import { type FormEvent, useState } from 'react';
 import { Button, ErrorMessage, Field, Select, TextArea, TextInput } from '../../components/ui';
 import { LabelFields } from './LabelFields';
-import { milestoneOrNull, parseTags, validateLabels } from './taskFormModel';
+import { milestoneOrNull, parseTags, startModeOf, validateLabels } from './taskFormModel';
 import { useAssignTask } from './taskQueries';
 
 interface AssignTaskFormProps {
@@ -13,10 +13,6 @@ interface AssignTaskFormProps {
   tags: string[];
   onAssigned: (task: TaskDto) => void;
 }
-
-const SUBMIT_MODES: readonly TaskStartMode[] = ['now', 'queue', 'draft'];
-const isStartMode = (value: string | undefined): value is TaskStartMode =>
-  SUBMIT_MODES.some((mode) => mode === value);
 
 export function AssignTaskForm({ projectId, members, milestones, tags, onAssigned }: AssignTaskFormProps) {
   const [agentId, setAgentId] = useState('');
@@ -34,7 +30,7 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    const start = isStartMode(submitter?.value) ? submitter.value : 'now';
+    const start = startModeOf(submitter?.value);
     if (labelsError) return;
     assignTask.mutate(
       {
