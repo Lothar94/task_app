@@ -34,7 +34,7 @@ export function Dialog({ open, title, onClose, children }: DialogProps) {
               type="button"
               aria-label="Cerrar"
               onClick={onClose}
-              className="rounded-md px-2 text-xl leading-none text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              className="rounded-md px-2 text-xl leading-none text-zinc-400 hover:bg-zinc-800 hover:text-zinc-50"
             >
               ×
             </button>

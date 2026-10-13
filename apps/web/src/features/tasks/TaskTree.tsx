@@ -73,7 +73,7 @@ function ToggleButton({ isOpen, onToggle, count }: { isOpen: boolean; onToggle: 
       onClick={onToggle}
       aria-expanded={isOpen}
       aria-label={`${isOpen ? 'Ocultar' : 'Mostrar'} ${count} subtareas`}
-      className="flex h-6 w-6 items-center justify-center rounded text-zinc-400 hover:bg-zinc-700 hover:text-white"
+      className="flex h-6 w-6 items-center justify-center rounded text-zinc-400 hover:bg-zinc-700 hover:text-zinc-50"
     >
       <svg
         viewBox="0 0 16 16"

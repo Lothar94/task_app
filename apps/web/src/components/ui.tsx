@@ -149,7 +149,7 @@ export function SegmentedControl<T extends string>({
           role="radio"
           aria-checked={option.value === value}
           onClick={() => onChange(option.value)}
-          className={`rounded px-3 py-1 text-sm ${option.value === value ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
+          className={`rounded px-3 py-1 text-sm ${option.value === value ? 'bg-zinc-700 text-zinc-50' : 'text-zinc-400 hover:text-zinc-50'}`}
         >
           {option.label}
         </button>
