@@ -7,9 +7,10 @@ import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { AgentGraph } from '../agents/diagram/AgentGraph';
 import { AssignTaskForm } from '../tasks/AssignTaskForm';
-import { TaskTree } from '../tasks/TaskTree';
+import { QueueCard } from '../tasks/QueueCard';
+import { TaskList } from '../tasks/TaskList';
 import { useTaskTree } from '../tasks/taskQueries';
-import { existingMilestones, existingTags } from '../tasks/taskListModel';
+import { existingMilestones, existingTags, queuedTasks } from '../tasks/taskListModel';
 import { collectActiveAgentIds } from '../tasks/taskTreeModel';
 import { ProjectMembers } from './ProjectMembers';
 import { useProject } from './projectQueries';
@@ -20,11 +21,13 @@ function ProjectTasks({ projectId, agents }: { projectId: string; agents: AgentD
   if (tree.isPending) return <Loading />;
   if (tree.error) return <ErrorMessage error={tree.error} />;
   const agentNames = new Map(agents.map((agent) => [agent.id, agent.name]));
+  const queued = queuedTasks(tree.data);
   return (
     <div className="space-y-6">
       <ProjectStats nodes={tree.data} />
+      {queued.length > 0 && <QueueCard projectId={projectId} queued={queued} agentNames={agentNames} />}
       <Card title="Tareas">
-        <TaskTree projectId={projectId} nodes={tree.data} agentNames={agentNames} />
+        <TaskList projectId={projectId} roots={tree.data} agentNames={agentNames} />
       </Card>
     </div>
   );
