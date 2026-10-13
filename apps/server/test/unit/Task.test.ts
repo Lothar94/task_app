@@ -65,4 +65,97 @@ describe('Task', () => {
       ),
     ).toThrow(ValidationError);
   });
+
+  describe('planning', () => {
+    const draft = (extra: Partial<Parameters<typeof Task.createDraft>[1]> = {}) =>
+      Task.createDraft(
+        't1',
+        {
+          projectId: 'p1',
+          number: 1,
+          parentTaskId: null,
+          agentId: 'a1',
+          title: 'Build',
+          description: 'Do it',
+          ...extra,
+        },
+        now,
+      );
+
+    it('creates drafts that are neither active nor finished', () => {
+      const task = draft();
+      expect(task.status).toBe('draft');
+      expect([task.isPlanned, task.isActive, task.isFinished]).toEqual([true, false, false]);
+      expect(task.queuePosition).toBeNull();
+    });
+
+    it('moves between draft and queued keeping the position only while queued', () => {
+      const task = draft();
+      expect(() => task.dequeue()).toThrow(ConflictError);
+      expect(() => task.moveInQueue(1)).toThrow(ConflictError);
+      task.enqueue(2);
+      expect([task.status, task.queuePosition]).toEqual(['queued', 2]);
+      expect(() => task.enqueue(3)).toThrow(ConflictError);
+      task.moveInQueue(1);
+      expect(task.queuePosition).toBe(1);
+      task.dequeue();
+      expect([task.status, task.queuePosition]).toEqual(['draft', null]);
+    });
+
+    it.each(['draft', 'queued'] as const)('starts from %s clearing the queue position', (from) => {
+      const task = draft();
+      if (from === 'queued') task.enqueue(1);
+      task.start(now);
+      expect([task.status, task.queuePosition, task.isActive]).toEqual(['running', null, true]);
+    });
+
+    it('cancels planned tasks clearing the queue position', () => {
+      const task = draft();
+      task.enqueue(1);
+      task.cancel(now);
+      expect([task.status, task.queuePosition]).toEqual(['cancelled', null]);
+    });
+
+    it('cannot enqueue a task that is not a draft', () => {
+      const task = newTask();
+      expect(() => task.enqueue(1)).toThrow(ConflictError);
+    });
+
+    it('edits title, description and agent only while planned', () => {
+      const task = draft();
+      task.edit({ title: ' New ', agentId: 'a2' });
+      expect([task.title, task.description, task.agentId]).toEqual(['New', 'Do it', 'a2']);
+      expect(() => task.edit({ title: ' ' })).toThrow(ValidationError);
+      task.start(now);
+      expect(() => task.edit({ title: 'Late' })).toThrow(ConflictError);
+    });
+
+    it('retags at any time and leaves omitted fields untouched', () => {
+      const task = draft({ milestone: 'M1', tags: ['a'] });
+      task.start(now);
+      task.complete('ok', now);
+      task.retag(undefined, ['b']);
+      expect([task.milestone, task.tags]).toEqual(['M1', ['b']]);
+      task.retag(null, undefined);
+      expect([task.milestone, task.tags]).toEqual([null, ['b']]);
+    });
+
+    it('normalizes the milestone', () => {
+      expect(draft({ milestone: '  Beta  ' }).milestone).toBe('Beta');
+      expect(draft({ milestone: '   ' }).milestone).toBeNull();
+      expect(() => draft({ milestone: 'x'.repeat(81) })).toThrow(ValidationError);
+    });
+
+    it('normalizes tags: trims, drops empties and case-insensitive duplicates', () => {
+      expect(draft({ tags: [' API ', '', 'api', 'Db', '  '] }).tags).toEqual(['API', 'Db']);
+    });
+
+    it('enforces tag limits', () => {
+      expect(() => draft({ tags: ['x'.repeat(41)] })).toThrow(ValidationError);
+      expect(draft({ tags: ['x'.repeat(40)] }).tags).toHaveLength(1);
+      const eleven = Array.from({ length: 11 }, (_, index) => `t${index}`);
+      expect(() => draft({ tags: eleven })).toThrow(ValidationError);
+      expect(draft({ tags: eleven.slice(0, 10) }).tags).toHaveLength(10);
+    });
+  });
 });

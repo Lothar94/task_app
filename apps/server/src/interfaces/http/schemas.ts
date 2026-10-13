@@ -1,4 +1,4 @@
-import { AGENT_MODELS, EFFORT_LEVELS, PERMISSION_MODES } from '@fleet/shared';
+import { AGENT_MODELS, EFFORT_LEVELS, PERMISSION_MODES, TASK_START_MODES } from '@fleet/shared';
 import { z } from 'zod';
 
 const ids = z.array(z.string().min(1)).default([]);
@@ -46,7 +46,20 @@ export const assignTaskSchema = z.object({
   agentId: z.string().min(1),
   title: z.string(),
   description: z.string(),
+  start: z.enum(TASK_START_MODES).default('now'),
+  milestone: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
 });
+
+export const updateTaskSchema = z.object({
+  agentId: z.string().min(1).optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  milestone: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
+});
+
+export const reorderQueueSchema = z.object({ taskIds: z.array(z.string().min(1)) });
 
 export const followUpSchema = z.object({ message: z.string() });
 

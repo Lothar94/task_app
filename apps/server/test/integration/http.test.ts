@@ -27,6 +27,17 @@ describe('HTTP API', () => {
     expect(list.json()).toMatchObject([{ name: 'CTO', model: 'sonnet' }]);
   });
 
+  it('answers 400 to an empty or malformed JSON body', async () => {
+    const headers = { 'content-type': 'application/json' };
+    const empty = await app.inject({ method: 'POST', url: '/api/agents', headers, payload: '' });
+    const malformed = await app.inject({ method: 'POST', url: '/api/agents', headers, payload: '{oops' });
+
+    expect(empty.statusCode).toBe(400);
+    expect(empty.json()).toEqual({ error: 'Request body must not be empty' });
+    expect(malformed.statusCode).toBe(400);
+    expect(malformed.json()).toEqual({ error: 'Request body is not valid JSON' });
+  });
+
   it('defaults the effort to high and rejects unknown levels', async () => {
     const { effort: _effort, ...withoutEffort } = profile('CTO');
     const created = await app.inject({ method: 'POST', url: '/api/agents', payload: withoutEffort });

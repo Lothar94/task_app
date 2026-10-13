@@ -17,6 +17,9 @@ interface TaskRow {
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
+  milestone: string | null;
+  tags: string;
+  queue_position: number | null;
 }
 
 const ACTIVE_STATUSES = "('pending', 'running', 'waiting_subtasks')";
@@ -30,14 +33,17 @@ export class SqliteTaskRepository implements TaskRepository {
     this.db
       .prepare(
         `INSERT INTO tasks (id, number, project_id, parent_task_id, agent_id, title, description, status,
-           result_summary, session_id, created_at, started_at, finished_at)
+           result_summary, session_id, created_at, started_at, finished_at, milestone, tags, queue_position)
          VALUES (@id, @number, @projectId, @parentTaskId, @agentId, @title, @description, @status,
-           @resultSummary, @sessionId, @createdAt, @startedAt, @finishedAt)
-         ON CONFLICT(id) DO UPDATE SET status = @status, result_summary = @resultSummary,
+           @resultSummary, @sessionId, @createdAt, @startedAt, @finishedAt, @milestone, @tags, @queuePosition)
+         ON CONFLICT(id) DO UPDATE SET title = @title, description = @description, agent_id = @agentId,
+           milestone = @milestone, tags = @tags, queue_position = @queuePosition,
+           status = @status, result_summary = @resultSummary,
            session_id = @sessionId, started_at = @startedAt, finished_at = @finishedAt`,
       )
       .run({
         ...snapshot,
+        tags: JSON.stringify(snapshot.tags),
         createdAt: snapshot.createdAt.toISOString(),
         startedAt: snapshot.startedAt?.toISOString() ?? null,
         finishedAt: snapshot.finishedAt?.toISOString() ?? null,
@@ -72,6 +78,28 @@ export class SqliteTaskRepository implements TaskRepository {
     return this.query(`SELECT * FROM tasks WHERE status IN ${ACTIVE_STATUSES}`);
   }
 
+  findQueued(projectId: string): Task[] {
+    return this.query(
+      "SELECT * FROM tasks WHERE project_id = ? AND status = 'queued' ORDER BY queue_position",
+      projectId,
+    );
+  }
+
+  findProjectIdsWithQueue(): string[] {
+    const rows = this.db.prepare("SELECT DISTINCT project_id FROM tasks WHERE status = 'queued'").all();
+    return (rows as { project_id: string }[]).map((row) => row.project_id);
+  }
+
+  hasActiveRootTask(projectId: string): boolean {
+    return (
+      this.db
+        .prepare(
+          `SELECT 1 FROM tasks WHERE project_id = ? AND parent_task_id IS NULL AND status IN ${ACTIVE_STATUSES} LIMIT 1`,
+        )
+        .get(projectId) !== undefined
+    );
+  }
+
   existsForAgent(agentId: string): boolean {
     return this.db.prepare('SELECT 1 FROM tasks WHERE agent_id = ? LIMIT 1').get(agentId) !== undefined;
   }
@@ -96,5 +124,8 @@ function toTask(row: TaskRow): Task {
     createdAt: new Date(row.created_at),
     startedAt: toDate(row.started_at),
     finishedAt: toDate(row.finished_at),
+    milestone: row.milestone,
+    tags: JSON.parse(row.tags) as string[],
+    queuePosition: row.queue_position,
   });
 }

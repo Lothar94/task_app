@@ -16,6 +16,12 @@ import { AssignTask } from '../application/tasks/AssignTask.js';
 import { CancelTask } from '../application/tasks/CancelTask.js';
 import { DelegateSubtask } from '../application/tasks/DelegateSubtask.js';
 import { GetTask, GetTaskConversation, GetTaskTree } from '../application/tasks/QueryTasks.js';
+import { DequeueTask } from '../application/tasks/DequeueTask.js';
+import { EnqueueTask } from '../application/tasks/EnqueueTask.js';
+import { ReorderQueue } from '../application/tasks/ReorderQueue.js';
+import { StartTask } from '../application/tasks/StartTask.js';
+import { TaskQueue } from '../application/tasks/TaskQueue.js';
+import { UpdateTask } from '../application/tasks/UpdateTask.js';
 import { RecoverInterruptedTasks } from '../application/tasks/RecoverInterruptedTasks.js';
 import { RunningTasks } from '../application/tasks/RunningTasks.js';
 import { RunTask } from '../application/tasks/RunTask.js';
@@ -98,10 +104,13 @@ export function createContainer(options: ContainerOptions) {
     { ids, clock, agents, projects, tasks, recorder },
     options,
   );
+  const queue = new TaskQueue(tasks, recorder, launcher);
+  queue.watch(events);
   const draftAgentInstructions = new DraftAgentInstructions(agents, instructionWriter);
 
   return {
     events,
+    processTaskQueues: () => queue.processAll(),
     recoverInterruptedTasks: new RecoverInterruptedTasks(tasks, recorder, ids, clock),
     useCases: {
       createAgent: new CreateAgent(agents, draftAgentInstructions, ids, clock),
@@ -115,9 +124,14 @@ export function createContainer(options: ContainerOptions) {
       listProjects: new ListProjects(projects),
       getProject: new GetProject(projects),
       setProjectMembers: new SetProjectMembers(projects, agents),
-      assignTask: new AssignTask(projects, agents, tasks, recorder, launcher, ids, clock),
+      assignTask: new AssignTask({ projects, agents, tasks, recorder, launcher, queue, ids, clock }),
       sendFollowUp: new SendFollowUp(tasks, recorder, launcher),
-      cancelTask: new CancelTask(tasks, running, recorder, clock),
+      cancelTask: new CancelTask(tasks, running, recorder, clock, queue),
+      updateTask: new UpdateTask(tasks, agents, projects, recorder),
+      startTask: new StartTask(tasks, launcher, queue),
+      enqueueTask: new EnqueueTask(tasks, recorder, queue),
+      dequeueTask: new DequeueTask(tasks, recorder, queue),
+      reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
       getUsageDashboard: new GetUsageDashboard(tasks, runs, agents, projects, clock),
