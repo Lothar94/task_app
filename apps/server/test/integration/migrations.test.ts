@@ -74,3 +74,19 @@ describe('task runs migration', () => {
     ]);
   });
 });
+
+describe('task planning migration', () => {
+  it('gives existing tasks no milestone, no tags and no queue position', () => {
+    const file = legacyDatabase(
+      4,
+      `${AGENT_V1}
+      INSERT INTO projects VALUES ('p1', 'P1', '', '/tmp/p1', 'x');
+      INSERT INTO tasks (id, number, project_id, agent_id, title, description, status, created_at)
+        VALUES ('t1', 1, 'p1', 'a1', 'Old', 'd', 'completed', '2026-01-01');`,
+    );
+
+    const row = openDatabase(file).prepare('SELECT milestone, tags, queue_position FROM tasks').get();
+
+    expect(row).toEqual({ milestone: null, tags: '[]', queue_position: null });
+  });
+});

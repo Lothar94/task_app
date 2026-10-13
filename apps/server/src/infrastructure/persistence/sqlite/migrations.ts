@@ -85,6 +85,12 @@ const MIGRATIONS: readonly string[] = [
       CASE WHEN status = 'failed' THEN result_summary END, NULL, '[]'
     FROM tasks WHERE status IN ('completed', 'failed', 'cancelled') AND finished_at IS NOT NULL;
   `,
+  `
+  ALTER TABLE tasks ADD COLUMN milestone TEXT;
+  ALTER TABLE tasks ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';
+  ALTER TABLE tasks ADD COLUMN queue_position INTEGER;
+  CREATE INDEX tasks_queue_idx ON tasks(project_id, queue_position) WHERE status = 'queued';
+  `,
 ];
 
 /** Applies pending migrations, optionally stopping at `targetVersion` (useful to build old schemas in tests). */
