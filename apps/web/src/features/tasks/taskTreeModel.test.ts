@@ -34,6 +34,9 @@ const node = (
   description: 'd',
   status,
   resultSummary: null,
+  milestone: null,
+  tags: [],
+  queuePosition: null,
   createdAt: '',
   startedAt: null,
   finishedAt: null,
@@ -65,7 +68,13 @@ describe('task tree model', () => {
     expect(findNode(tree, 'qa-failed')?.agentId).toBe('qa');
   });
 
+  it('does not treat drafts or queued tasks as active work', () => {
+    const planned = [node('a', 'draft'), node('b', 'queued')];
+    expect(collectActiveAgentIds(planned)).toEqual(new Set());
+    expect(countTasks(planned)).toMatchObject({ total: 2, active: 0, planned: 2, queued: 1 });
+  });
+
   it('counts tasks by status, subtasks included', () => {
-    expect(countTasks(tree)).toEqual({ total: 5, active: 2, completed: 2, failed: 1 });
+    expect(countTasks(tree)).toEqual({ total: 5, active: 2, planned: 0, queued: 0, completed: 2, failed: 1 });
   });
 });

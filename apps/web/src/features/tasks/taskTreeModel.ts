@@ -46,16 +46,21 @@ export function findNode(nodes: TaskNodeDto[], id: string): TaskNodeDto | undefi
 export interface TaskCounts {
   total: number;
   active: number;
+  /** Root tasks waiting to be started: drafts and queued. */
+  planned: number;
+  queued: number;
   completed: number;
   failed: number;
 }
 
 /** Status counts of every task in the tree, subtasks included. */
 export function countTasks(nodes: TaskNodeDto[]): TaskCounts {
-  const counts: TaskCounts = { total: 0, active: 0, completed: 0, failed: 0 };
+  const counts: TaskCounts = { total: 0, active: 0, planned: 0, queued: 0, completed: 0, failed: 0 };
   const visit = (node: TaskNodeDto) => {
     counts.total += 1;
     if (isTaskActive(node.status)) counts.active += 1;
+    if (node.status === 'draft' || node.status === 'queued') counts.planned += 1;
+    if (node.status === 'queued') counts.queued += 1;
     if (node.status === 'completed') counts.completed += 1;
     if (node.status === 'failed') counts.failed += 1;
     node.children.forEach(visit);
