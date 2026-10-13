@@ -82,7 +82,7 @@ describe('task list model', () => {
     it('lists a task with several tags in each tag group, case-insensitively, "Sin tag" last', () => {
       const groups = buildTaskList(roots, view({ groupBy: 'tag' }));
       expect(groups.map((g) => [g.label, numbers(g.nodes)])).toEqual([
-        ['bug', [2, 1]],
+        ['Bug', [2, 1]],
         ['ui', [5, 1]],
         ['Sin tag', [4, 3]],
       ]);
@@ -118,5 +118,30 @@ describe('task list model', () => {
     });
 
     it('orders queued tasks by queue position', () => expect(numbers(queuedTasks(roots))).toEqual([5, 4]));
+  });
+
+  describe('single equality and spelling rule', () => {
+    it('groups and suggests milestones that differ only in case as one (QA-W1)', () => {
+      const same = [task(1, { milestone: 'Sprint 1' }), task(2, { milestone: 'sprint 1' })];
+      const groups = buildTaskList(same, view({ groupBy: 'milestone' }));
+      expect(existingMilestones(same)).toEqual(['Sprint 1']);
+      expect(groups).toHaveLength(1);
+      expect(groups[0]?.label).toBe('Sprint 1');
+      expect(numbers(groups[0]?.nodes ?? [])).toEqual([2, 1]);
+    });
+
+    it('treats accents as different in filtering, grouping and suggestions (QA-W2)', () => {
+      const accented = [task(1, { tags: ['café'] }), task(2, { tags: ['cafe'] })];
+      expect(numbers(buildTaskList(accented, view({ tag: 'cafe' }))[0]?.nodes ?? [])).toEqual([2]);
+      expect(buildTaskList(accented, view({ groupBy: 'tag' }))).toHaveLength(2);
+      expect(existingTags(accented)).toHaveLength(2);
+    });
+
+    it('shows the same spelling in group labels and suggestions (QA-W3)', () => {
+      const spelled = [task(1, { tags: ['Bug'] }), task(2, { tags: ['bug'] })];
+      const [group] = buildTaskList(spelled, view({ groupBy: 'tag' }));
+      expect(group?.label).toBe('Bug');
+      expect(existingTags(spelled)).toEqual(['Bug']);
+    });
   });
 });
