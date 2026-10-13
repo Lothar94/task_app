@@ -28,6 +28,7 @@ async function main(): Promise<void> {
 
   const recovered = container.recoverInterruptedTasks.execute();
   if (recovered > 0) logger.info(`Marked ${recovered} interrupted task(s) as failed`);
+  container.processTaskQueues();
 
   const app = await createHttpServer({
     useCases: container.useCases,

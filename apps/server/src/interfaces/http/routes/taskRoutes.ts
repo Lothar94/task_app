@@ -4,12 +4,28 @@ import type { AssignTask } from '../../../application/tasks/AssignTask.js';
 import type { CancelTask } from '../../../application/tasks/CancelTask.js';
 import type { GetTask, GetTaskConversation, GetTaskTree } from '../../../application/tasks/QueryTasks.js';
 import type { SendFollowUp } from '../../../application/tasks/SendFollowUp.js';
-import { assignTaskSchema, followUpSchema, idParams } from '../schemas.js';
+import type { DequeueTask } from '../../../application/tasks/DequeueTask.js';
+import type { EnqueueTask } from '../../../application/tasks/EnqueueTask.js';
+import type { ReorderQueue } from '../../../application/tasks/ReorderQueue.js';
+import type { StartTask } from '../../../application/tasks/StartTask.js';
+import type { UpdateTask } from '../../../application/tasks/UpdateTask.js';
+import {
+  assignTaskSchema,
+  followUpSchema,
+  idParams,
+  reorderQueueSchema,
+  updateTaskSchema,
+} from '../schemas.js';
 
 export interface TaskUseCases {
   assignTask: AssignTask;
   sendFollowUp: SendFollowUp;
   cancelTask: CancelTask;
+  updateTask: UpdateTask;
+  startTask: StartTask;
+  enqueueTask: EnqueueTask;
+  dequeueTask: DequeueTask;
+  reorderQueue: ReorderQueue;
   getTask: GetTask;
   getTaskTree: GetTaskTree;
   getTaskConversation: GetTaskConversation;
@@ -47,5 +63,31 @@ export function registerTaskRoutes(app: FastifyInstance, useCases: TaskUseCases)
     const { id } = idParams.parse(request.params);
     useCases.cancelTask.execute(id);
     return reply.status(202).send();
+  });
+
+  app.patch('/api/tasks/:id', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toTaskDto(useCases.updateTask.execute(id, updateTaskSchema.parse(request.body)));
+  });
+
+  app.post('/api/tasks/:id/start', (request, reply) => {
+    const { id } = idParams.parse(request.params);
+    return reply.status(202).send(toTaskDto(useCases.startTask.execute(id)));
+  });
+
+  app.post('/api/tasks/:id/enqueue', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toTaskDto(useCases.enqueueTask.execute(id));
+  });
+
+  app.post('/api/tasks/:id/dequeue', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toTaskDto(useCases.dequeueTask.execute(id));
+  });
+
+  app.put('/api/projects/:id/queue', (request) => {
+    const { id } = idParams.parse(request.params);
+    const { taskIds } = reorderQueueSchema.parse(request.body);
+    return useCases.reorderQueue.execute(id, taskIds).map(toTaskDto);
   });
 }
