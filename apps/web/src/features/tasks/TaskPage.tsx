@@ -1,5 +1,7 @@
 import type { TaskDto } from '@fleet/shared';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { Dialog } from '../../components/Dialog';
 import { Button, Card, ErrorMessage, Loading, PageHeader } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
@@ -10,8 +12,20 @@ import { FollowUpForm } from './FollowUpForm';
 import { TaskTree } from './TaskTree';
 import { findNode, subtreeMetrics } from './taskTreeModel';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
-import { useCancelTask, useConversation, useTask, useTaskTree } from './taskQueries';
-import { isTaskActive, TaskStatusBadge } from './TaskStatusBadge';
+import { TaskEditForm } from './TaskEditForm';
+import { TaskLabels } from './TaskLabels';
+import { existingMilestones, existingTags } from './taskListModel';
+import {
+  useCancelTask,
+  useConversation,
+  useDequeueTask,
+  useEnqueueTask,
+  useStartTask,
+  useTask,
+  useTaskTree,
+} from './taskQueries';
+import { isTaskActive, isTaskPlanned, TaskStatusBadge } from './TaskStatusBadge';
+import { useProject } from '../projects/projectQueries';
 
 function TaskMetricsSummary({ task }: { task: TaskDto }) {
   const tree = useTaskTree(task.projectId);
@@ -42,6 +56,7 @@ function TaskMeta({ task, agentName }: { task: TaskDto; agentName: string }) {
         <span className="text-zinc-500">· inicio {new Date(task.startedAt).toLocaleString()}</span>
       )}
       <TaskMetricsSummary task={task} />
+      <TaskLabels milestone={task.milestone} tags={task.tags} />
     </span>
   );
 }
@@ -67,17 +82,76 @@ function SubtasksPanel({ task, agentNames }: { task: TaskDto; agentNames: Map<st
   );
 }
 
-function CancelTaskButton({ taskId }: { taskId: string }) {
-  const cancelTask = useCancelTask();
+function PlannedActions({ task }: { task: TaskDto }) {
+  const start = useStartTask();
+  const enqueue = useEnqueueTask();
+  const dequeue = useDequeueTask();
+  const queueAction = task.status === 'queued' ? dequeue : enqueue;
+  const busy = start.isPending || queueAction.isPending;
+  const error = start.error ?? enqueue.error ?? dequeue.error;
   return (
-    <Button
-      variant="danger"
-      title={cancelTask.error instanceof Error ? cancelTask.error.message : undefined}
-      onClick={() => cancelTask.mutate(taskId)}
-      disabled={cancelTask.isPending}
-    >
-      Cancelar tarea
-    </Button>
+    <>
+      <Button disabled={busy} onClick={() => start.mutate(task.id)}>
+        Iniciar
+      </Button>
+      <Button variant="secondary" disabled={busy} onClick={() => queueAction.mutate(task.id)}>
+        {task.status === 'queued' ? 'Quitar de la cola' : 'Encolar'}
+      </Button>
+      <ActionError error={error} />
+    </>
+  );
+}
+
+function CancelTaskButton({ taskId }: { taskId: string }) {
+  const cancel = useCancelTask();
+  return (
+    <>
+      <Button variant="danger" disabled={cancel.isPending} onClick={() => cancel.mutate(taskId)}>
+        Cancelar tarea
+      </Button>
+      <ActionError error={cancel.error} />
+    </>
+  );
+}
+
+function ActionError({ error }: { error: unknown }) {
+  if (!error) return null;
+  return (
+    <span role="alert" className="self-center text-sm text-red-300">
+      {error instanceof Error ? error.message : String(error)}
+    </span>
+  );
+}
+
+function TaskActions({ task, onEdit }: { task: TaskDto; onEdit?: () => void }) {
+  const isPlanned = isTaskPlanned(task.status);
+  return (
+    <>
+      {onEdit && (
+        <Button variant="secondary" onClick={onEdit}>
+          Editar
+        </Button>
+      )}
+      {isPlanned && task.parentTaskId === null && <PlannedActions task={task} />}
+      {(isPlanned || isTaskActive(task.status)) && <CancelTaskButton taskId={task.id} />}
+    </>
+  );
+}
+
+function EditTaskDialog({ task, onClose }: { task: TaskDto; onClose: () => void }) {
+  const project = useProject(task.projectId);
+  const agents = useAgents();
+  const tree = useTaskTree(task.projectId);
+  const members = (agents.data ?? []).filter((agent) => project.data?.memberIds.includes(agent.id));
+  return (
+    <TaskEditForm
+      task={task}
+      members={members}
+      milestones={existingMilestones(tree.data ?? [])}
+      tags={existingTags(tree.data ?? [])}
+      canEditContent={isTaskPlanned(task.status)}
+      onSaved={onClose}
+    />
   );
 }
 
@@ -104,13 +178,15 @@ function Breadcrumbs({ task }: { task: TaskDto }) {
 
 function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
   const isActive = isTaskActive(task.status);
+  const isRoot = task.parentTaskId === null;
+  const [isEditing, setIsEditing] = useState(false);
   return (
     <>
       <Breadcrumbs task={task} />
       <PageHeader
         title={task.title}
         subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} />}
-        actions={isActive && <CancelTaskButton taskId={task.id} />}
+        actions={<TaskActions task={task} onEdit={isRoot ? () => setIsEditing(true) : undefined} />}
       />
       <div className="space-y-6">
         {task.resultSummary && <ResultPanel key={task.resultSummary} task={task} />}
@@ -119,7 +195,7 @@ function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string,
             <Card title="Conversación">
               <ConversationPanel taskId={task.id} projectId={task.projectId} />
             </Card>
-            {!isActive && (
+            {!isActive && !isTaskPlanned(task.status) && (
               <Card title="Continuar la conversación">
                 <FollowUpForm taskId={task.id} />
               </Card>
@@ -130,6 +206,11 @@ function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string,
           </aside>
         </div>
       </div>
+      {isRoot && (
+        <Dialog open={isEditing} title="Editar tarea" onClose={() => setIsEditing(false)}>
+          <EditTaskDialog task={task} onClose={() => setIsEditing(false)} />
+        </Dialog>
+      )}
     </>
   );
 }

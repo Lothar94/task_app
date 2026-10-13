@@ -14,6 +14,9 @@ const STATUS_STYLES: Record<TaskStatus, { label: string; className: string }> = 
 export const isTaskActive = (status: TaskStatus) =>
   status === 'pending' || status === 'running' || status === 'waiting_subtasks';
 
+/** Defined but not started yet: still editable and cancellable. */
+export const isTaskPlanned = (status: TaskStatus) => status === 'draft' || status === 'queued';
+
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
   const { label, className } = STATUS_STYLES[status];
   return (
