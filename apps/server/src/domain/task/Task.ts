@@ -201,14 +201,12 @@ export class Task {
   }
 
   dequeue(): void {
-    this.requireStatus('queued', 'draft');
+    this.requireQueued();
     this.state = { ...this.state, status: 'draft', queuePosition: null };
   }
 
   moveInQueue(position: number): void {
-    if (this.state.status !== 'queued') {
-      throw new ConflictError(`Task "${this.state.id}" is not queued`);
-    }
+    this.requireQueued();
     this.state = { ...this.state, queuePosition: requirePositiveInteger(position) };
   }
 
@@ -263,6 +261,12 @@ export class Task {
 
   private finish(status: TaskStatus, now: Date, summary: string): void {
     this.state = { ...this.state, status, resultSummary: summary, finishedAt: now };
+  }
+
+  private requireQueued(): void {
+    if (this.state.status !== 'queued') {
+      throw new ConflictError(`Task "${this.state.id}" is not queued`);
+    }
   }
 
   private requireStatus(expected: TaskStatus, transition: string): void {
