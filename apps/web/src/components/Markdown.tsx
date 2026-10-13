@@ -15,7 +15,7 @@ const COMPONENTS: Components = {
 export function Markdown({ children, className = '' }: { children: string; className?: string }) {
   return (
     <div
-      className={`prose prose-sm dark:prose-invert max-w-none min-w-0 [overflow-wrap:anywhere] prose-headings:font-semibold prose-a:text-indigo-300 prose-code:before:content-none prose-code:after:content-none prose-code:rounded prose-code:bg-zinc-800 prose-code:px-1 prose-code:py-0.5 prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-zinc-800 ${className}`}
+      className={`prose prose-sm dark:prose-invert max-w-none min-w-0 [overflow-wrap:anywhere] prose-headings:font-semibold prose-a:text-indigo-300 prose-code:before:content-none prose-code:after:content-none prose-code:rounded prose-code:bg-zinc-800 prose-code:px-1 prose-code:py-0.5 prose-pre:bg-zinc-950 prose-pre:text-zinc-200 prose-pre:border prose-pre:border-zinc-800 ${className}`}
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={COMPONENTS}>
         {children}
