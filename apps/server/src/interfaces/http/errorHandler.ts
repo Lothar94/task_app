@@ -18,7 +18,23 @@ export function createErrorHandler(logger: Logger) {
       const details = error.issues.map((issue) => `${issue.path.join('.') || 'body'}: ${issue.message}`);
       return reply.status(400).send({ error: 'Invalid request', details });
     }
+    if (isClientError(error)) {
+      return reply.status(error.statusCode).send({ error: clientMessage(error) });
+    }
     logger.error('Unexpected error handling request', error);
     return reply.status(500).send({ error: 'Internal server error' });
   };
+}
+
+function isClientError(error: FastifyError | Error): error is FastifyError & { statusCode: number } {
+  const { statusCode } = error as FastifyError;
+  return typeof statusCode === 'number' && statusCode >= 400 && statusCode < 500;
+}
+
+function clientMessage(error: FastifyError): string {
+  if (error.code === 'FST_ERR_CTP_EMPTY_JSON_BODY') return 'Request body must not be empty';
+  if (error.code === 'FST_ERR_CTP_INVALID_JSON_BODY' || error instanceof SyntaxError) {
+    return 'Request body is not valid JSON';
+  }
+  return error.message;
 }
