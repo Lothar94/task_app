@@ -1,6 +1,6 @@
 import { TASK_LIMITS } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { addTag, milestoneOrNull, parseTags, validateLabels } from './taskFormModel';
+import { addTag, milestoneOrNull, parseTags, startModeOf, validateLabels } from './taskFormModel';
 
 describe('task form model', () => {
   it('parses comma-separated tags, trimmed and unique ignoring case', () => {
@@ -24,5 +24,13 @@ describe('task form model', () => {
   it('turns an empty milestone into null', () => {
     expect(milestoneOrNull('  ')).toBeNull();
     expect(milestoneOrNull(' v1 ')).toBe('v1');
+  });
+
+  it('uses the submitter start mode and falls back to draft without one', () => {
+    expect(startModeOf('now')).toBe('now');
+    expect(startModeOf('queue')).toBe('queue');
+    expect(startModeOf('draft')).toBe('draft');
+    expect(startModeOf(undefined)).toBe('draft');
+    expect(startModeOf('bogus')).toBe('draft');
   });
 });

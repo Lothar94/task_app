@@ -1,4 +1,4 @@
-import { TASK_LIMITS } from '@fleet/shared';
+import { TASK_LIMITS, type TaskStartMode } from '@fleet/shared';
 
 /** Splits a comma-separated text into trimmed, case-insensitively unique tags. */
 export function parseTags(text: string): string[] {
@@ -35,3 +35,12 @@ export function validateLabels(milestone: string, tagsText: string): string | nu
 
 /** Empty milestone text means "no milestone". */
 export const milestoneOrNull = (text: string) => text.trim() || null;
+
+const START_MODES: readonly TaskStartMode[] = ['now', 'queue', 'draft'];
+
+/**
+ * Start mode of the button that submitted the form. Without a known submitter (e.g. Enter in the
+ * title field) it falls back to the safe `draft`, never to launching an agent.
+ */
+export const startModeOf = (submitterValue: string | undefined): TaskStartMode =>
+  START_MODES.find((mode) => mode === submitterValue) ?? 'draft';
