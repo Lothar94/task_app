@@ -12,7 +12,13 @@ export interface AppConfig {
   reservedPorts: number[];
   allowedOrigin: string;
   claudeExecutablePath?: string;
+  /** Cap on the characters of a Bash output that stay in an agent's context. */
+  bashMaxOutputChars: number;
+  /** Command of a PreToolUse hook for Bash that rewrites commands to save tokens. */
+  bashRewriteHook?: string;
 }
+
+const DEFAULT_BASH_MAX_OUTPUT_CHARS = 15000;
 
 function portOf(origin: string): number {
   const { port, protocol } = new URL(origin);
@@ -30,6 +36,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     maxDelegationDepth: Number(env.MAX_DELEGATION_DEPTH ?? 4),
     allowedOrigin,
     reservedPorts: [port, portOf(allowedOrigin)],
+    bashMaxOutputChars: Number(env.AGENT_BASH_MAX_OUTPUT ?? DEFAULT_BASH_MAX_OUTPUT_CHARS),
+    ...(env.AGENT_BASH_REWRITE_HOOK ? { bashRewriteHook: env.AGENT_BASH_REWRITE_HOOK } : {}),
     ...(env.CLAUDE_EXECUTABLE ? { claudeExecutablePath: env.CLAUDE_EXECUTABLE } : {}),
   };
 }

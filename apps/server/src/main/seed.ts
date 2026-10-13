@@ -5,6 +5,7 @@ import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/Claude
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
 import { ConsoleLogger } from '../infrastructure/system/ConsoleLogger.js';
+import { claudeRuntimeConfig } from './claudeRuntimeConfig.js';
 import { loadConfig } from './config.js';
 import { createContainer } from './container.js';
 
@@ -67,7 +68,7 @@ const config = loadConfig();
 const logger = new ConsoleLogger();
 const { useCases } = createContainer({
   db: openDatabase(config.databasePath),
-  runtime: new ClaudeAgentRuntime(new SdkMessageMapper()),
+  runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), claudeRuntimeConfig(config)),
   instructionWriter: new ClaudeInstructionWriter(config.claudeExecutablePath),
   logger,
   maxDelegationDepth: config.maxDelegationDepth,
