@@ -26,12 +26,26 @@ const task = (number: number, extra: Partial<TaskNodeDto> = {}): TaskNodeDto =>
     ...extra,
   }) as TaskNodeDto;
 
-const view = (overrides = {}) => ({ groupBy: 'none' as const, sortBy: 'number' as const, tag: '', ...overrides });
+const view = (overrides = {}) => ({
+  groupBy: 'none' as const,
+  sortBy: 'number' as const,
+  tag: '',
+  ...overrides,
+});
 const labelled = (groups: ReturnType<typeof buildTaskList>) =>
   groups.map((g) => [g.label, g.nodes.map((n) => n.number)]);
 
 describe('status helpers', () => {
-  const all: TaskStatus[] = ['draft', 'queued', 'pending', 'running', 'waiting_subtasks', 'completed', 'failed', 'cancelled'];
+  const all: TaskStatus[] = [
+    'draft',
+    'queued',
+    'pending',
+    'running',
+    'waiting_subtasks',
+    'completed',
+    'failed',
+    'cancelled',
+  ];
 
   it('treats only pending/running/waiting_subtasks as active', () => {
     expect(all.filter(isTaskActive)).toEqual(['pending', 'running', 'waiting_subtasks']);
