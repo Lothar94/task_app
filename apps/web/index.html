@@ -3,6 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Applies the saved theme before first paint. Keep the key and rule in sync with
+      // src/features/theme/theme.ts (THEME_STORAGE_KEY, resolveInitialTheme).
+      (function () {
+        var theme = 'dark';
+        try {
+          var stored = localStorage.getItem('fleet.theme');
+          if (stored === 'light' || stored === 'dark') theme = stored;
+          else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
+        } catch (e) {}
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <title>Agent Fleet</title>
   </head>
   <body>

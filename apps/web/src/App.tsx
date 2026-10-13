@@ -6,10 +6,11 @@ import { AgentsPage } from './features/agents/AgentsPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
+import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-md px-3 py-1.5 text-sm ${isActive ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`;
+  `rounded-md px-3 py-1.5 text-sm ${isActive ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400 hover:text-zinc-50'}`;
 
 function Layout() {
   const { pathname } = useLocation();
@@ -31,6 +32,7 @@ function Layout() {
               Agentes
             </NavLink>
           </nav>
+          <ThemeToggle />
         </div>
       </header>
       <main className="mx-auto max-w-[1800px] px-4 py-8 lg:px-8">
