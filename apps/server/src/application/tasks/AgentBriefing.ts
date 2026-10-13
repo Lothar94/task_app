@@ -19,6 +19,7 @@ export class AgentBriefing {
       `# Your instructions\n${instructions}`,
       this.teamSection(collaborators),
       this.sharedMachineSection(),
+      this.efficiencySection(),
       this.reportingSection(),
     ].join('\n\n');
   }
@@ -73,11 +74,22 @@ export class AgentBriefing {
     ].join('\n');
   }
 
+  private efficiencySection(): string {
+    return [
+      '# Working efficiently',
+      '- Every turn re-reads the whole conversation: fewer turns and smaller tool outputs save the most.',
+      '- Batch independent tool calls (reads, searches, commands) in a single response instead of one per turn.',
+      '- Search first (Grep/Glob) and read only the relevant line ranges of large files; do not re-read files you already have.',
+      '- Keep command output short: `| tail -n 40`, quiet/summary reporters, `git diff --stat` before targeted diffs.',
+      '- Only view images when essential; crop or downscale screenshots first.',
+    ].join('\n');
+  }
+
   private reportingSection(): string {
     return [
       '# Finishing',
-      'When you are done, call the `report_result` tool with a concise summary of what was done,',
-      'which files changed and any open issues. That summary is what your requester will read.',
+      'When you are done, call the `report_result` tool with a concise summary (max ~200 words: result, files changed, open issues).',
+      'That summary enters the context of whoever assigned you the task, so keep it short.',
     ].join('\n');
   }
 }
