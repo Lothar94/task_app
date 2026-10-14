@@ -7,8 +7,9 @@ const useSkills = vi.fn();
 vi.mock('./agentQueries', () => ({ useSkills: () => useSkills() }));
 
 const CATALOG = [
-  { name: 'pdf', description: 'Work with PDFs' },
-  { name: 'graphify', description: 'Build a graph' },
+  { name: 'pdf', description: 'Work with PDFs', plugin: null },
+  { name: 'graphify', description: 'Build a graph', plugin: null },
+  { name: 'caveman:caveman', description: 'Talk short', plugin: 'caveman' },
 ];
 const render = (skills: string[]) =>
   renderToStaticMarkup(<SkillsField skills={skills} onChange={() => undefined} />);
@@ -25,6 +26,30 @@ describe('SkillsField (static render)', () => {
 
   it('renders no chips list when nothing is selected', () => {
     expect(render([])).not.toContain('Skills seleccionadas');
+  });
+
+  it('groups the catalog under labelled fieldsets: own skills, then each plugin', () => {
+    const html = render([]);
+    expect(html).toMatch(/<legend[^>]*>Tus skills<\/legend>/);
+    expect(html).toMatch(/<legend[^>]*>Plugin caveman<\/legend>/);
+    expect(html.indexOf('Tus skills')).toBeLessThan(html.indexOf('Plugin caveman'));
+    expect(html.indexOf('Plugin caveman')).toBeLessThan(html.indexOf('caveman:caveman'));
+  });
+
+  it('selects plugin skills and shows them as chips', () => {
+    const html = render(['caveman:caveman']);
+    expect(html).toContain('aria-label="Quitar skill caveman:caveman"');
+    expect(html).not.toContain('plugin no instalado');
+  });
+
+  it('mentions plugin skills in the custom input', () => {
+    expect(render([])).toContain('placeholder="code-review o plugin:skill"');
+  });
+
+  it('flags plugin skills missing from the catalog as not installed or disabled', () => {
+    const html = render(['gone:skill']);
+    expect(html).toContain('plugin no instalado o desactivado');
+    expect(html).not.toContain('debe existir en el proyecto');
   });
 
   it('flags skills that are not in the catalog', () => {
