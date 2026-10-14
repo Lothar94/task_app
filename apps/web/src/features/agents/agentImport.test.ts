@@ -1,6 +1,6 @@
 import { AGENT_EXPORT_FORMAT, AGENT_EXPORT_VERSION, MAX_IMPORTED_AGENTS } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { findNameConflicts, parseImportFile, readFileText } from './agentImport';
+import { findNameConflicts, parseImportFile, readImportFile } from './agentImport';
 
 const bundle = (overrides: Record<string, unknown> = {}) => ({
   format: AGENT_EXPORT_FORMAT,
@@ -68,8 +68,18 @@ describe('findNameConflicts', () => {
   });
 });
 
-describe('readFileText', () => {
-  it('reads the file contents', async () => {
-    expect(await readFileText(new File(['hola'], 'a.json'))).toBe('hola');
+describe('readImportFile', () => {
+  it('parses the file contents', async () => {
+    const file = new File([JSON.stringify(bundle())], 'a.json');
+    expect(await readImportFile(file)).toMatchObject({ ok: true });
+  });
+
+  it('returns a readable error when the file cannot be read', async () => {
+    const file = new File(['x'], 'a.json');
+    file.text = () => Promise.reject(new Error('boom'));
+    expect(await readImportFile(file)).toEqual({
+      ok: false,
+      error: 'No se pudo leer el fichero. Inténtalo de nuevo.',
+    });
   });
 });

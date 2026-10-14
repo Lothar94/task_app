@@ -1,4 +1,5 @@
 import type { AgentImportConflictStrategy, AgentImportResultDto } from '@fleet/shared';
+import { useEffect, useRef } from 'react';
 import { Button, ErrorMessage, Field, Select } from '../../components/ui';
 import type { ParsedImport } from './agentImport';
 
@@ -74,8 +75,10 @@ function ParseError({ parsed }: { parsed: ParsedImport | null }) {
 }
 
 function ImportDone({ result, onClose }: { result: AgentImportResultDto; onClose: () => void }) {
+  const summaryRef = useRef<HTMLDivElement>(null);
+  useEffect(() => summaryRef.current?.focus(), []);
   return (
-    <div className="space-y-4">
+    <div ref={summaryRef} tabIndex={-1} className="space-y-4 outline-none">
       <ImportResult result={result} />
       <div className="flex justify-end">
         <Button onClick={onClose}>Cerrar</Button>

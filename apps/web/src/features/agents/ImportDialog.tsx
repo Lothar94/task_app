@@ -1,7 +1,7 @@
 import type { AgentDto, AgentImportConflictStrategy, AgentImportResultDto } from '@fleet/shared';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Dialog } from '../../components/Dialog';
-import { findNameConflicts, parseImportFile, readFileText, type ParsedImport } from './agentImport';
+import { findNameConflicts, readImportFile, type ParsedImport } from './agentImport';
 import { useImportAgents } from './agentQueries';
 import { ImportDialogView } from './ImportDialogView';
 
@@ -35,9 +35,14 @@ export function ImportDialog({
     onClose();
   };
 
+  const latestSelection = useRef(0);
+
   const handleFile = async (selected: File | undefined) => {
+    const selection = ++latestSelection.current;
     importAgents.reset();
-    setParsed(selected ? parseImportFile(await readFileText(selected)) : null);
+    if (!selected) return setParsed(null);
+    const next = await readImportFile(selected);
+    if (selection === latestSelection.current) setParsed(next);
   };
 
   const submit = () => {

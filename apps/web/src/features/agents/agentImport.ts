@@ -12,10 +12,6 @@ const fail = (error: string): ParsedImport => ({ ok: false, error });
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-export function readFileText(file: File): Promise<string> {
-  return file.text();
-}
-
 export function parseImportFile(text: string): ParsedImport {
   let data: unknown;
   try {
@@ -44,4 +40,12 @@ export function parseImportFile(text: string): ParsedImport {
 export function findNameConflicts(file: AgentExportDto, existingNames: string[]): string[] {
   const existing = new Set(existingNames.map((name) => name.trim()));
   return file.agents.map((agent) => agent.name).filter((name) => existing.has(name.trim()));
+}
+
+export async function readImportFile(file: File): Promise<ParsedImport> {
+  try {
+    return parseImportFile(await file.text());
+  } catch {
+    return fail('No se pudo leer el fichero. Inténtalo de nuevo.');
+  }
 }
