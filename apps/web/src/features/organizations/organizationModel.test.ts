@@ -45,6 +45,14 @@ describe('validateOrganizationName', () => {
   });
 });
 
+describe('validateOrganizationName (QA)', () => {
+  it('measures the maximum length after trimming and keeps inner spaces', () => {
+    const padded = validateOrganizationName(`  ${'x'.repeat(ORGANIZATION_NAME_MAX_LENGTH)}  `);
+    expect(padded.error).toBeNull();
+    expect(validateOrganizationName(' My  Lab ').name).toBe('My  Lab');
+  });
+});
+
 describe('queryKeys', () => {
   it('scopes lists by organization', () => {
     expect(queryKeys.agents('a')).not.toEqual(queryKeys.agents('b'));
