@@ -3,6 +3,7 @@ import type { CreateAgent } from '../../../application/agents/CreateAgent.js';
 import type { DraftAgentInstructions } from '../../../application/agents/DraftAgentInstructions.js';
 import type { DeleteAgent } from '../../../application/agents/DeleteAgent.js';
 import type { ExportAgents } from '../../../application/agents/ExportAgents.js';
+import type { ImportAgents } from '../../../application/agents/ImportAgents.js';
 import type { GetAgent, ListAgents } from '../../../application/agents/QueryAgents.js';
 import type { SetAgentCollaborators } from '../../../application/agents/SetAgentCollaborators.js';
 import type { UpdateAgent } from '../../../application/agents/UpdateAgent.js';
@@ -15,6 +16,7 @@ import {
   draftInstructionsSchema,
   exportAgentsSchema,
   idParams,
+  importAgentsSchema,
 } from '../schemas.js';
 
 export interface AgentUseCases {
@@ -26,6 +28,7 @@ export interface AgentUseCases {
   getAgent: GetAgent;
   setAgentCollaborators: SetAgentCollaborators;
   exportAgents: ExportAgents;
+  importAgents: ImportAgents;
 }
 
 function slugify(text: string): string {
@@ -54,6 +57,12 @@ export function registerAgentRoutes(app: FastifyInstance, useCases: AgentUseCase
     const input = exportAgentsSchema.parse(request.body ?? {});
     const dto = useCases.exportAgents.execute(id, input);
     return reply.header('Content-Disposition', `attachment; filename="${exportFileName(dto)}"`).send(dto);
+  });
+
+  app.post('/api/organizations/:id/agents/import', (request, reply) => {
+    const { id } = idParams.parse(request.params);
+    const input = importAgentsSchema.parse(request.body);
+    return reply.status(201).send(useCases.importAgents.execute(id, input));
   });
 
   app.get('/api/agents/:id', (request) => {

@@ -1,4 +1,13 @@
-import { AGENT_MODELS, EFFORT_LEVELS, PERMISSION_MODES, TASK_START_MODES } from '@fleet/shared';
+import {
+  AGENT_EXPORT_FORMAT,
+  AGENT_EXPORT_VERSION,
+  AGENT_IMPORT_CONFLICT_STRATEGIES,
+  AGENT_MODELS,
+  EFFORT_LEVELS,
+  MAX_IMPORTED_AGENTS,
+  PERMISSION_MODES,
+  TASK_START_MODES,
+} from '@fleet/shared';
 import { z } from 'zod';
 
 const ids = z.array(z.string().min(1)).default([]);
@@ -28,6 +37,20 @@ export const createAgentSchema = agentProfileSchema.extend({
 export const exportAgentsSchema = z.object({
   agentIds: z.array(z.string().min(1)).optional(),
   includeCollaborators: z.boolean().default(false),
+});
+
+export const importAgentsSchema = z.object({
+  file: z.object({
+    format: z.literal(AGENT_EXPORT_FORMAT),
+    version: z.literal(AGENT_EXPORT_VERSION),
+    exportedAt: z.string().optional(),
+    organization: z.string().optional(),
+    agents: z
+      .array(agentProfileSchema.extend({ collaborators: z.array(z.string()).default([]) }))
+      .min(1)
+      .max(MAX_IMPORTED_AGENTS),
+  }),
+  onConflict: z.enum(AGENT_IMPORT_CONFLICT_STRATEGIES).default('fail'),
 });
 
 export const draftInstructionsSchema = z.object({

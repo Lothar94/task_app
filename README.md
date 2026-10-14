@@ -66,6 +66,15 @@ organización) e `includeCollaborators` (añade, de forma transitiva, a quienes 
 lleva ids ni fechas: cada agente trae sus campos de perfil y `collaborators` con los *nombres* de sus
 colaboradores presentes en la exportación (el resto se omiten).
 
+Importar agentes: `POST /api/organizations/:id/agents/import` con `{ file, onConflict }` crea los agentes
+de un fichero de exportación (`file`, tal cual se descargó; hasta 200 agentes) y responde `201` con
+`{ imported, skipped, renamed }`. Las instrucciones se importan sin cambios (sin llamar a Claude) y los
+`collaborators` se resuelven por nombre entre los agentes del fichero; un nombre desconocido, nombres
+repetidos en el fichero o un `format`/`version` distintos dan `400`. `onConflict` indica qué hacer si ya
+existe un agente con el mismo nombre en la organización: `fail` (por defecto) responde `409` sin crear
+nada, `skip` omite ese agente (los colaboradores que lo citan apuntan al ya existente) y `rename` lo crea
+como `Nombre (2)`, `Nombre (3)`… La importación es todo o nada.
+
 Intensidad por agente: `low`, `medium`, `high` (por defecto), `xhigh` o `max`. Se pasa al SDK como
 `effort` y regula cuánto razona el modelo antes de actuar: más intensidad da más calidad, pero tarda
 más y consume más cuota de la suscripción.
