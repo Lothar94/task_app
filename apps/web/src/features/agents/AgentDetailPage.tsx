@@ -34,6 +34,19 @@ function AgentLinks({ agents }: { agents: AgentDto[] }) {
   );
 }
 
+function SkillChips({ skills }: { skills: string[] }) {
+  if (skills.length === 0) return <span className="text-zinc-500">Sin skills</span>;
+  return (
+    <div className="flex flex-wrap gap-1">
+      {skills.map((skill) => (
+        <code key={skill} className="rounded bg-zinc-800 px-2 py-0.5 text-xs">
+          {skill}
+        </code>
+      ))}
+    </div>
+  );
+}
+
 export function AgentDetailPage() {
   const { agentId = '' } = useParams();
   const navigate = useNavigate();
@@ -89,6 +102,11 @@ export function AgentDetailPage() {
                   </code>
                 ))}
               </div>
+            </Property>
+          </div>
+          <div className="mt-4">
+            <Property label="Skills">
+              <SkillChips skills={agent.skills} />
             </Property>
           </div>
         </Card>
