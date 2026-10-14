@@ -74,3 +74,33 @@ export interface SkillDto {
   description: string;
   plugin: string | null;
 }
+
+/** Identifies an agent export file; checked on import so other JSON files are rejected. */
+export const AGENT_EXPORT_FORMAT = 'agent-fleet/agents';
+export const AGENT_EXPORT_VERSION = 1;
+
+/**
+ * A portable agent: its profile without ids, organization or timestamps. Collaborators are
+ * referenced by name and only include agents present in the same export.
+ */
+export interface ExportedAgent extends AgentInput {
+  collaborators: string[];
+}
+
+export interface AgentExportDto {
+  format: typeof AGENT_EXPORT_FORMAT;
+  version: typeof AGENT_EXPORT_VERSION;
+  exportedAt: string;
+  /** Name of the organization the agents were exported from. */
+  organization: string;
+  agents: ExportedAgent[];
+}
+
+/**
+ * Body of `POST /api/organizations/:id/agents/export`. Without `agentIds` every agent of the
+ * organization is exported; `includeCollaborators` adds, transitively, the agents they delegate to.
+ */
+export interface AgentExportRequest {
+  agentIds?: string[];
+  includeCollaborators?: boolean;
+}
