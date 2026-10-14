@@ -1,3 +1,4 @@
+import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createHttpServer } from '../../src/interfaces/http/createHttpServer.js';
@@ -226,6 +227,7 @@ describe('task planning API', () => {
 
     it('requires the new agent to be a project member', async () => {
       const outsider = await fleet.useCases.createAgent.execute({
+        organizationId: DEFAULT_ORGANIZATION_ID,
         profile: {
           name: 'Out',
           role: 'r',

@@ -1,12 +1,17 @@
 import type { Agent } from '../../domain/agent/Agent.js';
 import type { AgentRepository } from '../ports/AgentRepository.js';
-import { requireAgent } from '../shared/lookups.js';
+import type { OrganizationRepository } from '../ports/OrganizationRepository.js';
+import { requireAgent, requireOrganization } from '../shared/lookups.js';
 
 export class ListAgents {
-  constructor(private readonly agents: AgentRepository) {}
+  constructor(
+    private readonly organizations: OrganizationRepository,
+    private readonly agents: AgentRepository,
+  ) {}
 
-  execute(): Agent[] {
-    return this.agents.findAll();
+  execute(organizationId: string): Agent[] {
+    requireOrganization(this.organizations, organizationId);
+    return this.agents.findByOrganization(organizationId);
   }
 }
 

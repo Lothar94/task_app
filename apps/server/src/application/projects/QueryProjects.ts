@@ -1,12 +1,17 @@
 import type { Project } from '../../domain/project/Project.js';
 import type { ProjectRepository } from '../ports/ProjectRepository.js';
-import { requireProject } from '../shared/lookups.js';
+import type { OrganizationRepository } from '../ports/OrganizationRepository.js';
+import { requireOrganization, requireProject } from '../shared/lookups.js';
 
 export class ListProjects {
-  constructor(private readonly projects: ProjectRepository) {}
+  constructor(
+    private readonly organizations: OrganizationRepository,
+    private readonly projects: ProjectRepository,
+  ) {}
 
-  execute(): Project[] {
-    return this.projects.findAll();
+  execute(organizationId: string): Project[] {
+    requireOrganization(this.organizations, organizationId);
+    return this.projects.findByOrganization(organizationId);
   }
 }
 

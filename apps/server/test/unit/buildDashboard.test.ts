@@ -18,9 +18,15 @@ const usage = (model: string, input: number, output: number): ModelTokenUsage =>
   costUsd: 0.5,
 });
 
-const cto = Agent.create('cto', profile('CTO'), now);
-const dev = Agent.create('dev', profile('Dev'), now);
-const project = Project.create('p1', { name: 'Demo', description: '', workspacePath: '/tmp/demo' }, [], now);
+const cto = Agent.create('cto', 'org', profile('CTO'), now);
+const dev = Agent.create('dev', 'org', profile('Dev'), now);
+const project = Project.create(
+  'p1',
+  'org',
+  { name: 'Demo', description: '', workspacePath: '/tmp/demo' },
+  [],
+  now,
+);
 
 function task(
   id: string,

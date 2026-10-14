@@ -13,16 +13,20 @@ export interface ProjectUseCases {
 }
 
 export function registerProjectRoutes(app: FastifyInstance, useCases: ProjectUseCases): void {
-  app.get('/api/projects', () => useCases.listProjects.execute().map(toProjectDto));
+  app.get('/api/organizations/:id/projects', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.listProjects.execute(id).map(toProjectDto);
+  });
 
   app.get('/api/projects/:id', (request) => {
     const { id } = idParams.parse(request.params);
     return toProjectDto(useCases.getProject.execute(id));
   });
 
-  app.post('/api/projects', (request, reply) => {
+  app.post('/api/organizations/:id/projects', (request, reply) => {
+    const { id: organizationId } = idParams.parse(request.params);
     const { memberIds, ...details } = createProjectSchema.parse(request.body);
-    const project = useCases.createProject.execute({ details, memberIds });
+    const project = useCases.createProject.execute({ organizationId, details, memberIds });
     return reply.status(201).send(toProjectDto(project));
   });
 

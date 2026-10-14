@@ -1,7 +1,8 @@
+import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { describe, expect, it } from 'vitest';
 import type { AgentRunRequest } from '../../src/application/ports/AgentRuntime.js';
 import { waitForAbort } from '../support/FakeAgentRuntime.js';
-import { createTeamProject, createTestFleet, eventually } from '../support/testFleet.js';
+import { createTeamProject, createTestFleet, eventually, profile } from '../support/testFleet.js';
 
 const delegateTo = (request: AgentRunRequest, collaboratorName: string) =>
   request.delegation.delegate({
@@ -124,6 +125,7 @@ describe('task delegation', () => {
     });
     const { cto, project } = await createTeamProject(fleet, ['Backend']);
     await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: { ...cto.toSnapshot(), name: 'Stranger' },
       collaboratorIds: [],
     });
@@ -136,6 +138,42 @@ describe('task delegation', () => {
 
     await eventually(() => expect(fleet.useCases.getTask.execute(root.id).status).toBe('completed'));
     expect(failure).toMatch(/not one of your collaborators/);
+  });
+
+  it('resolves the collaborator by name inside the delegator organization', async () => {
+    let failure = '';
+    const fleet = createTestFleet({
+      CTO: (request) =>
+        delegateTo(request, 'Backend')
+          .then(() => delegateTo(request, 'Outsider'))
+          .then(
+            () => 'unexpected',
+            (error: Error) => (failure = error.message),
+          ),
+    });
+    const other = fleet.useCases.createOrganization.execute('Other');
+    await createTeamProject(fleet, ['Backend'], other.id);
+    const { cto, project } = await createTeamProject(fleet, ['Backend']);
+    await fleet.useCases.createAgent.execute({
+      organizationId: other.id,
+      profile: profile('Outsider'),
+      collaboratorIds: [],
+    });
+
+    const root = fleet.useCases.assignTask.execute(project.id, {
+      agentId: cto.id,
+      title: 'Go',
+      description: 'Go',
+    });
+
+    await eventually(() => expect(fleet.useCases.getTask.execute(root.id).status).toBe('completed'));
+    const [subtask] = fleet.useCases.getTaskTree.execute(project.id)[0]?.children ?? [];
+    const delegate = fleet.useCases.listAgents
+      .execute(DEFAULT_ORGANIZATION_ID)
+      .find((agent) => agent.id === subtask?.agentId);
+    expect(delegate?.name).toBe('Backend');
+    expect(failure).toMatch(/not one of your collaborators/);
+    expect(fleet.runtime.requests[0]?.delegation.listCollaborators().map((c) => c.name)).toEqual(['Backend']);
   });
 
   it('prevents delegating back to an agent higher in the chain', async () => {
@@ -250,7 +288,8 @@ describe('task metrics', () => {
     expect(tree?.metrics).toMatchObject({ runs: 1, inputTokens: 100, outputTokens: 50, totalTokens: 1160 });
     expect(tree?.children[0]?.metrics.runs).toBe(1);
     expect(
-      fleet.useCases.getUsageDashboard.execute({ projectId: project.id, days: null }).totals,
+      fleet.useCases.getUsageDashboard.execute(DEFAULT_ORGANIZATION_ID, { projectId: project.id, days: null })
+        .totals,
     ).toMatchObject({
       completed: 2,
       totalTokens: 2320,
@@ -264,7 +303,10 @@ describe('task metrics', () => {
 
     fleet.recoverInterruptedTasks.execute();
 
-    expect(fleet.useCases.getUsageDashboard.execute({ projectId: null, days: null }).errors).toEqual([
+    expect(
+      fleet.useCases.getUsageDashboard.execute(DEFAULT_ORGANIZATION_ID, { projectId: null, days: null })
+        .errors,
+    ).toEqual([
       expect.objectContaining({ error: 'Interrupted: the server stopped while the task was running' }),
     ]);
   });

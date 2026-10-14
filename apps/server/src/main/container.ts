@@ -1,3 +1,6 @@
+import { CreateOrganization } from '../application/organizations/CreateOrganization.js';
+import { GetOrganization, ListOrganizations } from '../application/organizations/QueryOrganizations.js';
+import { RenameOrganization } from '../application/organizations/RenameOrganization.js';
 import { CreateAgent } from '../application/agents/CreateAgent.js';
 import { DraftAgentInstructions } from '../application/agents/DraftAgentInstructions.js';
 import { DeleteAgent } from '../application/agents/DeleteAgent.js';
@@ -32,6 +35,7 @@ import { InMemoryEventBus } from '../infrastructure/events/InMemoryEventBus.js';
 import type { SqliteDatabase } from '../infrastructure/persistence/sqlite/openDatabase.js';
 import { SqliteAgentRepository } from '../infrastructure/persistence/sqlite/SqliteAgentRepository.js';
 import { SqliteConversationRepository } from '../infrastructure/persistence/sqlite/SqliteConversationRepository.js';
+import { SqliteOrganizationRepository } from '../infrastructure/persistence/sqlite/SqliteOrganizationRepository.js';
 import { SqliteProjectRepository } from '../infrastructure/persistence/sqlite/SqliteProjectRepository.js';
 import { SqliteTaskRunRepository } from '../infrastructure/persistence/sqlite/SqliteTaskRunRepository.js';
 import { SqliteTaskRepository } from '../infrastructure/persistence/sqlite/SqliteTaskRepository.js';
@@ -87,6 +91,19 @@ function createTaskExecution(
   return { running, launcher: new TaskLauncher(runTask, logger) };
 }
 
+function createOrganizationUseCases(
+  organizations: SqliteOrganizationRepository,
+  ids: UuidGenerator,
+  clock: SystemClock,
+) {
+  return {
+    createOrganization: new CreateOrganization(organizations, ids, clock),
+    renameOrganization: new RenameOrganization(organizations, clock),
+    listOrganizations: new ListOrganizations(organizations),
+    getOrganization: new GetOrganization(organizations),
+  };
+}
+
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
   const { db, instructionWriter } = options;
@@ -94,6 +111,7 @@ export function createContainer(options: ContainerOptions) {
   const ids = new UuidGenerator();
   const events = new InMemoryEventBus();
 
+  const organizations = new SqliteOrganizationRepository(db);
   const agents = new SqliteAgentRepository(db);
   const projects = new SqliteProjectRepository(db);
   const tasks = new SqliteTaskRepository(db);
@@ -113,15 +131,23 @@ export function createContainer(options: ContainerOptions) {
     processTaskQueues: () => queue.processAll(),
     recoverInterruptedTasks: new RecoverInterruptedTasks(tasks, recorder, ids, clock),
     useCases: {
-      createAgent: new CreateAgent(agents, draftAgentInstructions, ids, clock),
+      ...createOrganizationUseCases(organizations, ids, clock),
+      createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, ids, clock),
       draftAgentInstructions,
       updateAgent: new UpdateAgent(agents, clock),
       deleteAgent: new DeleteAgent(agents, projects, tasks, clock),
-      listAgents: new ListAgents(agents),
+      listAgents: new ListAgents(organizations, agents),
       getAgent: new GetAgent(agents),
       setAgentCollaborators: new SetAgentCollaborators(agents, clock),
-      createProject: new CreateProject(projects, agents, new FileSystemWorkspaceProvisioner(), ids, clock),
-      listProjects: new ListProjects(projects),
+      createProject: new CreateProject(
+        organizations,
+        projects,
+        agents,
+        new FileSystemWorkspaceProvisioner(),
+        ids,
+        clock,
+      ),
+      listProjects: new ListProjects(organizations, projects),
       getProject: new GetProject(projects),
       setProjectMembers: new SetProjectMembers(projects, agents),
       assignTask: new AssignTask({ projects, agents, tasks, recorder, launcher, queue, ids, clock }),
@@ -134,7 +160,7 @@ export function createContainer(options: ContainerOptions) {
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
-      getUsageDashboard: new GetUsageDashboard(tasks, runs, agents, projects, clock),
+      getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
       getTaskConversation: new GetTaskConversation(tasks, conversations),
     },
   };

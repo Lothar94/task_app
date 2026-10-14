@@ -44,7 +44,7 @@ export class DelegateSubtask {
 
   private resolveCollaborator(parent: Task, collaboratorName: string): Agent {
     const delegator = requireAgent(this.agents, parent.agentId);
-    const collaborator = this.agents.findByName(collaboratorName.trim());
+    const collaborator = this.agents.findByName(delegator.organizationId, collaboratorName.trim());
     if (!collaborator || !delegator.canDelegateTo(collaborator.id)) {
       throw new ValidationError(`"${collaboratorName}" is not one of your collaborators`);
     }

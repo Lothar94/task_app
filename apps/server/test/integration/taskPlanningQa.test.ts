@@ -1,9 +1,15 @@
+import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { describe, expect, it } from 'vitest';
 import { ConflictError, ValidationError } from '../../src/domain/errors/DomainError.js';
 import { createContainer } from '../../src/main/container.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
 import { waitForAbort, FakeAgentRuntime } from '../support/FakeAgentRuntime.js';
-import { createTeamProject, createTestFleet, eventually, FakeInstructionWriter } from '../support/testFleet.js';
+import {
+  createTeamProject,
+  createTestFleet,
+  eventually,
+  FakeInstructionWriter,
+} from '../support/testFleet.js';
 
 type Start = 'now' | 'draft' | 'queue';
 
@@ -136,22 +142,31 @@ describe('queue progression (QA)', () => {
 });
 
 describe('planning guards (QA)', () => {
-  it.each(['queued', 'running', 'completed', 'cancelled'])('enqueue of a %s task is a conflict', async (kind) => {
-    const { add, status, useCases, release } = await setupProject();
-    const blocker = add('hold blocker', 'now');
-    await eventually(() => expect(status(blocker)).toBe('running'));
-    const id =
-      kind === 'queued' ? add('q') : kind === 'running' ? blocker : kind === 'cancelled' ? add('c', 'draft') : add('x', 'draft');
-    if (kind === 'cancelled') useCases.cancelTask.execute(id);
-    if (kind === 'completed') {
-      release();
-      useCases.startTask.execute(id);
-      await eventually(() => expect(status(id)).toBe('completed'));
-    }
+  it.each(['queued', 'running', 'completed', 'cancelled'])(
+    'enqueue of a %s task is a conflict',
+    async (kind) => {
+      const { add, status, useCases, release } = await setupProject();
+      const blocker = add('hold blocker', 'now');
+      await eventually(() => expect(status(blocker)).toBe('running'));
+      const id =
+        kind === 'queued'
+          ? add('q')
+          : kind === 'running'
+            ? blocker
+            : kind === 'cancelled'
+              ? add('c', 'draft')
+              : add('x', 'draft');
+      if (kind === 'cancelled') useCases.cancelTask.execute(id);
+      if (kind === 'completed') {
+        release();
+        useCases.startTask.execute(id);
+        await eventually(() => expect(status(id)).toBe('completed'));
+      }
 
-    expect(() => useCases.enqueueTask.execute(id)).toThrow(ConflictError);
-    release();
-  });
+      expect(() => useCases.enqueueTask.execute(id)).toThrow(ConflictError);
+      release();
+    },
+  );
 
   it('rejects start, dequeue and edits of definition for non-planned tasks', async () => {
     const { add, status, useCases } = await setupProject();
@@ -169,7 +184,9 @@ describe('planning guards (QA)', () => {
     const gate = new Promise<string>((resolve) => (release = () => resolve('done')));
     const fleet = createTestFleet({
       CTO: (r) =>
-        r.delegation.delegate({ collaboratorName: 'Backend', title: 'sub', instructions: 'i' }).then(() => 'ok'),
+        r.delegation
+          .delegate({ collaboratorName: 'Backend', title: 'sub', instructions: 'i' })
+          .then(() => 'ok'),
       Backend: () => gate,
     });
     const { cto, project } = await createTeamProject(fleet, ['Backend']);
@@ -186,9 +203,17 @@ describe('planning guards (QA)', () => {
   it('rejects PATCH agentId for an agent that is not a project member', async () => {
     const { add, useCases, fleet } = await setupProject();
     const outsider = await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: {
-        name: 'Out', role: 'r', description: '', instructions: 'i', model: 'sonnet', effort: 'high',
-        allowedTools: [], permissionMode: 'dontAsk', maxTurns: 5,
+        name: 'Out',
+        role: 'r',
+        description: '',
+        instructions: 'i',
+        model: 'sonnet',
+        effort: 'high',
+        allowedTools: [],
+        permissionMode: 'dontAsk',
+        maxTurns: 5,
       },
       collaboratorIds: [],
     });
@@ -208,7 +233,10 @@ describe('planning guards (QA)', () => {
     expect(() => useCases.reorderQueue.execute(project.id, [a, draft])).toThrow(ValidationError);
     expect(() => useCases.reorderQueue.execute(project.id, [a, b, b])).toThrow(ValidationError);
     expect(() => useCases.reorderQueue.execute(project.id, [])).toThrow(ValidationError);
-    expect(queueOf()).toEqual([['a', 1], ['b', 2]]);
+    expect(queueOf()).toEqual([
+      ['a', 1],
+      ['b', 2],
+    ]);
   });
 });
 
@@ -222,7 +250,8 @@ describe('task.updated events (QA)', () => {
     await eventually(() => expect(status(head)).toBe('running'));
     const seen: Array<[string, number | null, string]> = [];
     events.subscribe((event) => {
-      if (event.type === 'task.updated') seen.push([event.task.id, event.task.queuePosition, event.task.status]);
+      if (event.type === 'task.updated')
+        seen.push([event.task.id, event.task.queuePosition, event.task.status]);
     });
 
     useCases.dequeueTask.execute(a);
@@ -232,7 +261,10 @@ describe('task.updated events (QA)', () => {
 
     seen.length = 0;
     useCases.reorderQueue.execute(project.id, [c, b]);
-    expect(seen).toEqual([[c, 1, 'queued'], [b, 2, 'queued']]);
+    expect(seen).toEqual([
+      [c, 1, 'queued'],
+      [b, 2, 'queued'],
+    ]);
 
     seen.length = 0;
     useCases.cancelTask.execute(c);
@@ -271,7 +303,9 @@ describe('tags and milestone normalisation (QA)', () => {
   it('does not persist a partial edit when the tags are invalid', async () => {
     const { add, task, useCases } = await setupProject();
     const id = add('orig', 'draft');
-    expect(() => useCases.updateTask.execute(id, { title: 'changed', tags: ['x'.repeat(41)] })).toThrow(ValidationError);
+    expect(() => useCases.updateTask.execute(id, { title: 'changed', tags: ['x'.repeat(41)] })).toThrow(
+      ValidationError,
+    );
     expect(task(id).title).toBe('orig');
   });
 });
@@ -281,8 +315,12 @@ describe('restart with a shared database (QA)', () => {
     const db = openDatabase(':memory:');
     const build = (runtime: FakeAgentRuntime) =>
       createContainer({
-        db, runtime, instructionWriter: new FakeInstructionWriter(),
-        logger: { info: () => undefined, error: () => undefined }, maxDelegationDepth: 4, reservedPorts: [],
+        db,
+        runtime,
+        instructionWriter: new FakeInstructionWriter(),
+        logger: { info: () => undefined, error: () => undefined },
+        maxDelegationDepth: 4,
+        reservedPorts: [],
       });
     let busyReached = false;
     const first = build(
@@ -293,7 +331,10 @@ describe('restart with a shared database (QA)', () => {
         },
       }),
     );
-    const { cto, project } = await createTeamProject({ ...first, runtime: undefined, instructionWriter: undefined } as never, []);
+    const { cto, project } = await createTeamProject(
+      { ...first, runtime: undefined, instructionWriter: undefined } as never,
+      [],
+    );
     const assign = (title: string, start: Start) =>
       first.useCases.assignTask.execute(project.id, { agentId: cto.id, title, description: 'D', start }).id;
     const busy = assign('busy', 'now');
@@ -308,7 +349,12 @@ describe('restart with a shared database (QA)', () => {
     const second = build(runtime);
     expect(second.recoverInterruptedTasks.execute()).toBe(1);
     const status = (id: string) => second.useCases.getTask.execute(id).status;
-    expect([status(busy), status(draft), status(q1), status(q2)]).toEqual(['failed', 'draft', 'queued', 'queued']);
+    expect([status(busy), status(draft), status(q1), status(q2)]).toEqual([
+      'failed',
+      'draft',
+      'queued',
+      'queued',
+    ]);
     second.processTaskQueues();
 
     await eventually(() => expect([status(q1), status(q2)]).toEqual(['completed', 'completed']));

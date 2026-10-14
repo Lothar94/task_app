@@ -3,7 +3,7 @@ import { AgentBriefing } from '../../src/application/tasks/AgentBriefing.js';
 import { Agent } from '../../src/domain/agent/Agent.js';
 import { profile } from '../support/testFleet.js';
 
-const agent = Agent.create('a1', profile('Lara'), new Date());
+const agent = Agent.create('a1', 'org', profile('Lara'), new Date());
 const context = { agent, instructions: 'Do the work.', collaborators: [] };
 
 describe('AgentBriefing.systemPromptAppendix', () => {
@@ -16,7 +16,10 @@ describe('AgentBriefing.systemPromptAppendix', () => {
   });
 
   it('keeps the efficiency section compact', () => {
-    const section = appendix.slice(appendix.indexOf('# Working efficiently'), appendix.indexOf('# Finishing'));
+    const section = appendix.slice(
+      appendix.indexOf('# Working efficiently'),
+      appendix.indexOf('# Finishing'),
+    );
     expect(section.split('\n').filter((line) => line.startsWith('- ')).length).toBeLessThanOrEqual(8);
   });
 

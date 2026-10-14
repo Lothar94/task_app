@@ -5,6 +5,8 @@ const ids = z.array(z.string().min(1)).default([]);
 
 export const idParams = z.object({ id: z.string().min(1) });
 
+export const organizationSchema = z.object({ name: z.string() });
+
 export const agentProfileSchema = z.object({
   name: z.string(),
   role: z.string(),

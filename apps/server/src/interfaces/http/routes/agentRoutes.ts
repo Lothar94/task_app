@@ -25,16 +25,25 @@ export interface AgentUseCases {
 }
 
 export function registerAgentRoutes(app: FastifyInstance, useCases: AgentUseCases): void {
-  app.get('/api/agents', () => useCases.listAgents.execute().map(toAgentDto));
+  app.get('/api/organizations/:id/agents', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.listAgents.execute(id).map(toAgentDto);
+  });
 
   app.get('/api/agents/:id', (request) => {
     const { id } = idParams.parse(request.params);
     return toAgentDto(useCases.getAgent.execute(id));
   });
 
-  app.post('/api/agents', async (request, reply) => {
+  app.post('/api/organizations/:id/agents', async (request, reply) => {
+    const { id: organizationId } = idParams.parse(request.params);
     const { collaboratorIds, instructionsGuidance, ...profile } = createAgentSchema.parse(request.body);
-    const agent = await useCases.createAgent.execute({ profile, collaboratorIds, instructionsGuidance });
+    const agent = await useCases.createAgent.execute({
+      organizationId,
+      profile,
+      collaboratorIds,
+      instructionsGuidance,
+    });
     return reply.status(201).send(toAgentDto(agent));
   });
 
