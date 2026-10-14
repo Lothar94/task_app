@@ -1,4 +1,4 @@
-import type { AgentExportRequest, AgentInput } from '@fleet/shared';
+import type { AgentExportRequest, AgentImportRequest, AgentInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
 import { skillsApi } from '../../api/skillsApi';
@@ -61,5 +61,14 @@ export function useExportAgents() {
   return useMutation({
     mutationFn: (exportRequest: AgentExportRequest) => agentsApi.export(organizationId, exportRequest),
     onSuccess: (bundle) => downloadJson(exportFileName(bundle), bundle),
+  });
+}
+
+export function useImportAgents() {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  return useMutation({
+    mutationFn: (importRequest: AgentImportRequest) => agentsApi.import(organizationId, importRequest),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
   });
 }

@@ -1,6 +1,6 @@
 import type { AgentEffort, AgentModel, AgentPermissionMode } from '@fleet/shared';
 import type { AgentRepository } from '../../../application/ports/AgentRepository.js';
-import { Agent } from '../../../domain/agent/Agent.js';
+import { Agent, type AgentSnapshot } from '../../../domain/agent/Agent.js';
 import type { SqliteDatabase } from './openDatabase.js';
 
 interface AgentRow {
@@ -24,30 +24,14 @@ export class SqliteAgentRepository implements AgentRepository {
   constructor(private readonly db: SqliteDatabase) {}
 
   save(agent: Agent): void {
-    const snapshot = agent.toSnapshot();
+    this.saveAll([agent]);
+  }
+
+  saveAll(agents: readonly Agent[]): void {
     this.db.transaction(() => {
-      this.db
-        .prepare(
-          `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools, skills,
-             permission_mode, max_turns, created_at, updated_at)
-           VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools, @skills,
-             @permissionMode, @maxTurns, @createdAt, @updatedAt)
-           ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
-             instructions = @instructions, model = @model, effort = @effort, allowed_tools = @allowedTools,
-             skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
-        )
-        .run({
-          ...snapshot,
-          allowedTools: JSON.stringify(snapshot.allowedTools),
-          skills: JSON.stringify(snapshot.skills),
-          createdAt: snapshot.createdAt.toISOString(),
-          updatedAt: snapshot.updatedAt.toISOString(),
-        });
-      this.db.prepare('DELETE FROM agent_relations WHERE agent_id = ?').run(snapshot.id);
-      const insertRelation = this.db.prepare(
-        'INSERT INTO agent_relations (agent_id, collaborator_id) VALUES (?, ?)',
-      );
-      for (const collaboratorId of snapshot.collaboratorIds) insertRelation.run(snapshot.id, collaboratorId);
+      const snapshots = agents.map((agent) => agent.toSnapshot());
+      for (const snapshot of snapshots) this.upsert(snapshot);
+      for (const snapshot of snapshots) this.replaceRelations(snapshot);
     })();
   }
 
@@ -72,6 +56,35 @@ export class SqliteAgentRepository implements AgentRepository {
 
   delete(id: string): void {
     this.db.prepare('DELETE FROM agents WHERE id = ?').run(id);
+  }
+
+  private upsert(snapshot: AgentSnapshot): void {
+    this.db
+      .prepare(
+        `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools, skills,
+           permission_mode, max_turns, created_at, updated_at)
+         VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools, @skills,
+           @permissionMode, @maxTurns, @createdAt, @updatedAt)
+         ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
+           instructions = @instructions, model = @model, effort = @effort, allowed_tools = @allowedTools,
+           skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
+      )
+      .run({
+        ...snapshot,
+        allowedTools: JSON.stringify(snapshot.allowedTools),
+        skills: JSON.stringify(snapshot.skills),
+        createdAt: snapshot.createdAt.toISOString(),
+        updatedAt: snapshot.updatedAt.toISOString(),
+      });
+  }
+
+  /** Runs after every agent of the batch exists, so links between them satisfy the foreign keys. */
+  private replaceRelations(snapshot: AgentSnapshot): void {
+    this.db.prepare('DELETE FROM agent_relations WHERE agent_id = ?').run(snapshot.id);
+    const insertRelation = this.db.prepare(
+      'INSERT INTO agent_relations (agent_id, collaborator_id) VALUES (?, ?)',
+    );
+    for (const collaboratorId of snapshot.collaboratorIds) insertRelation.run(snapshot.id, collaboratorId);
   }
 
   private toAgent(row: AgentRow): Agent {

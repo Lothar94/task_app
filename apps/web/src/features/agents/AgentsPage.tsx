@@ -13,6 +13,7 @@ import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { useAgents } from './agentQueries';
 import { useAgentExportSelection } from './useAgentExportSelection';
 import { ExportToolbar } from './ExportToolbar';
+import { ImportButton } from './ImportButton';
 import { EFFORT_LABELS } from './agentLabels';
 import { AgentGraph } from './diagram/AgentGraph';
 
@@ -140,6 +141,7 @@ export function AgentsPage() {
                 isPending={exporting.isPending}
               />
             )}
+            <ImportButton existingAgents={agents.data} disabled={Boolean(selected)} />
             <LinkButton to="/agents/new">Nuevo agente</LinkButton>
           </>
         }

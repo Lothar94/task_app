@@ -104,3 +104,32 @@ export interface AgentExportRequest {
   agentIds?: string[];
   includeCollaborators?: boolean;
 }
+
+/**
+ * What to do with an imported agent whose name already exists in the target organization:
+ * `fail` rejects the whole import, `skip` keeps the existing agent (collaborator links to that
+ * name point to it) and `rename` imports it under a free name such as `Name (2)`.
+ */
+export const AGENT_IMPORT_CONFLICT_STRATEGIES = ['fail', 'skip', 'rename'] as const;
+export type AgentImportConflictStrategy = (typeof AGENT_IMPORT_CONFLICT_STRATEGIES)[number];
+
+/** Upper bound on the agents a single import file may contain. */
+export const MAX_IMPORTED_AGENTS = 200;
+
+/**
+ * Body of `POST /api/organizations/:id/agents/import`: the export file as is plus how to resolve
+ * name conflicts (`fail` by default). The import is all or nothing.
+ */
+export interface AgentImportRequest {
+  file: AgentExportDto;
+  onConflict?: AgentImportConflictStrategy;
+}
+
+export interface AgentImportResultDto {
+  /** Agents created, in file order, already linked to their collaborators. */
+  imported: AgentDto[];
+  /** Names from the file left out because an agent with that name already existed (`skip`). */
+  skipped: string[];
+  /** Agents imported under a different name (`rename`). */
+  renamed: { from: string; to: string }[];
+}
