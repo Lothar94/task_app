@@ -4,6 +4,7 @@ import { RenameOrganization } from '../application/organizations/RenameOrganizat
 import { CreateAgent } from '../application/agents/CreateAgent.js';
 import { DraftAgentInstructions } from '../application/agents/DraftAgentInstructions.js';
 import { DeleteAgent } from '../application/agents/DeleteAgent.js';
+import { ExportAgents } from '../application/agents/ExportAgents.js';
 import { GetAgent, ListAgents } from '../application/agents/QueryAgents.js';
 import { SetAgentCollaborators } from '../application/agents/SetAgentCollaborators.js';
 import { UpdateAgent } from '../application/agents/UpdateAgent.js';
@@ -145,6 +146,7 @@ export function createContainer(options: ContainerOptions) {
       deleteAgent: new DeleteAgent(agents, projects, tasks, clock),
       listAgents: new ListAgents(organizations, agents),
       getAgent: new GetAgent(agents),
+      exportAgents: new ExportAgents(organizations, agents, clock),
       setAgentCollaborators: new SetAgentCollaborators(agents, clock),
       createProject: new CreateProject(
         organizations,
