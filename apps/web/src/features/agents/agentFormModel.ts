@@ -75,6 +75,10 @@ export function validateSkillName(name: string): string | null {
   return null;
 }
 
+export const SKILL_LIMIT_MESSAGE = `Un agente admite como máximo ${MAX_AGENT_SKILLS} skills`;
+
+export const canAddSkill = (skills: string[]) => skills.length < MAX_AGENT_SKILLS;
+
 export type AddSkillResult = { skills: string[]; error: string | null };
 
 /** Adds a skill keeping the list unique; duplicates and empty names are ignored silently. */
@@ -83,9 +87,7 @@ export function addSkill(skills: string[], rawName: string): AddSkillResult {
   if (name === '' || skills.includes(name)) return { skills, error: null };
   const error = validateSkillName(name);
   if (error) return { skills, error };
-  if (skills.length >= MAX_AGENT_SKILLS) {
-    return { skills, error: `Un agente admite como máximo ${MAX_AGENT_SKILLS} skills` };
-  }
+  if (!canAddSkill(skills)) return { skills, error: SKILL_LIMIT_MESSAGE };
   return { skills: [...skills, name], error: null };
 }
 

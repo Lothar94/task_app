@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { AgentDto } from '@fleet/shared';
 import {
   addSkill,
+  canAddSkill,
   canDraftInstructions,
   EMPTY_AGENT_FORM,
   removeSkill,
@@ -79,6 +80,11 @@ describe('agent form model', () => {
       const result = addSkill(full, 'one-more');
       expect(result.skills).toHaveLength(20);
       expect(result.error).toMatch(/20/);
+    });
+
+    it('allows adding skills only below the limit', () => {
+      expect(canAddSkill(Array.from({ length: 19 }, (_, i) => `skill-${i}`))).toBe(true);
+      expect(canAddSkill(Array.from({ length: 20 }, (_, i) => `skill-${i}`))).toBe(false);
     });
 
     it('removes a skill', () => {

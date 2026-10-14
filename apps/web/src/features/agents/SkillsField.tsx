@@ -1,7 +1,7 @@
 import { MAX_AGENT_SKILLS } from '@fleet/shared';
 import { type KeyboardEvent, useId, useState } from 'react';
 import { Button, CheckboxList, TextInput } from '../../components/ui';
-import { addSkill, removeSkill } from './agentFormModel';
+import { addSkill, canAddSkill, removeSkill, SKILL_LIMIT_MESSAGE } from './agentFormModel';
 import { useSkills } from './agentQueries';
 
 interface SkillsFieldProps {
@@ -45,6 +45,7 @@ function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
   }
   const catalogNames = new Set(catalog.map((skill) => skill.name));
   const outsideCatalog = skills.filter((name) => !catalogNames.has(name));
+  const limitReached = !canAddSkill(skills);
   return (
     <>
       <CheckboxList
@@ -52,7 +53,9 @@ function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
         selected={skills.filter((name) => catalogNames.has(name))}
         onChange={(selected) => onChange([...outsideCatalog, ...selected])}
         describe={(skill) => skill.description}
+        isDisabled={(skill) => limitReached && !skills.includes(skill.id)}
       />
+      {limitReached && <p className="mt-2 text-xs text-amber-300">{SKILL_LIMIT_MESSAGE}</p>}
       {outsideCatalog.length > 0 && (
         <ul className="mt-2 space-y-1 text-xs text-zinc-500">
           {outsideCatalog.map((name) => (
