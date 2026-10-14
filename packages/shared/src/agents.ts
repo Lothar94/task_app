@@ -17,6 +17,8 @@ export interface AgentDto {
   model: AgentModel;
   effort: AgentEffort;
   allowedTools: string[];
+  /** Skills the agent must use; empty means skills are disabled for it. */
+  skills: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
   collaboratorIds: string[];
@@ -32,8 +34,20 @@ export interface AgentInput {
   model: AgentModel;
   effort: AgentEffort;
   allowedTools: string[];
+  skills: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
 }
 
 export const DEFAULT_AGENT_TOOLS = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Bash', 'TodoWrite'];
+
+/** Skill names follow the Agent Skills spec: lowercase letters, digits and single hyphens. */
+export const SKILL_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export const MAX_SKILL_NAME_LENGTH = 64;
+export const MAX_AGENT_SKILLS = 20;
+
+/** A skill installed for the user (`~/.claude/skills`) that agents can be told to use. */
+export interface SkillDto {
+  name: string;
+  description: string;
+}
