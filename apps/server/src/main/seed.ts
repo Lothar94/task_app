@@ -74,14 +74,18 @@ const { useCases } = createContainer({
   maxDelegationDepth: config.maxDelegationDepth,
 });
 
-const existing = new Set(useCases.listAgents.execute().map((agent) => agent.name.toLowerCase()));
+const [organization] = useCases.listOrganizations.execute();
+if (!organization) throw new Error('No organization found: the database has not been migrated');
+
+const listTeam = () => useCases.listAgents.execute(organization.id);
+const existing = new Set(listTeam().map((agent) => agent.name.toLowerCase()));
 const created = await Promise.all(
   TEAM.filter((profile) => !existing.has(profile.name.toLowerCase())).map((profile) =>
-    useCases.createAgent.execute({ profile, collaboratorIds: [] }),
+    useCases.createAgent.execute({ organizationId: organization.id, profile, collaboratorIds: [] }),
   ),
 );
 
-const byName = new Map(useCases.listAgents.execute().map((agent) => [agent.name, agent]));
+const byName = new Map(listTeam().map((agent) => [agent.name, agent]));
 const cto = byName.get('CTO');
 if (cto) {
   const team = ['Backend', 'Frontend', 'QA'].flatMap((name) => byName.get(name)?.id ?? []);

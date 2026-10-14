@@ -12,7 +12,7 @@ export class UpdateAgent {
 
   execute(agentId: string, profile: AgentProfile): Agent {
     const agent = requireAgent(this.agents, agentId);
-    ensureUniqueAgentName(this.agents, profile.name, agentId);
+    ensureUniqueAgentName(this.agents, agent.organizationId, profile.name, agentId);
     agent.updateProfile(profile, this.clock.now());
     this.agents.save(agent);
     return agent;

@@ -72,6 +72,20 @@ cuentan en resultados y tiempos, pero no tienen tokens registrados.
 Permisos por agente: `dontAsk` (solo las herramientas listadas), `acceptEdits` (además edita
 ficheros) o `bypassPermissions` (sin restricciones; úsalo con cuidado, el agente trabaja en tu disco).
 
+## Organizaciones
+
+Una organización es el nivel superior: cada una tiene sus propios agentes, proyectos (y por tanto
+tareas y métricas). Lo anterior a esta función vive en la organización «Lothar's lab» (id `default`).
+Los nombres de agente son únicos **por organización**, y colaboradores, miembros de proyecto y
+`delegate_task` solo ven agentes de la misma organización.
+
+- `GET/POST /api/organizations`, `GET/PUT /api/organizations/:id` (crear y renombrar; nombre único sin
+  distinguir mayúsculas).
+- `GET/POST /api/organizations/:id/agents`, `GET/POST /api/organizations/:id/projects`.
+- `GET /api/organizations/:id/dashboard?projectId&days` (404 si el proyecto es de otra organización).
+- Siguen igual: `/api/agents/:id` (+ `/collaborators`, `/instructions-draft`), `/api/projects/:id`
+  (+ `/agents`), tareas y eventos.
+
 ## Arquitectura
 
 Monorepo pnpm con arquitectura hexagonal (Clean Architecture) en el servidor:

@@ -18,6 +18,7 @@ export interface AgentProfile {
 
 export interface AgentSnapshot extends AgentProfile {
   id: string;
+  organizationId: string;
   collaboratorIds: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -26,9 +27,10 @@ export interface AgentSnapshot extends AgentProfile {
 export class Agent {
   private constructor(private state: AgentSnapshot) {}
 
-  static create(id: string, profile: AgentProfile, now: Date): Agent {
+  static create(id: string, organizationId: string, profile: AgentProfile, now: Date): Agent {
     return new Agent({
       id,
+      organizationId,
       ...Agent.validateProfile(profile),
       collaboratorIds: [],
       createdAt: now,
@@ -42,6 +44,10 @@ export class Agent {
 
   get id(): string {
     return this.state.id;
+  }
+
+  get organizationId(): string {
+    return this.state.organizationId;
   }
 
   get name(): string {

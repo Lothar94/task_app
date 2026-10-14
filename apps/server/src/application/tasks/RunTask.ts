@@ -158,7 +158,10 @@ export class RunTask implements TaskExecutor {
     return agent.collaboratorIds
       .filter((id) => project.hasMember(id))
       .map((id) => this.deps.agents.findById(id))
-      .filter((collaborator): collaborator is Agent => collaborator !== null)
+      .filter(
+        (collaborator): collaborator is Agent =>
+          collaborator !== null && collaborator.organizationId === agent.organizationId,
+      )
       .map(({ name, role, description }) => ({ name, role, description }));
   }
 }

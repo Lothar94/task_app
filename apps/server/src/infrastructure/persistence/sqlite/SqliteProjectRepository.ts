@@ -4,6 +4,7 @@ import type { SqliteDatabase } from './openDatabase.js';
 
 interface ProjectRow {
   id: string;
+  organization_id: string;
   name: string;
   description: string;
   workspace_path: string;
@@ -18,8 +19,8 @@ export class SqliteProjectRepository implements ProjectRepository {
     this.db.transaction(() => {
       this.db
         .prepare(
-          `INSERT INTO projects (id, name, description, workspace_path, created_at)
-           VALUES (@id, @name, @description, @workspacePath, @createdAt)
+          `INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at)
+           VALUES (@id, @organizationId, @name, @description, @workspacePath, @createdAt)
            ON CONFLICT(id) DO UPDATE SET name = @name, description = @description,
              workspace_path = @workspacePath`,
         )
@@ -35,8 +36,10 @@ export class SqliteProjectRepository implements ProjectRepository {
     return row ? this.toProject(row) : null;
   }
 
-  findAll(): Project[] {
-    const rows = this.db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all() as ProjectRow[];
+  findByOrganization(organizationId: string): Project[] {
+    const rows = this.db
+      .prepare('SELECT * FROM projects WHERE organization_id = ? ORDER BY created_at DESC')
+      .all(organizationId) as ProjectRow[];
     return rows.map((row) => this.toProject(row));
   }
 
@@ -53,6 +56,7 @@ export class SqliteProjectRepository implements ProjectRepository {
   private toProject(row: ProjectRow): Project {
     return Project.restore({
       id: row.id,
+      organizationId: row.organization_id,
       name: row.name,
       description: row.description,
       workspacePath: row.workspace_path,

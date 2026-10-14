@@ -10,6 +10,7 @@ export interface ProjectDetails {
 
 export interface ProjectSnapshot extends ProjectDetails {
   id: string;
+  organizationId: string;
   memberIds: string[];
   createdAt: Date;
 }
@@ -17,9 +18,16 @@ export interface ProjectSnapshot extends ProjectDetails {
 export class Project {
   private constructor(private state: ProjectSnapshot) {}
 
-  static create(id: string, details: ProjectDetails, memberIds: string[], now: Date): Project {
+  static create(
+    id: string,
+    organizationId: string,
+    details: ProjectDetails,
+    memberIds: string[],
+    now: Date,
+  ): Project {
     const project = new Project({
       id,
+      organizationId,
       ...Project.validateDetails(details),
       memberIds: [],
       createdAt: now,
@@ -34,6 +42,10 @@ export class Project {
 
   get id(): string {
     return this.state.id;
+  }
+
+  get organizationId(): string {
+    return this.state.organizationId;
   }
 
   get workspacePath(): string {

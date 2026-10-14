@@ -18,14 +18,14 @@ export class DeleteAgent {
     if (this.tasks.existsForAgent(agentId)) {
       throw new ConflictError(`Agent "${agent.name}" has tasks and cannot be deleted`);
     }
-    this.detachFromTeammates(agentId);
+    this.detachFromTeammates(agent.organizationId, agentId);
     this.detachFromProjects(agentId);
     this.agents.delete(agentId);
   }
 
-  private detachFromTeammates(agentId: string): void {
+  private detachFromTeammates(organizationId: string, agentId: string): void {
     const now = this.clock.now();
-    for (const teammate of this.agents.findAll()) {
+    for (const teammate of this.agents.findByOrganization(organizationId)) {
       if (!teammate.canDelegateTo(agentId)) continue;
       teammate.removeCollaborator(agentId, now);
       this.agents.save(teammate);

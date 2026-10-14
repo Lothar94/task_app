@@ -1,3 +1,4 @@
+import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { describe, expect, it } from 'vitest';
 import { ValidationError } from '../../src/domain/errors/DomainError.js';
 import { createTestFleet, profile } from '../support/testFleet.js';
@@ -6,11 +7,13 @@ describe('agent instructions', () => {
   it('are generated when an agent is created without them', async () => {
     const fleet = createTestFleet();
     const backend = await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: profile('Backend'),
       collaboratorIds: [],
     });
 
     const cto = await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: profile('CTO', { instructions: '   ', role: 'Chief Technology Officer' }),
       collaboratorIds: [backend.id],
     });
@@ -31,6 +34,7 @@ describe('agent instructions', () => {
   it('keep what the project manager wrote', async () => {
     const fleet = createTestFleet();
     const agent = await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: profile('QA', { instructions: 'Test everything' }),
       collaboratorIds: [],
     });
@@ -67,6 +71,7 @@ describe('agent instructions', () => {
   it('use the guidance given when creating the agent without instructions', async () => {
     const fleet = createTestFleet();
     const agent = await fleet.useCases.createAgent.execute({
+      organizationId: DEFAULT_ORGANIZATION_ID,
       profile: profile('Docs', { instructions: '' }),
       collaboratorIds: [],
       instructionsGuidance: 'Write in Spanish',

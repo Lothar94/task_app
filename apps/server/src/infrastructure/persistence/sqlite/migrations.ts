@@ -1,4 +1,8 @@
+import { DEFAULT_ORGANIZATION_NAME } from '@fleet/shared';
 import type Database from 'better-sqlite3';
+
+/** Fixed id of the organization that owns everything created before organizations existed. */
+export const DEFAULT_ORGANIZATION_ID = 'default';
 
 const MIGRATIONS: readonly string[] = [
   `
@@ -91,15 +95,95 @@ const MIGRATIONS: readonly string[] = [
   ALTER TABLE tasks ADD COLUMN queue_position INTEGER;
   CREATE INDEX tasks_queue_idx ON tasks(project_id, queue_position) WHERE status = 'queued';
   `,
+  `
+  CREATE TABLE organizations (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  INSERT INTO organizations (id, name, created_at, updated_at) VALUES
+    ('${DEFAULT_ORGANIZATION_ID}', '${DEFAULT_ORGANIZATION_NAME.replaceAll("'", "''")}',
+     strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'));
+
+  -- Agent names stop being globally unique: they are unique within their organization.
+  CREATE TABLE agents_rebuilt (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL REFERENCES organizations(id),
+    name TEXT NOT NULL COLLATE NOCASE,
+    role TEXT NOT NULL,
+    description TEXT NOT NULL,
+    instructions TEXT NOT NULL,
+    model TEXT NOT NULL,
+    effort TEXT NOT NULL,
+    allowed_tools TEXT NOT NULL,
+    permission_mode TEXT NOT NULL,
+    max_turns INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (organization_id, name)
+  );
+  INSERT INTO agents_rebuilt (id, organization_id, name, role, description, instructions, model, effort,
+      allowed_tools, permission_mode, max_turns, created_at, updated_at)
+    SELECT id, '${DEFAULT_ORGANIZATION_ID}', name, role, description, instructions, model, effort,
+      allowed_tools, permission_mode, max_turns, created_at, updated_at
+    FROM agents;
+  DROP TABLE agents;
+  ALTER TABLE agents_rebuilt RENAME TO agents;
+
+  CREATE TABLE projects_rebuilt (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL REFERENCES organizations(id),
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    workspace_path TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  INSERT INTO projects_rebuilt (id, organization_id, name, description, workspace_path, created_at)
+    SELECT id, '${DEFAULT_ORGANIZATION_ID}', name, description, workspace_path, created_at FROM projects;
+  DROP TABLE projects;
+  ALTER TABLE projects_rebuilt RENAME TO projects;
+  CREATE INDEX projects_organization_idx ON projects(organization_id);
+  `,
 ];
+
+/** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */
+const REBUILDING_MIGRATIONS: ReadonlySet<number> = new Set([6]);
 
 /** Applies pending migrations, optionally stopping at `targetVersion` (useful to build old schemas in tests). */
 export function migrate(db: Database.Database, targetVersion = MIGRATIONS.length): void {
   const applied = db.pragma('user_version', { simple: true }) as number;
   MIGRATIONS.slice(applied, targetVersion).forEach((sql, offset) => {
+    const version = applied + offset + 1;
+    if (REBUILDING_MIGRATIONS.has(version)) applyWithoutForeignKeys(db, sql, version);
+    else applyInTransaction(db, sql, version);
+  });
+}
+
+function applyInTransaction(db: Database.Database, sql: string, version: number): void {
+  db.transaction(() => {
+    db.exec(sql);
+    db.pragma(`user_version = ${version}`);
+  })();
+}
+
+/**
+ * PRAGMA foreign_keys is a no-op inside a transaction, so it is switched off around it. Nothing is
+ * committed unless every foreign key still holds afterwards.
+ */
+function applyWithoutForeignKeys(db: Database.Database, sql: string, version: number): void {
+  const wereEnabled = db.pragma('foreign_keys', { simple: true }) === 1;
+  db.pragma('foreign_keys = OFF');
+  try {
     db.transaction(() => {
       db.exec(sql);
-      db.pragma(`user_version = ${applied + offset + 1}`);
+      const violations = db.pragma('foreign_key_check') as unknown[];
+      if (violations.length > 0) {
+        throw new Error(`Migration ${version} leaves ${violations.length} foreign key violation(s)`);
+      }
+      db.pragma(`user_version = ${version}`);
     })();
-  });
+  } finally {
+    if (wereEnabled) db.pragma('foreign_keys = ON');
+  }
 }

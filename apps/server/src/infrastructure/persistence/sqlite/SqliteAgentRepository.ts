@@ -5,6 +5,7 @@ import type { SqliteDatabase } from './openDatabase.js';
 
 interface AgentRow {
   id: string;
+  organization_id: string;
   name: string;
   role: string;
   description: string;
@@ -26,9 +27,9 @@ export class SqliteAgentRepository implements AgentRepository {
     this.db.transaction(() => {
       this.db
         .prepare(
-          `INSERT INTO agents (id, name, role, description, instructions, model, effort, allowed_tools,
+          `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools,
              permission_mode, max_turns, created_at, updated_at)
-           VALUES (@id, @name, @role, @description, @instructions, @model, @effort, @allowedTools,
+           VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools,
              @permissionMode, @maxTurns, @createdAt, @updatedAt)
            ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
              instructions = @instructions, model = @model, effort = @effort, allowed_tools = @allowedTools,
@@ -53,13 +54,17 @@ export class SqliteAgentRepository implements AgentRepository {
     return row ? this.toAgent(row) : null;
   }
 
-  findByName(name: string): Agent | null {
-    const row = this.db.prepare('SELECT * FROM agents WHERE name = ?').get(name) as AgentRow | undefined;
+  findByName(organizationId: string, name: string): Agent | null {
+    const row = this.db
+      .prepare('SELECT * FROM agents WHERE organization_id = ? AND name = ?')
+      .get(organizationId, name) as AgentRow | undefined;
     return row ? this.toAgent(row) : null;
   }
 
-  findAll(): Agent[] {
-    const rows = this.db.prepare('SELECT * FROM agents ORDER BY created_at').all() as AgentRow[];
+  findByOrganization(organizationId: string): Agent[] {
+    const rows = this.db
+      .prepare('SELECT * FROM agents WHERE organization_id = ? ORDER BY created_at')
+      .all(organizationId) as AgentRow[];
     return rows.map((row) => this.toAgent(row));
   }
 
@@ -70,6 +75,7 @@ export class SqliteAgentRepository implements AgentRepository {
   private toAgent(row: AgentRow): Agent {
     return Agent.restore({
       id: row.id,
+      organizationId: row.organization_id,
       name: row.name,
       role: row.role,
       description: row.description,

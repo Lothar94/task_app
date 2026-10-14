@@ -1,3 +1,4 @@
+import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import type { AgentProfile } from '../../src/domain/agent/Agent.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
 import type { AgentBrief, InstructionWriter } from '../../src/application/ports/InstructionWriter.js';
@@ -49,16 +50,24 @@ export function createTestFleet(
 }
 
 /** Creates a CTO that can delegate to the given teammates, all members of a fresh project. */
-export async function createTeamProject(fleet: ReturnType<typeof createTestFleet>, teammates: string[]) {
+export async function createTeamProject(
+  fleet: ReturnType<typeof createTestFleet>,
+  teammates: string[],
+  organizationId = DEFAULT_ORGANIZATION_ID,
+) {
   const { useCases } = fleet;
   const members = await Promise.all(
-    teammates.map((name) => useCases.createAgent.execute({ profile: profile(name), collaboratorIds: [] })),
+    teammates.map((name) =>
+      useCases.createAgent.execute({ organizationId, profile: profile(name), collaboratorIds: [] }),
+    ),
   );
   const cto = await useCases.createAgent.execute({
+    organizationId,
     profile: profile('CTO'),
     collaboratorIds: members.map((member) => member.id),
   });
   const project = useCases.createProject.execute({
+    organizationId,
     details: { name: 'Demo', description: '', workspacePath: '/tmp/fleet-test-workspace' },
     memberIds: [cto.id, ...members.map((member) => member.id)],
   });

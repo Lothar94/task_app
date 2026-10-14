@@ -3,7 +3,8 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { migrate } from '../../src/infrastructure/persistence/sqlite/migrations.js';
+import { DEFAULT_ORGANIZATION_NAME } from '@fleet/shared';
+import { DEFAULT_ORGANIZATION_ID, migrate } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
 import { SqliteAgentRepository } from '../../src/infrastructure/persistence/sqlite/SqliteAgentRepository.js';
 
@@ -88,5 +89,87 @@ describe('task planning migration', () => {
     const row = openDatabase(file).prepare('SELECT milestone, tags, queue_position FROM tasks').get();
 
     expect(row).toEqual({ milestone: null, tags: '[]', queue_position: null });
+  });
+});
+
+describe('organizations migration', () => {
+  const LEGACY_FLEET = `${AGENT_V1}
+    INSERT INTO agents (id, name, role, description, instructions, model, effort, allowed_tools, permission_mode,
+      max_turns, created_at, updated_at) VALUES ('a2', 'Dev', 'Dev', '', 'Dev', 'sonnet', 'low', '["Read"]', 'dontAsk', 5,
+      '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z');
+    INSERT INTO agent_relations VALUES ('a1', 'a2');
+    INSERT INTO projects VALUES ('p1', 'P1', 'desc', '/tmp/p1', '2026-01-01T00:00:00Z');
+    INSERT INTO project_agents VALUES ('p1', 'a1'), ('p1', 'a2');
+    INSERT INTO tasks (id, number, project_id, agent_id, title, description, status, result_summary, created_at,
+      started_at, finished_at) VALUES ('t1', 1, 'p1', 'a2', 'Done', 'd', 'completed', 'ok', '2026-01-01', '2026-01-01', '2026-01-02');
+    INSERT INTO conversation_messages VALUES ('m1', 't1', 1, '{}', '2026-01-01');
+    INSERT INTO task_runs (id, task_id, started_at, finished_at, outcome, model_usage)
+      VALUES ('r1', 't1', '2026-01-01', '2026-01-02', 'completed', '[]');`;
+
+  const count = (db: ReturnType<typeof openDatabase>, table: string) =>
+    (db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
+
+  it('moves every existing record into the default organization without losing data', () => {
+    const db = openDatabase(legacyDatabase(5, LEGACY_FLEET));
+
+    const [organization] = db.prepare('SELECT id, name FROM organizations').all();
+    expect(organization).toEqual({ id: DEFAULT_ORGANIZATION_ID, name: DEFAULT_ORGANIZATION_NAME });
+    expect(db.prepare('SELECT DISTINCT organization_id FROM agents').all()).toEqual([
+      { organization_id: DEFAULT_ORGANIZATION_ID },
+    ]);
+    expect(db.prepare('SELECT DISTINCT organization_id FROM projects').all()).toEqual([
+      { organization_id: DEFAULT_ORGANIZATION_ID },
+    ]);
+    for (const [table, rows] of Object.entries({
+      agents: 2,
+      agent_relations: 1,
+      projects: 1,
+      project_agents: 2,
+      tasks: 1,
+      conversation_messages: 1,
+      task_runs: 1,
+    })) {
+      expect(count(db, table), table).toBe(rows);
+    }
+    expect(new SqliteAgentRepository(db).findById('a2')?.toSnapshot()).toMatchObject({
+      name: 'Dev',
+      effort: 'low',
+      allowedTools: ['Read'],
+      organizationId: DEFAULT_ORGANIZATION_ID,
+    });
+    expect(db.pragma('foreign_key_check')).toEqual([]);
+    expect(db.pragma('foreign_keys', { simple: true })).toBe(1);
+  });
+
+  it('keeps enforcing foreign keys and cascades afterwards', () => {
+    const db = openDatabase(legacyDatabase(5, LEGACY_FLEET));
+
+    expect(() => db.prepare('DELETE FROM agents WHERE id = ?').run('a2')).toThrow(/FOREIGN KEY/);
+    db.prepare('DELETE FROM projects WHERE id = ?').run('p1');
+    expect(count(db, 'tasks')).toBe(0);
+    expect(count(db, 'project_agents')).toBe(0);
+  });
+
+  it('allows the same agent name in different organizations but not within one', () => {
+    const db = openDatabase(legacyDatabase(5, LEGACY_FLEET));
+    db.prepare("INSERT INTO organizations VALUES ('o2', 'Other', 'x', 'x')").run();
+    const insert =
+      db.prepare(`INSERT INTO agents (id, organization_id, name, role, description, instructions, model,
+      effort, allowed_tools, permission_mode, max_turns, created_at, updated_at)
+      VALUES (?, ?, ?, 'r', '', 'i', 'opus', 'high', '[]', 'dontAsk', 1, 'x', 'x')`);
+
+    expect(() => insert.run('b1', 'o2', 'cto')).not.toThrow();
+    expect(() => insert.run('b2', DEFAULT_ORGANIZATION_ID, 'CTO')).toThrow(/UNIQUE/);
+  });
+
+  it('refuses to commit when a foreign key would be left broken', () => {
+    const file = legacyDatabase(
+      5,
+      `${LEGACY_FLEET} PRAGMA foreign_keys = OFF;
+      INSERT INTO project_agents VALUES ('p1', 'ghost');`,
+    );
+
+    expect(() => openDatabase(file)).toThrow(/foreign key violation/);
+    expect(new Database(file).pragma('user_version', { simple: true })).toBe(5);
   });
 });
