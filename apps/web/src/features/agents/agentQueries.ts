@@ -1,8 +1,9 @@
-import type { AgentInput } from '@fleet/shared';
+import type { AgentExportRequest, AgentInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
 import { skillsApi } from '../../api/skillsApi';
 import { queryKeys } from '../../api/queryKeys';
+import { downloadJson, exportFileName } from './agentExport';
 import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
 export function useAgents() {
@@ -52,5 +53,13 @@ export function useDeleteAgent() {
   return useMutation({
     mutationFn: agentsApi.remove,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
+  });
+}
+
+export function useExportAgents() {
+  const { id: organizationId } = useCurrentOrganization();
+  return useMutation({
+    mutationFn: (exportRequest: AgentExportRequest) => agentsApi.export(organizationId, exportRequest),
+    onSuccess: (bundle) => downloadJson(exportFileName(bundle), bundle),
   });
 }

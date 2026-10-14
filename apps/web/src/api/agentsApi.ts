@@ -1,4 +1,4 @@
-import type { AgentDto, AgentInput } from '@fleet/shared';
+import type { AgentDto, AgentExportDto, AgentExportRequest, AgentInput } from '@fleet/shared';
 import { request } from './httpClient';
 
 export interface InstructionsBrief {
@@ -24,5 +24,10 @@ export const agentsApi = {
     request<AgentDto>(`/agents/${id}/collaborators`, { method: 'PUT', body: { collaboratorIds } }),
   draftInstructions: (brief: InstructionsBrief) =>
     request<{ instructions: string }>('/agents/instructions-draft', { method: 'POST', body: brief }),
+  export: (organizationId: string, exportRequest: AgentExportRequest) =>
+    request<AgentExportDto>(`/organizations/${organizationId}/agents/export`, {
+      method: 'POST',
+      body: exportRequest,
+    }),
   remove: (id: string) => request<void>(`/agents/${id}`, { method: 'DELETE' }),
 };
