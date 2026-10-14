@@ -9,6 +9,7 @@ export type AgentPermissionMode = (typeof PERMISSION_MODES)[number];
 
 export interface AgentDto {
   id: string;
+  organizationId: string;
   name: string;
   role: string;
   description: string;
