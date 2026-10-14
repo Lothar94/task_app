@@ -145,6 +145,7 @@ const MIGRATIONS: readonly string[] = [
   ALTER TABLE projects_rebuilt RENAME TO projects;
   CREATE INDEX projects_organization_idx ON projects(organization_id);
   `,
+  `ALTER TABLE agents ADD COLUMN skills TEXT NOT NULL DEFAULT '[]';`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */

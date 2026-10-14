@@ -1,9 +1,12 @@
+import { dirname, join } from 'node:path';
 import { DEFAULT_AGENT_TOOLS } from '@fleet/shared';
 import type { AgentProfile } from '../domain/agent/Agent.js';
 import { openDatabase } from '../infrastructure/persistence/sqlite/openDatabase.js';
 import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/ClaudeInstructionWriter.js';
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
+import { FileSystemSkillCatalog } from '../infrastructure/system/FileSystemSkillCatalog.js';
+import { FileSystemSkillWorkspace } from '../infrastructure/system/FileSystemSkillWorkspace.js';
 import { ConsoleLogger } from '../infrastructure/system/ConsoleLogger.js';
 import { claudeRuntimeConfig } from './claudeRuntimeConfig.js';
 import { loadConfig } from './config.js';
@@ -23,6 +26,7 @@ const TEAM: AgentProfile[] = [
     model: 'opus',
     effort: 'high',
     allowedTools: ['Read', 'Glob', 'Grep', 'TodoWrite'],
+    skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 60,
   },
@@ -35,6 +39,7 @@ const TEAM: AgentProfile[] = [
     model: 'sonnet',
     effort: 'medium',
     allowedTools: DEFAULT_AGENT_TOOLS,
+    skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 80,
   },
@@ -47,6 +52,7 @@ const TEAM: AgentProfile[] = [
     model: 'sonnet',
     effort: 'medium',
     allowedTools: DEFAULT_AGENT_TOOLS,
+    skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 80,
   },
@@ -59,6 +65,7 @@ const TEAM: AgentProfile[] = [
     model: 'sonnet',
     effort: 'low',
     allowedTools: ['Read', 'Glob', 'Grep', 'Bash', 'TodoWrite'],
+    skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 40,
   },
@@ -70,6 +77,11 @@ const { useCases } = createContainer({
   db: openDatabase(config.databasePath),
   runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), claudeRuntimeConfig(config)),
   instructionWriter: new ClaudeInstructionWriter(config.claudeExecutablePath),
+  skillCatalog: new FileSystemSkillCatalog(config.userSkillsDir),
+  skillWorkspace: new FileSystemSkillWorkspace(
+    config.userSkillsDir,
+    join(dirname(config.databasePath), 'skill-bridges'),
+  ),
   logger,
   maxDelegationDepth: config.maxDelegationDepth,
 });

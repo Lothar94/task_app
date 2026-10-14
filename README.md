@@ -32,6 +32,7 @@ asigna una tarea al CTO.
 | `MAX_DELEGATION_DEPTH` | `4`                      | Profundidad máxima de la cadena de delegación |
 | `WEB_ORIGIN`           | `http://localhost:5173`  | Origen permitido por CORS                    |
 | `CLAUDE_EXECUTABLE`    | binario incluido en SDK  | Ruta a un `claude` concreto                  |
+| `USER_SKILLS_DIR`      | `~/.claude/skills`       | Skills de usuario que se pueden asignar a los agentes |
 
 ## Cómo funciona la delegación
 

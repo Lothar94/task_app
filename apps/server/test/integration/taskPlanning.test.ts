@@ -236,6 +236,7 @@ describe('task planning API', () => {
           model: 'sonnet',
           effort: 'high',
           allowedTools: [],
+          skills: [],
           permissionMode: 'dontAsk',
           maxTurns: 5,
         },

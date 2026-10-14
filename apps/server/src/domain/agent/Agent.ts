@@ -1,4 +1,11 @@
-import type { AgentEffort, AgentModel, AgentPermissionMode } from '@fleet/shared';
+import {
+  type AgentEffort,
+  type AgentModel,
+  type AgentPermissionMode,
+  MAX_AGENT_SKILLS,
+  MAX_SKILL_NAME_LENGTH,
+  SKILL_NAME_PATTERN,
+} from '@fleet/shared';
 import { ValidationError } from '../errors/DomainError.js';
 import { requireIntegerInRange, requireText } from '../shared/guards.js';
 
@@ -12,6 +19,7 @@ export interface AgentProfile {
   model: AgentModel;
   effort: AgentEffort;
   allowedTools: string[];
+  skills: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
 }
@@ -39,7 +47,11 @@ export class Agent {
   }
 
   static restore(snapshot: AgentSnapshot): Agent {
-    return new Agent({ ...snapshot, collaboratorIds: [...snapshot.collaboratorIds] });
+    return new Agent({
+      ...snapshot,
+      skills: [...snapshot.skills],
+      collaboratorIds: [...snapshot.collaboratorIds],
+    });
   }
 
   get id(): string {
@@ -60,6 +72,10 @@ export class Agent {
 
   get description(): string {
     return this.state.description;
+  }
+
+  get skills(): readonly string[] {
+    return this.state.skills;
   }
 
   get collaboratorIds(): readonly string[] {
@@ -90,7 +106,11 @@ export class Agent {
   }
 
   toSnapshot(): AgentSnapshot {
-    return { ...this.state, collaboratorIds: [...this.state.collaboratorIds] };
+    return {
+      ...this.state,
+      skills: [...this.state.skills],
+      collaboratorIds: [...this.state.collaboratorIds],
+    };
   }
 
   private static validateProfile(profile: AgentProfile): AgentProfile {
@@ -102,8 +122,26 @@ export class Agent {
       model: profile.model,
       effort: profile.effort,
       allowedTools: [...new Set(profile.allowedTools.map((tool) => tool.trim()).filter(Boolean))],
+      skills: normalizeSkills(profile.skills),
       permissionMode: profile.permissionMode,
       maxTurns: requireIntegerInRange(profile.maxTurns, 'maxTurns', 1, MAX_AGENT_TURNS),
     };
+  }
+}
+
+function normalizeSkills(skills: string[]): string[] {
+  const unique = [...new Set(skills.map((skill) => skill.trim()).filter(Boolean))];
+  if (unique.length > MAX_AGENT_SKILLS) {
+    throw new ValidationError(`An agent can use at most ${MAX_AGENT_SKILLS} skills`);
+  }
+  for (const skill of unique) requireValidSkillName(skill);
+  return unique;
+}
+
+function requireValidSkillName(skill: string): void {
+  if (skill.length > MAX_SKILL_NAME_LENGTH || !SKILL_NAME_PATTERN.test(skill)) {
+    throw new ValidationError(
+      `Invalid skill name "${skill}": use lowercase letters, digits and single hyphens, up to ${MAX_SKILL_NAME_LENGTH} characters`,
+    );
   }
 }

@@ -13,6 +13,7 @@ interface AgentRow {
   model: AgentModel;
   effort: AgentEffort;
   allowed_tools: string;
+  skills: string;
   permission_mode: AgentPermissionMode;
   max_turns: number;
   created_at: string;
@@ -27,17 +28,18 @@ export class SqliteAgentRepository implements AgentRepository {
     this.db.transaction(() => {
       this.db
         .prepare(
-          `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools,
+          `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools, skills,
              permission_mode, max_turns, created_at, updated_at)
-           VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools,
+           VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools, @skills,
              @permissionMode, @maxTurns, @createdAt, @updatedAt)
            ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
              instructions = @instructions, model = @model, effort = @effort, allowed_tools = @allowedTools,
-             permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
+             skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
         )
         .run({
           ...snapshot,
           allowedTools: JSON.stringify(snapshot.allowedTools),
+          skills: JSON.stringify(snapshot.skills),
           createdAt: snapshot.createdAt.toISOString(),
           updatedAt: snapshot.updatedAt.toISOString(),
         });
@@ -83,6 +85,7 @@ export class SqliteAgentRepository implements AgentRepository {
       model: row.model,
       effort: row.effort,
       allowedTools: JSON.parse(row.allowed_tools) as string[],
+      skills: JSON.parse(row.skills) as string[],
       permissionMode: row.permission_mode,
       maxTurns: row.max_turns,
       collaboratorIds: this.collaboratorIdsOf(row.id),

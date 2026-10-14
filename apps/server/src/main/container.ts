@@ -9,6 +9,9 @@ import { SetAgentCollaborators } from '../application/agents/SetAgentCollaborato
 import { UpdateAgent } from '../application/agents/UpdateAgent.js';
 import type { AgentRuntime } from '../application/ports/AgentRuntime.js';
 import type { InstructionWriter } from '../application/ports/InstructionWriter.js';
+import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
+import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
+import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
@@ -47,6 +50,8 @@ export interface ContainerOptions {
   db: SqliteDatabase;
   runtime: AgentRuntime;
   instructionWriter: InstructionWriter;
+  skillCatalog: SkillCatalog;
+  skillWorkspace: SkillWorkspace;
   logger: Logger;
   maxDelegationDepth: number;
   reservedPorts?: number[];
@@ -64,7 +69,7 @@ interface Infrastructure {
 /** Wires the execution of tasks: running agents, delegation and cancellation. */
 function createTaskExecution(
   { ids, clock, agents, projects, tasks, recorder }: Infrastructure,
-  { runtime, logger, maxDelegationDepth, reservedPorts = [] }: ContainerOptions,
+  { runtime, skillWorkspace, logger, maxDelegationDepth, reservedPorts = [] }: ContainerOptions,
 ) {
   const running = new RunningTasks();
   const delegateSubtask = new DelegateSubtask(
@@ -84,6 +89,7 @@ function createTaskExecution(
     recorder,
     running,
     briefing: new AgentBriefing(reservedPorts),
+    skillWorkspace,
     delegateSubtask,
     clock,
     ids,
@@ -106,7 +112,7 @@ function createOrganizationUseCases(
 
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
-  const { db, instructionWriter } = options;
+  const { db, instructionWriter, skillCatalog } = options;
   const clock = new SystemClock();
   const ids = new UuidGenerator();
   const events = new InMemoryEventBus();
@@ -134,6 +140,7 @@ export function createContainer(options: ContainerOptions) {
       ...createOrganizationUseCases(organizations, ids, clock),
       createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, ids, clock),
       draftAgentInstructions,
+      listSkills: new ListSkills(skillCatalog),
       updateAgent: new UpdateAgent(agents, clock),
       deleteAgent: new DeleteAgent(agents, projects, tasks, clock),
       listAgents: new ListAgents(organizations, agents),

@@ -9,6 +9,7 @@ import {
   createTestFleet,
   eventually,
   FakeInstructionWriter,
+  fakeSkillSupport,
 } from '../support/testFleet.js';
 
 type Start = 'now' | 'draft' | 'queue';
@@ -212,6 +213,7 @@ describe('planning guards (QA)', () => {
         model: 'sonnet',
         effort: 'high',
         allowedTools: [],
+        skills: [],
         permissionMode: 'dontAsk',
         maxTurns: 5,
       },
@@ -318,6 +320,7 @@ describe('restart with a shared database (QA)', () => {
         db,
         runtime,
         instructionWriter: new FakeInstructionWriter(),
+        ...fakeSkillSupport(),
         logger: { info: () => undefined, error: () => undefined },
         maxDelegationDepth: 4,
         reservedPorts: [],

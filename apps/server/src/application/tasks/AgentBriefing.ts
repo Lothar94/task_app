@@ -17,6 +17,7 @@ export class AgentBriefing {
     return [
       this.identitySection(agent),
       `# Your instructions\n${instructions}`,
+      ...this.skillsSection(agent),
       this.teamSection(collaborators),
       this.sharedMachineSection(),
       this.efficiencySection(),
@@ -41,6 +42,17 @@ export class AgentBriefing {
     ];
     if (agent.description) lines.push(agent.description);
     return lines.join('\n');
+  }
+
+  private skillsSection(agent: Agent): string[] {
+    if (agent.skills.length === 0) return [];
+    return [
+      [
+        '# Your skills',
+        'You must use these skills. Load each one with the `Skill` tool before doing the work it covers:',
+        ...agent.skills.map((skill) => `- ${skill}`),
+      ].join('\n'),
+    ];
   }
 
   private teamSection(collaborators: CollaboratorInfo[]): string {

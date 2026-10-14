@@ -1,8 +1,11 @@
+import { dirname, join } from 'node:path';
 import { createHttpServer } from '../interfaces/http/createHttpServer.js';
 import { openDatabase } from '../infrastructure/persistence/sqlite/openDatabase.js';
 import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/ClaudeInstructionWriter.js';
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
+import { FileSystemSkillCatalog } from '../infrastructure/system/FileSystemSkillCatalog.js';
+import { FileSystemSkillWorkspace } from '../infrastructure/system/FileSystemSkillWorkspace.js';
 import { ConsoleLogger } from '../infrastructure/system/ConsoleLogger.js';
 import { claudeRuntimeConfig } from './claudeRuntimeConfig.js';
 import { loadConfig } from './config.js';
@@ -21,6 +24,11 @@ async function main(): Promise<void> {
     db: openDatabase(config.databasePath),
     runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), claudeRuntimeConfig(config)),
     instructionWriter: new ClaudeInstructionWriter(config.claudeExecutablePath),
+    skillCatalog: new FileSystemSkillCatalog(config.userSkillsDir),
+    skillWorkspace: new FileSystemSkillWorkspace(
+      config.userSkillsDir,
+      join(dirname(config.databasePath), 'skill-bridges'),
+    ),
     logger,
     maxDelegationDepth: config.maxDelegationDepth,
     reservedPorts: config.reservedPorts,

@@ -3,6 +3,7 @@ export interface AgentBrief {
   role: string;
   description: string;
   allowedTools: string[];
+  skills: string[];
   collaborators: { name: string; role: string }[];
   /** Free-form requests from the project manager to shape the result. */
   guidance: string;

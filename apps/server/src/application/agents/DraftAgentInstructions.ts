@@ -8,6 +8,7 @@ export interface DraftInstructionsCommand {
   role: string;
   description: string;
   allowedTools: string[];
+  skills?: string[];
   collaboratorIds: string[];
   guidance?: string;
 }
@@ -35,6 +36,7 @@ export class DraftAgentInstructions {
       role: requireText(command.role, 'role', 120),
       description: command.description.trim(),
       allowedTools: command.allowedTools,
+      skills: command.skills ?? [],
       collaborators,
       guidance: requireOptionalText(command.guidance),
     });
