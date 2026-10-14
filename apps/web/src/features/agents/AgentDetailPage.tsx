@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Markdown } from '../../components/Markdown';
 import { Button, Card, ErrorMessage, LinkButton, Loading, PageHeader } from '../../components/ui';
 import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
-import { useAgents, useDeleteAgent } from './agentQueries';
+import { useSyncOrganization } from '../organizations/OrganizationContext';
+import { useAgent, useAgents, useDeleteAgent } from './agentQueries';
 
 function Property({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -36,10 +37,13 @@ function AgentLinks({ agents }: { agents: AgentDto[] }) {
 export function AgentDetailPage() {
   const { agentId = '' } = useParams();
   const navigate = useNavigate();
+  const requested = useAgent(agentId);
+  const isInOrganization = useSyncOrganization(requested.data?.organizationId);
   const agents = useAgents();
   const deleteAgent = useDeleteAgent();
 
-  if (agents.isPending) return <Loading />;
+  if (requested.error) return <ErrorMessage error={requested.error} />;
+  if (requested.isPending || !isInOrganization || agents.isPending) return <Loading />;
   if (agents.error) return <ErrorMessage error={agents.error} />;
   const agent = agents.data.find((candidate) => candidate.id === agentId);
   if (!agent) return <ErrorMessage error="Agente no encontrado" />;

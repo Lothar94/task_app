@@ -5,6 +5,7 @@ import { Dialog } from '../../components/Dialog';
 import { Button, Card, ErrorMessage, Loading, PageHeader } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
+import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { AgentGraph } from '../agents/diagram/AgentGraph';
 import { AssignTaskForm } from '../tasks/AssignTaskForm';
 import { QueueCard } from '../tasks/QueueCard';
@@ -99,10 +100,11 @@ function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDt
 export function ProjectPage() {
   const { projectId = '' } = useParams();
   const project = useProject(projectId);
+  const isInOrganization = useSyncOrganization(project.data?.organizationId);
   const agents = useAgents();
   useFleetEvents(projectId);
 
-  if (project.isPending || agents.isPending) return <Loading />;
+  if (project.isPending || !isInOrganization || agents.isPending) return <Loading />;
   if (project.error || agents.error) return <ErrorMessage error={project.error ?? agents.error} />;
   return <ProjectView project={project.data} agents={agents.data} />;
 }

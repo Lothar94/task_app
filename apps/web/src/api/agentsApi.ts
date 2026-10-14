@@ -11,10 +11,12 @@ export interface InstructionsBrief {
 }
 
 export const agentsApi = {
-  list: () => request<AgentDto[]>('/agents'),
+  list: (organizationId: string) => request<AgentDto[]>(`/organizations/${organizationId}/agents`),
   get: (id: string) => request<AgentDto>(`/agents/${id}`),
-  create: (input: AgentInput & { collaboratorIds: string[]; instructionsGuidance: string }) =>
-    request<AgentDto>('/agents', { method: 'POST', body: input }),
+  create: (
+    organizationId: string,
+    input: AgentInput & { collaboratorIds: string[]; instructionsGuidance: string },
+  ) => request<AgentDto>(`/organizations/${organizationId}/agents`, { method: 'POST', body: input }),
   update: (id: string, input: AgentInput) =>
     request<AgentDto>(`/agents/${id}`, { method: 'PUT', body: input }),
   setCollaborators: (id: string, collaboratorIds: string[]) =>
