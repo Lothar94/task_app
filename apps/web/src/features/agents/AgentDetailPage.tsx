@@ -5,6 +5,7 @@ import { Markdown } from '../../components/Markdown';
 import { Button, Card, ErrorMessage, LinkButton, Loading, PageHeader } from '../../components/ui';
 import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
+import { ExportButtons } from './ExportButtons';
 import { useAgent, useAgents, useDeleteAgent } from './agentQueries';
 
 function Property({ label, children }: { label: string; children: ReactNode }) {
@@ -75,6 +76,7 @@ export function AgentDetailPage() {
         subtitle={agent.role}
         actions={
           <>
+            <ExportButtons agentId={agent.id} hasCollaborators={collaborators.length > 0} />
             <LinkButton to={`/agents/${agent.id}/edit`}>Editar</LinkButton>
             <Button variant="danger" onClick={handleDelete} disabled={deleteAgent.isPending}>
               Eliminar

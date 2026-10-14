@@ -25,6 +25,11 @@ export const createAgentSchema = agentProfileSchema.extend({
   instructionsGuidance: z.string().default(''),
 });
 
+export const exportAgentsSchema = z.object({
+  agentIds: z.array(z.string().min(1)).optional(),
+  includeCollaborators: z.boolean().default(false),
+});
+
 export const draftInstructionsSchema = z.object({
   name: z.string(),
   role: z.string(),

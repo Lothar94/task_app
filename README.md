@@ -59,6 +59,13 @@ instrucciones a partir del nombre, rol, descripción, herramientas y colaborador
 antes de guardar. Si creas el agente con las instrucciones vacías, el servidor las genera
 automáticamente (`POST /api/agents/instructions-draft` para pedir solo el borrador).
 
+Exportar agentes: `POST /api/organizations/:id/agents/export` devuelve un JSON portable
+(`{ format: "agent-fleet/agents", version: 1, exportedAt, organization, agents }`) y lo descarga con
+`Content-Disposition`. El cuerpo es opcional: `agentIds` (sin él se exportan todos los agentes de la
+organización) e `includeCollaborators` (añade, de forma transitiva, a quienes delegan). El fichero no
+lleva ids ni fechas: cada agente trae sus campos de perfil y `collaborators` con los *nombres* de sus
+colaboradores presentes en la exportación (el resto se omiten).
+
 Intensidad por agente: `low`, `medium`, `high` (por defecto), `xhigh` o `max`. Se pasa al SDK como
 `effort` y regula cuánto razona el modelo antes de actuar: más intensidad da más calidad, pero tarda
 más y consume más cuota de la suscripción.
