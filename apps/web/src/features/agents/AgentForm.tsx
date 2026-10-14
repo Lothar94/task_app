@@ -4,6 +4,7 @@ import { Button, Card, CheckboxList, ErrorMessage, Field, Select, TextInput } fr
 import type { AgentFormValues } from './agentFormModel';
 import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
 import { InstructionsField } from './InstructionsField';
+import { SkillsField } from './SkillsField';
 
 const submittingLabel = (isNew: boolean, values: AgentFormValues) =>
   isNew && !values.instructions.trim() ? 'Creando y redactando instrucciones…' : 'Guardando…';
@@ -111,6 +112,9 @@ export function AgentForm(props: AgentFormProps) {
           >
             <TextInput value={values.allowedTools} onChange={(e) => set('allowedTools', e.target.value)} />
           </Field>
+        </div>
+        <div className="mt-4">
+          <SkillsField skills={values.skills} onChange={(skills) => set('skills', skills)} />
         </div>
       </Card>
 

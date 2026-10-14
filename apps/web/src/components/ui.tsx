@@ -167,11 +167,13 @@ export function CheckboxList<T extends { id: string; name: string }>({
   selected,
   onChange,
   describe,
+  isDisabled,
 }: {
   options: T[];
   selected: string[];
   onChange: (selected: string[]) => void;
   describe?: (option: T) => string;
+  isDisabled?: (option: T) => boolean;
 }) {
   if (options.length === 0) return <p className="text-sm text-zinc-500">No hay opciones disponibles.</p>;
   const toggle = (id: string) =>
@@ -180,11 +182,12 @@ export function CheckboxList<T extends { id: string; name: string }>({
     <ul className="grid gap-2 sm:grid-cols-2">
       {options.map((option) => (
         <li key={option.id}>
-          <label className="flex cursor-pointer items-start gap-2 rounded-md border border-zinc-800 p-2 hover:border-zinc-600">
+          <label className="flex cursor-pointer items-start gap-2 rounded-md border border-zinc-800 p-2 hover:border-zinc-600 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50">
             <input
               type="checkbox"
               className="mt-1 accent-indigo-500"
               checked={selected.includes(option.id)}
+              disabled={isDisabled?.(option) ?? false}
               onChange={() => toggle(option.id)}
             />
             <span>
