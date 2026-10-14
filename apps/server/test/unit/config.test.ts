@@ -37,4 +37,11 @@ describe('loadConfig user skills', () => {
   it('reads the skills directory from USER_SKILLS_DIR', () => {
     expect(loadConfig({ USER_SKILLS_DIR: '/opt/skills' }).userSkillsDir).toBe('/opt/skills');
   });
+
+  it('defaults the Claude config directory to ~/.claude and derives the skills directory from it', () => {
+    expect(loadConfig({}).claudeConfigDir).toBe(join(homedir(), '.claude'));
+    const config = loadConfig({ CLAUDE_CONFIG_DIR: '/opt/claude' });
+    expect(config.claudeConfigDir).toBe('/opt/claude');
+    expect(config.userSkillsDir).toBe(join('/opt/claude', 'skills'));
+  });
 });
