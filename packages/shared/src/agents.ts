@@ -43,11 +43,34 @@ export const DEFAULT_AGENT_TOOLS = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Ba
 
 /** Skill names follow the Agent Skills spec: lowercase letters, digits and single hyphens. */
 export const SKILL_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Applies to each part of a name: the skill and, for plugin skills, the plugin. */
 export const MAX_SKILL_NAME_LENGTH = 64;
 export const MAX_AGENT_SKILLS = 20;
+/** Separates the plugin from the skill in plugin skills, as Claude Code does: `caveman:caveman`. */
+export const PLUGIN_SKILL_SEPARATOR = ':';
 
-/** A skill installed for the user (`~/.claude/skills`) that agents can be told to use. */
+const isValidSkillPart = (part: string) =>
+  part.length <= MAX_SKILL_NAME_LENGTH && SKILL_NAME_PATTERN.test(part);
+
+/** Splits `plugin:skill` into its parts; plain skills have no plugin. */
+export function parseSkillName(name: string): { plugin: string | null; skill: string } {
+  const separator = name.indexOf(PLUGIN_SKILL_SEPARATOR);
+  if (separator === -1) return { plugin: null, skill: name };
+  return { plugin: name.slice(0, separator), skill: name.slice(separator + 1) };
+}
+
+/** True for `skill` and `plugin:skill`, where both parts follow SKILL_NAME_PATTERN. */
+export function isValidSkillName(name: string): boolean {
+  const { plugin, skill } = parseSkillName(name);
+  return isValidSkillPart(skill) && (plugin === null || isValidSkillPart(plugin));
+}
+
+/**
+ * A skill installed for the user that agents can be told to use: from `~/.claude/skills`
+ * (`plugin: null`) or from an installed and enabled Claude Code plugin (`name` is `plugin:skill`).
+ */
 export interface SkillDto {
   name: string;
   description: string;
+  plugin: string | null;
 }
