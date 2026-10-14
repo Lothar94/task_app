@@ -7,11 +7,11 @@ export interface DashboardQuery {
 }
 
 export const dashboardApi = {
-  get: ({ projectId, days }: DashboardQuery) => {
+  get: (organizationId: string, { projectId, days }: DashboardQuery) => {
     const params = new URLSearchParams();
     if (projectId) params.set('projectId', projectId);
     if (days) params.set('days', String(days));
     const query = params.toString();
-    return request<DashboardDto>(`/dashboard${query ? `?${query}` : ''}`);
+    return request<DashboardDto>(`/organizations/${organizationId}/dashboard${query ? `?${query}` : ''}`);
   },
 };

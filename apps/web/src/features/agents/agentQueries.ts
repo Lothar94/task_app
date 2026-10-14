@@ -2,11 +2,18 @@ import type { AgentInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
 import { queryKeys } from '../../api/queryKeys';
+import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
-export const useAgents = () => useQuery({ queryKey: queryKeys.agents, queryFn: agentsApi.list });
+export function useAgents() {
+  const { id: organizationId } = useCurrentOrganization();
+  return useQuery({
+    queryKey: queryKeys.agents(organizationId),
+    queryFn: () => agentsApi.list(organizationId),
+  });
+}
 
 export const useAgent = (id: string) =>
-  useQuery({ queryKey: queryKeys.agent(id), queryFn: () => agentsApi.get(id) });
+  useQuery({ queryKey: queryKeys.agent(id), queryFn: () => agentsApi.get(id), enabled: id !== '' });
 
 export interface SaveAgentCommand {
   id?: string;
@@ -15,17 +22,21 @@ export interface SaveAgentCommand {
   instructionsGuidance: string;
 }
 
-async function saveAgent({ id, input, collaboratorIds, instructionsGuidance }: SaveAgentCommand) {
-  if (!id) return agentsApi.create({ ...input, collaboratorIds, instructionsGuidance });
+async function saveAgent(
+  organizationId: string,
+  { id, input, collaboratorIds, instructionsGuidance }: SaveAgentCommand,
+) {
+  if (!id) return agentsApi.create(organizationId, { ...input, collaboratorIds, instructionsGuidance });
   await agentsApi.update(id, input);
   return agentsApi.setCollaborators(id, collaboratorIds);
 }
 
 export function useSaveAgent() {
   const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
   return useMutation({
-    mutationFn: saveAgent,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents }),
+    mutationFn: (command: SaveAgentCommand) => saveAgent(organizationId, command),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
   });
 }
 
@@ -34,8 +45,9 @@ export const useDraftInstructions = () =>
 
 export function useDeleteAgent() {
   const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
   return useMutation({
     mutationFn: agentsApi.remove,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
   });
 }

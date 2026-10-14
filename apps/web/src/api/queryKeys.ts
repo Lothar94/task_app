@@ -1,10 +1,12 @@
 export const queryKeys = {
-  agents: ['agents'] as const,
-  agent: (id: string) => ['agents', id] as const,
-  projects: ['projects'] as const,
-  project: (id: string) => ['projects', id] as const,
+  organizations: ['organizations'] as const,
+  agents: (organizationId: string) => ['agents', organizationId] as const,
+  agent: (id: string) => ['agent', id] as const,
+  projects: (organizationId: string) => ['projects', organizationId] as const,
+  project: (id: string) => ['project', id] as const,
   taskTree: (projectId: string) => ['task-tree', projectId] as const,
   task: (id: string) => ['tasks', id] as const,
   conversation: (taskId: string) => ['conversation', taskId] as const,
-  dashboard: (projectId: string | null, days: number | null) => ['dashboard', projectId, days] as const,
+  dashboard: (organizationId: string, projectId: string | null, days: number | null) =>
+    ['dashboard', organizationId, projectId, days] as const,
 };
