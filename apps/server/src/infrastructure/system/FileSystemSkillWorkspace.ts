@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
 import { mkdir, stat, symlink } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { SkillWorkspace } from '../../application/ports/SkillWorkspace.js';
+import { parseSkillName } from '@fleet/shared';
+import type { PluginRegistry } from '../../application/ports/PluginRegistry.js';
+import type { PreparedSkills, SkillWorkspace } from '../../application/ports/SkillWorkspace.js';
 
 const BRIDGE_ID_LENGTH = 16;
 
@@ -15,10 +17,36 @@ export class FileSystemSkillWorkspace implements SkillWorkspace {
   constructor(
     private readonly userSkillsDir: string,
     private readonly bridgesDir: string,
+    private readonly plugins: PluginRegistry,
   ) {}
 
-  async prepare(skills: readonly string[]): Promise<string | null> {
-    const installed = await this.installed(skills);
+  async prepare(skills: readonly string[]): Promise<PreparedSkills> {
+    const names = [...new Set(skills)];
+    const [skillsDirectory, pluginPaths] = await Promise.all([
+      this.bridgeFor(names.filter((name) => parseSkillName(name).plugin === null)),
+      this.pluginPathsFor(names),
+    ]);
+    return { skillsDirectory, pluginPaths };
+  }
+
+  /** Install paths of the enabled plugins that really contain the requested plugin skills. */
+  private async pluginPathsFor(names: readonly string[]): Promise<string[]> {
+    const wanted = names.map(parseSkillName).filter((parsed) => parsed.plugin !== null);
+    if (wanted.length === 0) return [];
+    const plugins = await this.plugins.list();
+    const paths = await Promise.all(
+      wanted.map(async ({ plugin, skill }) => {
+        const owner = plugins.find((candidate) => candidate.name === plugin);
+        return owner && (await isFile(join(owner.installPath, 'skills', skill, 'SKILL.md')))
+          ? owner.installPath
+          : null;
+      }),
+    );
+    return [...new Set(paths.filter((path): path is string => path !== null))];
+  }
+
+  private async bridgeFor(userSkills: readonly string[]): Promise<string | null> {
+    const installed = await this.installed(userSkills);
     if (installed.length === 0) return null;
 
     const bridgeDir = join(this.bridgesDir, bridgeId(installed));
@@ -40,17 +68,19 @@ export class FileSystemSkillWorkspace implements SkillWorkspace {
   /** The existing skills, deduplicated and sorted so the same set always yields the same bridge. */
   private async installed(skills: readonly string[]): Promise<string[]> {
     const found = await Promise.all(
-      [...new Set(skills)].map(async (skill) => {
-        const exists = await stat(join(this.userSkillsDir, skill, 'SKILL.md')).then(
-          (file) => file.isFile(),
-          () => false,
-        );
-        return exists ? skill : null;
-      }),
+      skills.map(async (skill) =>
+        (await isFile(join(this.userSkillsDir, skill, 'SKILL.md'))) ? skill : null,
+      ),
     );
     return found.filter((skill): skill is string => skill !== null).sort();
   }
 }
+
+const isFile = (path: string) =>
+  stat(path).then(
+    (file) => file.isFile(),
+    () => false,
+  );
 
 function bridgeId(sortedSkills: readonly string[]): string {
   return createHash('sha256').update(sortedSkills.join('\n')).digest('hex').slice(0, BRIDGE_ID_LENGTH);

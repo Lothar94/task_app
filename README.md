@@ -25,14 +25,22 @@ pnpm dev       # API en http://127.0.0.1:4100, web en http://localhost:5173
 Luego: crea un proyecto con una ruta absoluta (se crea si no existe), añade agentes al equipo y
 asigna una tarea al CTO.
 
-| Variable               | Por defecto              | Descripción                                  |
-| ---------------------- | ------------------------ | -------------------------------------------- |
-| `PORT` / `HOST`        | `4100` / `127.0.0.1`     | Dirección de la API                          |
-| `DATABASE_PATH`        | `data/fleet.db`          | Fichero SQLite                               |
-| `MAX_DELEGATION_DEPTH` | `4`                      | Profundidad máxima de la cadena de delegación |
-| `WEB_ORIGIN`           | `http://localhost:5173`  | Origen permitido por CORS                    |
-| `CLAUDE_EXECUTABLE`    | binario incluido en SDK  | Ruta a un `claude` concreto                  |
-| `USER_SKILLS_DIR`      | `~/.claude/skills`       | Skills de usuario que se pueden asignar a los agentes |
+| Variable               | Por defecto                  | Descripción                                                                   |
+| ---------------------- | ---------------------------- | ----------------------------------------------------------------------------- |
+| `PORT` / `HOST`        | `4100` / `127.0.0.1`         | Dirección de la API                                                           |
+| `DATABASE_PATH`        | `data/fleet.db`              | Fichero SQLite                                                                |
+| `MAX_DELEGATION_DEPTH` | `4`                          | Profundidad máxima de la cadena de delegación                                 |
+| `WEB_ORIGIN`           | `http://localhost:5173`      | Origen permitido por CORS                                                     |
+| `CLAUDE_EXECUTABLE`    | binario incluido en SDK      | Ruta a un `claude` concreto                                                   |
+| `CLAUDE_CONFIG_DIR`    | `~/.claude`                  | Directorio de configuración de Claude Code (plugins instalados y habilitados) |
+| `USER_SKILLS_DIR`      | `<CLAUDE_CONFIG_DIR>/skills` | Skills de usuario que se pueden asignar a los agentes                         |
+
+Las skills de plugins de Claude Code se listan como `plugin:skill` (p. ej. `caveman:caveman`) y se
+pueden asignar igual que las de usuario. Se leen de los plugins instalados
+(`<CLAUDE_CONFIG_DIR>/plugins/installed_plugins.json`) y habilitados (`enabledPlugins` en
+`<CLAUDE_CONFIG_DIR>/settings.json`); el prefijo es el `name` de su `.claude-plugin/plugin.json`.
+Ojo: al cargar un plugin para usar una de sus skills también se cargan sus demás partes (hooks,
+comandos y agentes). Un plugin deshabilitado o desinstalado simplemente no se carga.
 
 ## Cómo funciona la delegación
 

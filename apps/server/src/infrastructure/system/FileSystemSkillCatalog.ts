@@ -1,37 +1,53 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { MAX_SKILL_NAME_LENGTH, SKILL_NAME_PATTERN, type SkillDto } from '@fleet/shared';
+import { isValidSkillName, PLUGIN_SKILL_SEPARATOR, type SkillDto } from '@fleet/shared';
+import type { PluginRegistry } from '../../application/ports/PluginRegistry.js';
 import type { SkillCatalog } from '../../application/ports/SkillCatalog.js';
 
 const SKILL_FILE = 'SKILL.md';
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 
 /**
- * Lists the skills found in a directory: each subdirectory with a SKILL.md is one skill, identified by
- * its directory name (the frontmatter only provides the description).
+ * Lists the user's skills (each subdirectory of `skillsDir` with a SKILL.md) and those of the enabled
+ * plugins (`<plugin>:<directory>` under each plugin's `skills/`). A skill is identified by its directory
+ * name; the frontmatter only provides the description.
  */
 export class FileSystemSkillCatalog implements SkillCatalog {
-  constructor(private readonly skillsDir: string) {}
+  constructor(
+    private readonly skillsDir: string,
+    private readonly plugins: PluginRegistry,
+  ) {}
 
   async list(): Promise<SkillDto[]> {
-    const entries = await readdir(this.skillsDir, { withFileTypes: true }).catch(() => []);
-    const skills = await Promise.all(
-      entries
-        .filter((entry) => entry.isDirectory() || entry.isSymbolicLink())
-        .map((entry) => this.read(entry.name)),
-    );
-    return skills
-      .filter((skill): skill is SkillDto => skill !== null)
-      .sort((a, b) => a.name.localeCompare(b.name));
+    const plugins = await this.plugins.list();
+    const groups = await Promise.all([
+      readSkills(this.skillsDir, null),
+      ...plugins.map((plugin) => readSkills(join(plugin.installPath, 'skills'), plugin.name)),
+    ]);
+    return groups.flat().sort((a, b) => a.name.localeCompare(b.name));
   }
+}
 
-  private async read(directoryName: string): Promise<SkillDto | null> {
-    const content = await readFile(join(this.skillsDir, directoryName, SKILL_FILE), 'utf8').catch(() => null);
-    if (content === null) return null;
-    const fields = parseFrontmatter(content);
-    if (directoryName.length > MAX_SKILL_NAME_LENGTH || !SKILL_NAME_PATTERN.test(directoryName)) return null;
-    return { name: directoryName, description: fields.get('description') ?? '' };
-  }
+async function readSkills(directory: string, plugin: string | null): Promise<SkillDto[]> {
+  const entries = await readdir(directory, { withFileTypes: true }).catch(() => []);
+  const skills = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory() || entry.isSymbolicLink())
+      .map((entry) => readSkill(directory, entry.name, plugin)),
+  );
+  return skills.filter((skill): skill is SkillDto => skill !== null);
+}
+
+async function readSkill(
+  directory: string,
+  directoryName: string,
+  plugin: string | null,
+): Promise<SkillDto | null> {
+  const content = await readFile(join(directory, directoryName, SKILL_FILE), 'utf8').catch(() => null);
+  if (content === null) return null;
+  const name = plugin === null ? directoryName : `${plugin}${PLUGIN_SKILL_SEPARATOR}${directoryName}`;
+  if (!isValidSkillName(name) || (plugin === null && name.includes(PLUGIN_SKILL_SEPARATOR))) return null;
+  return { name, description: parseFrontmatter(content).get('description') ?? '', plugin };
 }
 
 /** Reads the flat `key: value` lines of the frontmatter; enough for `description`. */

@@ -70,7 +70,8 @@ function settingsFor(config: ClaudeRuntimeConfig): NonNullable<Options['settings
  * tools the agent may use are defined, and no memory or foreign MCP servers are loaded. Skills are
  * off unless the agent was assigned some: then only those are enabled, the `Skill` tool is added,
  * and the user's skills are found through `skillsDirectory` (never through the `user` setting
- * source, which would also load the user's hooks, permissions and plugins).
+ * source, which would also load the user's hooks, permissions and plugins). Plugin skills load their
+ * plugin through `pluginPaths`, which also brings the plugin's other parts (hooks, commands, agents).
  */
 export function buildSdkOptions(
   request: AgentRunRequest,
@@ -94,6 +95,9 @@ export function buildSdkOptions(
     settings: settingsFor(config),
     skills: request.skills,
     ...(hasSkills && request.skillsDirectory ? { additionalDirectories: [request.skillsDirectory] } : {}),
+    ...(request.pluginPaths.length > 0
+      ? { plugins: request.pluginPaths.map((path) => ({ type: 'local' as const, path })) }
+      : {}),
     strictMcpConfig: true,
     env: environmentFor(config),
     hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [guardProcessCommands] }] },

@@ -6,8 +6,9 @@ import { createTeamProject, createTestFleet, eventually, profile } from '../supp
 
 const ORG = DEFAULT_ORGANIZATION_ID;
 const CATALOG = [
-  { name: 'pdf', description: 'Work with PDFs' },
-  { name: 'graphify', description: 'Build a graph' },
+  { name: 'pdf', description: 'Work with PDFs', plugin: null },
+  { name: 'graphify', description: 'Build a graph', plugin: null },
+  { name: 'caveman:caveman', description: 'Talk short', plugin: 'caveman' },
 ];
 
 describe('agent skills', () => {
@@ -72,6 +73,18 @@ describe('agent skills', () => {
     const response = await app.inject({ method: 'GET', url: '/api/skills' });
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual(CATALOG);
+  });
+
+  it('round-trips a plugin skill name', async () => {
+    const created = await post({ ...profile('Lara'), skills: ['caveman:caveman'] });
+    expect(created.statusCode).toBe(201);
+    expect(created.json().skills).toEqual(['caveman:caveman']);
+  });
+
+  it('answers 400 to a malformed plugin skill name', async () => {
+    const response = await post({ ...profile('Lara'), skills: ['a:b:c'] });
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error).toContain('plugin:skill');
   });
 
   it('passes the skills to the instruction writer when drafting', async () => {

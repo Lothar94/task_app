@@ -16,6 +16,7 @@ function requestWith(overrides: Partial<AgentRunRequest> = {}): AgentRunRequest 
     allowedTools: ['Read', 'Bash', 'mcp__other__tool'],
     skills: [],
     skillsDirectory: null,
+    pluginPaths: [],
     permissionMode: 'dontAsk',
     maxTurns: 5,
     workspacePath: '/workspace',
@@ -118,6 +119,20 @@ describe('buildSdkOptions', () => {
       const options = build({ skills: ['graphify'], allowedTools: ['Read', 'Skill'] });
       expect((options.tools as string[]).filter((tool) => tool === 'Skill')).toHaveLength(1);
       expect(options.allowedTools?.filter((tool) => tool === 'Skill')).toHaveLength(1);
+    });
+
+    it('loads the plugins that provide the assigned skills', () => {
+      const options = build({ skills: ['caveman:caveman'], pluginPaths: ['/p/a', '/p/b'] });
+      expect(options.plugins).toEqual([
+        { type: 'local', path: '/p/a' },
+        { type: 'local', path: '/p/b' },
+      ]);
+      expect(options.settingSources).toEqual(['project']);
+    });
+
+    it('adds no plugins option without plugin paths', () => {
+      expect(build({ skills: ['graphify'] })).not.toHaveProperty('plugins');
+      expect(build()).not.toHaveProperty('plugins');
     });
 
     it('adds no additional directory without a skills directory', () => {
