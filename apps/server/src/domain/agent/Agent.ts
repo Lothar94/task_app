@@ -3,8 +3,8 @@ import {
   type AgentModel,
   type AgentPermissionMode,
   MAX_AGENT_SKILLS,
+  isValidSkillName,
   MAX_SKILL_NAME_LENGTH,
-  SKILL_NAME_PATTERN,
 } from '@fleet/shared';
 import { ValidationError } from '../errors/DomainError.js';
 import { requireIntegerInRange, requireText } from '../shared/guards.js';
@@ -139,9 +139,9 @@ function normalizeSkills(skills: string[]): string[] {
 }
 
 function requireValidSkillName(skill: string): void {
-  if (skill.length > MAX_SKILL_NAME_LENGTH || !SKILL_NAME_PATTERN.test(skill)) {
+  if (!isValidSkillName(skill)) {
     throw new ValidationError(
-      `Invalid skill name "${skill}": use lowercase letters, digits and single hyphens, up to ${MAX_SKILL_NAME_LENGTH} characters`,
+      `Invalid skill name "${skill}": use "skill" or "plugin:skill", each part with lowercase letters, digits and single hyphens, up to ${MAX_SKILL_NAME_LENGTH} characters`,
     );
   }
 }

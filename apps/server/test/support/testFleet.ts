@@ -1,6 +1,7 @@
 import type { SkillDto } from '@fleet/shared';
 import type { SkillCatalog } from '../../src/application/ports/SkillCatalog.js';
-import type { SkillWorkspace } from '../../src/application/ports/SkillWorkspace.js';
+import type { PluginRegistry } from '../../src/application/ports/PluginRegistry.js';
+import type { PreparedSkills, SkillWorkspace } from '../../src/application/ports/SkillWorkspace.js';
 import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import type { AgentProfile } from '../../src/domain/agent/Agent.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
@@ -35,6 +36,8 @@ export function profile(name: string, overrides: Partial<AgentProfile> = {}): Ag
   };
 }
 
+export const noPlugins: PluginRegistry = { list: async () => [] };
+
 export class FakeSkillCatalog implements SkillCatalog {
   constructor(readonly skills: SkillDto[] = []) {}
 
@@ -47,9 +50,12 @@ export class FakeSkillCatalog implements SkillCatalog {
 export class FakeSkillWorkspace implements SkillWorkspace {
   readonly prepared: (readonly string[])[] = [];
 
-  async prepare(skills: readonly string[]): Promise<string | null> {
+  async prepare(skills: readonly string[]): Promise<PreparedSkills> {
     this.prepared.push(skills);
-    return skills.length > 0 ? `/tmp/skill-bridges/${[...skills].sort().join('+')}` : null;
+    return {
+      skillsDirectory: skills.length > 0 ? `/tmp/skill-bridges/${[...skills].sort().join('+')}` : null,
+      pluginPaths: [],
+    };
   }
 }
 

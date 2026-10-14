@@ -42,6 +42,8 @@ export interface AgentRunRequest {
   skills: string[];
   /** Directory whose `.claude/skills` links the agent's skills, or null when there is none. */
   skillsDirectory: string | null;
+  /** Install paths of the plugins that provide the agent's `plugin:skill` skills. */
+  pluginPaths: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
   workspacePath: string;

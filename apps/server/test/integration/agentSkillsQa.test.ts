@@ -9,7 +9,7 @@ import { FileSystemSkillWorkspace } from '../../src/infrastructure/system/FileSy
 import { createHttpServer } from '../../src/interfaces/http/createHttpServer.js';
 import { loadConfig } from '../../src/main/config.js';
 import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
-import { createTeamProject, createTestFleet, eventually, profile } from '../support/testFleet.js';
+import { createTeamProject, noPlugins, createTestFleet, eventually, profile } from '../support/testFleet.js';
 
 const ORG = DEFAULT_ORGANIZATION_ID;
 
@@ -99,7 +99,11 @@ describe('agent skills: QA regressions', () => {
     afterEach(() => rm(root, { recursive: true, force: true }));
 
     it('returns null for a skill assigned but not installed, and the run still completes', async () => {
-      const workspace = new FileSystemSkillWorkspace(join(root, 'skills'), join(root, 'skill-bridges'));
+      const workspace = new FileSystemSkillWorkspace(
+        join(root, 'skills'),
+        join(root, 'skill-bridges'),
+        noPlugins,
+      );
       const fleet = createTestFleet();
       Object.assign(fleet.skillWorkspace, {
         prepare: (skills: readonly string[]) => workspace.prepare(skills),

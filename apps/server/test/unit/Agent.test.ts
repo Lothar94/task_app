@@ -54,11 +54,27 @@ describe('Agent', () => {
       ['double hyphen', 'a--b'],
       ['leading hyphen', '-a'],
       ['trailing hyphen', 'a-'],
-      ['plugin prefix', 'plugin:skill'],
+      ['empty plugin', ':x'],
+      ['empty skill', 'x:'],
+      ['two separators', 'a:b:c'],
+      ['uppercase plugin', 'Caveman:x'],
+      ['too long skill part', `a:${'b'.repeat(65)}`],
+      ['too long plugin part', `${'a'.repeat(65)}:b`],
       ['too long', 'a'.repeat(65)],
     ])('rejects a skill name with %s', (_case, name) => {
       expect(() => skillsOf([name])).toThrow(ValidationError);
       expect(() => skillsOf([name])).toThrow(`"${name}"`);
+    });
+
+    it('accepts plugin:skill names', () => {
+      expect(skillsOf(['caveman:caveman', ' caveman:caveman ', 'graphify'])).toEqual([
+        'caveman:caveman',
+        'graphify',
+      ]);
+    });
+
+    it('mentions the plugin:skill form when rejecting a name', () => {
+      expect(() => skillsOf(['A:b'])).toThrow('plugin:skill');
     });
 
     it('accepts a name of exactly 64 characters', () => {

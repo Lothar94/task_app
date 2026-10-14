@@ -14,6 +14,8 @@ export interface AppConfig {
   allowedOrigin: string;
   /** Directory with the user's Agent Skills (one folder with a SKILL.md per skill). */
   userSkillsDir: string;
+  /** Claude Code's config directory, where installed plugins and their enabled state are read. */
+  claudeConfigDir: string;
   claudeExecutablePath?: string;
   /** Cap on the characters of a Bash output that stay in an agent's context. */
   bashMaxOutputChars: number;
@@ -31,6 +33,7 @@ function portOf(origin: string): number {
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const port = Number(env.PORT ?? 4100);
+  const claudeConfigDir = env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude');
   const allowedOrigin = env.WEB_ORIGIN ?? 'http://localhost:5173';
   return {
     port,
@@ -38,7 +41,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     databasePath: env.DATABASE_PATH ?? resolve(repositoryRoot, 'data/fleet.db'),
     maxDelegationDepth: Number(env.MAX_DELEGATION_DEPTH ?? 4),
     allowedOrigin,
-    userSkillsDir: env.USER_SKILLS_DIR ?? join(homedir(), '.claude', 'skills'),
+    claudeConfigDir,
+    userSkillsDir: env.USER_SKILLS_DIR ?? join(claudeConfigDir, 'skills'),
     reservedPorts: [port, portOf(allowedOrigin)],
     bashMaxOutputChars: Number(env.AGENT_BASH_MAX_OUTPUT ?? DEFAULT_BASH_MAX_OUTPUT_CHARS),
     ...optionalSettings(env),

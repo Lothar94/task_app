@@ -5,6 +5,7 @@ import { openDatabase } from '../infrastructure/persistence/sqlite/openDatabase.
 import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/ClaudeInstructionWriter.js';
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
+import { ClaudePluginRegistry } from '../infrastructure/system/ClaudePluginRegistry.js';
 import { FileSystemSkillCatalog } from '../infrastructure/system/FileSystemSkillCatalog.js';
 import { FileSystemSkillWorkspace } from '../infrastructure/system/FileSystemSkillWorkspace.js';
 import { ConsoleLogger } from '../infrastructure/system/ConsoleLogger.js';
@@ -73,14 +74,16 @@ const TEAM: AgentProfile[] = [
 
 const config = loadConfig();
 const logger = new ConsoleLogger();
+const plugins = new ClaudePluginRegistry(config.claudeConfigDir);
 const { useCases } = createContainer({
   db: openDatabase(config.databasePath),
   runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), claudeRuntimeConfig(config)),
   instructionWriter: new ClaudeInstructionWriter(config.claudeExecutablePath),
-  skillCatalog: new FileSystemSkillCatalog(config.userSkillsDir),
+  skillCatalog: new FileSystemSkillCatalog(config.userSkillsDir, plugins),
   skillWorkspace: new FileSystemSkillWorkspace(
     config.userSkillsDir,
     join(dirname(config.databasePath), 'skill-bridges'),
+    plugins,
   ),
   logger,
   maxDelegationDepth: config.maxDelegationDepth,
