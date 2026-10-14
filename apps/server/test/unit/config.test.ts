@@ -1,3 +1,5 @@
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadConfig } from '../../src/main/config.js';
 
@@ -24,5 +26,15 @@ describe('loadConfig agent output limits', () => {
     });
     expect(config.bashMaxOutputChars).toBe(5000);
     expect(config.bashRewriteHook).toBe('/hooks/rewrite.sh');
+  });
+});
+
+describe('loadConfig user skills', () => {
+  it('reads skills from ~/.claude/skills by default', () => {
+    expect(loadConfig({}).userSkillsDir).toBe(join(homedir(), '.claude', 'skills'));
+  });
+
+  it('reads the skills directory from USER_SKILLS_DIR', () => {
+    expect(loadConfig({ USER_SKILLS_DIR: '/opt/skills' }).userSkillsDir).toBe('/opt/skills');
   });
 });
