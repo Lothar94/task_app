@@ -6,6 +6,7 @@ export interface InstructionsBrief {
   role: string;
   description: string;
   allowedTools: string[];
+  skills: string[];
   collaboratorIds: string[];
   guidance: string;
 }

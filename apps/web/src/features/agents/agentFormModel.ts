@@ -1,4 +1,11 @@
-import { type AgentDto, type AgentInput, DEFAULT_AGENT_TOOLS } from '@fleet/shared';
+import {
+  type AgentDto,
+  type AgentInput,
+  DEFAULT_AGENT_TOOLS,
+  MAX_AGENT_SKILLS,
+  MAX_SKILL_NAME_LENGTH,
+  SKILL_NAME_PATTERN,
+} from '@fleet/shared';
 
 export interface AgentFormValues extends Omit<AgentInput, 'allowedTools'> {
   allowedTools: string;
@@ -17,6 +24,7 @@ export const EMPTY_AGENT_FORM: AgentFormValues = {
   allowedTools: DEFAULT_AGENT_TOOLS.join(', '),
   permissionMode: 'dontAsk',
   maxTurns: 50,
+  skills: [],
   collaboratorIds: [],
   instructionsGuidance: '',
 };
@@ -33,12 +41,13 @@ export function parseTools(tools: string): string[] {
 }
 
 export function toInstructionsBrief(values: AgentFormValues) {
-  const { name, role, description, allowedTools, collaboratorIds, instructionsGuidance } = values;
+  const { name, role, description, allowedTools, skills, collaboratorIds, instructionsGuidance } = values;
   return {
     name,
     role,
     description,
     allowedTools: parseTools(allowedTools),
+    skills,
     collaboratorIds,
     guidance: instructionsGuidance,
   };
@@ -55,3 +64,29 @@ export function toAgentInput({
 }: AgentFormValues): AgentInput {
   return { ...values, allowedTools: parseTools(allowedTools) };
 }
+
+/** Returns a Spanish error message when `name` is not a valid skill name, or null when it is. */
+export function validateSkillName(name: string): string | null {
+  if (name.length > MAX_SKILL_NAME_LENGTH)
+    return `El nombre no puede superar ${MAX_SKILL_NAME_LENGTH} caracteres`;
+  if (!SKILL_NAME_PATTERN.test(name)) {
+    return 'Usa minúsculas, números y guiones simples, p. ej. code-review';
+  }
+  return null;
+}
+
+export type AddSkillResult = { skills: string[]; error: string | null };
+
+/** Adds a skill keeping the list unique; duplicates and empty names are ignored silently. */
+export function addSkill(skills: string[], rawName: string): AddSkillResult {
+  const name = rawName.trim();
+  if (name === '' || skills.includes(name)) return { skills, error: null };
+  const error = validateSkillName(name);
+  if (error) return { skills, error };
+  if (skills.length >= MAX_AGENT_SKILLS) {
+    return { skills, error: `Un agente admite como máximo ${MAX_AGENT_SKILLS} skills` };
+  }
+  return { skills: [...skills, name], error: null };
+}
+
+export const removeSkill = (skills: string[], name: string) => skills.filter((skill) => skill !== name);
