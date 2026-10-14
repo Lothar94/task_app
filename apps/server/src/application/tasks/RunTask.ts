@@ -80,7 +80,7 @@ export class RunTask implements TaskExecutor {
     const { runtime, briefing, delegateSubtask, recorder } = this.deps;
     const collaborators = this.collaboratorsOf(agent, project);
     const profile = agent.toSnapshot();
-    const skillsDirectory = await this.deps.skillWorkspace.prepare(agent.id, profile.skills);
+    const skillsDirectory = await this.deps.skillWorkspace.prepare(profile.skills);
     const events = runtime.run({
       prompt,
       systemPromptAppendix: briefing.systemPromptAppendix({

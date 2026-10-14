@@ -45,11 +45,11 @@ export class FakeSkillCatalog implements SkillCatalog {
 
 /** Records the preparations and returns a fake bridge directory for agents with skills. */
 export class FakeSkillWorkspace implements SkillWorkspace {
-  readonly prepared: { agentId: string; skills: readonly string[] }[] = [];
+  readonly prepared: (readonly string[])[] = [];
 
-  async prepare(agentId: string, skills: readonly string[]): Promise<string | null> {
-    this.prepared.push({ agentId, skills });
-    return skills.length > 0 ? `/tmp/skill-bridges/${agentId}` : null;
+  async prepare(skills: readonly string[]): Promise<string | null> {
+    this.prepared.push(skills);
+    return skills.length > 0 ? `/tmp/skill-bridges/${[...skills].sort().join('+')}` : null;
   }
 }
 

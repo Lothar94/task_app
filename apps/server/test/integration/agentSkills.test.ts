@@ -106,7 +106,7 @@ describe('agent skills', () => {
 
     for (const request of fleet.runtime.requests) {
       expect(request.skills).toEqual(['graphify']);
-      expect(request.skillsDirectory).toBe(`/tmp/skill-bridges/${lara.id}`);
+      expect(request.skillsDirectory).toBe('/tmp/skill-bridges/graphify');
       expect(request.systemPromptAppendix).toContain('# Your skills');
     }
     expect(fleet.skillWorkspace.prepared).toHaveLength(2);

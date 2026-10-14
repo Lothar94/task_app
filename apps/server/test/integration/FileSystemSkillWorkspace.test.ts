@@ -24,34 +24,50 @@ describe('FileSystemSkillWorkspace', () => {
   const linksOf = (directory: string) => readdir(join(directory, '.claude', 'skills')).then((n) => n.sort());
 
   it('links only the requested skills that exist', async () => {
-    const directory = await workspace.prepare('agent-1', ['graphify', 'missing', 'pdf']);
+    const directory = await workspace.prepare(['graphify', 'missing', 'pdf']);
 
-    expect(directory).toBe(join(root, 'skill-bridges', 'agent-1'));
+    expect(directory).toMatch(new RegExp(`^${join(root, 'skill-bridges')}/[0-9a-f]{16}$`));
     expect(await linksOf(directory ?? '')).toEqual(['graphify', 'pdf']);
     expect(await readlink(join(directory ?? '', '.claude', 'skills', 'pdf'))).toBe(join(userSkills, 'pdf'));
   });
 
-  it('rebuilds the bridge on every run so removed skills disappear', async () => {
-    await workspace.prepare('agent-1', ['graphify', 'pdf']);
+  it('gives the same directory to the same skill set, whatever the order', async () => {
+    const first = await workspace.prepare(['pdf', 'graphify']);
+    const second = await workspace.prepare(['graphify', 'pdf', 'missing']);
 
-    const directory = await workspace.prepare('agent-1', ['pdf']);
-
-    expect(await linksOf(directory ?? '')).toEqual(['pdf']);
+    expect(second).toBe(first);
   });
 
-  it('keeps the bridges of different agents apart', async () => {
-    const first = await workspace.prepare('agent-1', ['graphify']);
-    const second = await workspace.prepare('agent-2', ['pdf']);
+  it('resolves concurrent prepares of the same skills to the same directory', async () => {
+    const directories = await Promise.all(
+      Array.from({ length: 8 }, () => workspace.prepare(['graphify', 'pdf'])),
+    );
 
+    expect(new Set(directories).size).toBe(1);
+    expect(await linksOf(directories[0] ?? '')).toEqual(['graphify', 'pdf']);
+  });
+
+  it('gives different directories to different skill sets', async () => {
+    const first = await workspace.prepare(['graphify']);
+    const second = await workspace.prepare(['pdf']);
+
+    expect(second).not.toBe(first);
     expect(await linksOf(first ?? '')).toEqual(['graphify']);
     expect(await linksOf(second ?? '')).toEqual(['pdf']);
   });
 
-  it('returns null and leaves no bridge when nothing can be linked', async () => {
-    await workspace.prepare('agent-1', ['graphify']);
+  it('does not remove the directory of a run when another one is prepared', async () => {
+    const running = await workspace.prepare(['graphify', 'pdf']);
 
-    expect(await workspace.prepare('agent-1', [])).toBeNull();
-    expect(await workspace.prepare('agent-1', ['missing'])).toBeNull();
-    expect(await readdir(join(root, 'skill-bridges'))).toEqual([]);
+    await workspace.prepare(['pdf']);
+    await workspace.prepare([]);
+
+    expect(await linksOf(running ?? '')).toEqual(['graphify', 'pdf']);
+  });
+
+  it('returns null and creates no bridge when nothing can be linked', async () => {
+    expect(await workspace.prepare([])).toBeNull();
+    expect(await workspace.prepare(['missing'])).toBeNull();
+    expect(await readdir(root)).toEqual(['user-skills']);
   });
 });

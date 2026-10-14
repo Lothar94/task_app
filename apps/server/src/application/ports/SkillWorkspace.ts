@@ -4,5 +4,5 @@ export interface SkillWorkspace {
    * Prepares a directory whose `.claude/skills` holds only the given skills that exist.
    * @returns the directory, or null when the agent has no installed skills to use.
    */
-  prepare(agentId: string, skills: readonly string[]): Promise<string | null>;
+  prepare(skills: readonly string[]): Promise<string | null>;
 }
