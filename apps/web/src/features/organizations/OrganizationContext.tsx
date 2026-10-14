@@ -1,5 +1,7 @@
 import type { OrganizationDto } from '@fleet/shared';
+import { useQueryClient } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { queryKeys } from '../../api/queryKeys';
 import { ErrorMessage, Loading } from '../../components/ui';
 import { resolveCurrentOrganization } from './organizationModel';
 import { useOrganizations } from './organizationQueries';
@@ -64,10 +66,15 @@ export const useCurrentOrganization = () => useOrganizationContext().current;
 
 /** Detail pages address global ids: make the organization of the shown resource the current one. */
 export function useSyncOrganization(resourceOrganizationId: string | undefined): boolean {
-  const { current, selectOrganization } = useOrganizationContext();
+  const { organizations, current, selectOrganization } = useOrganizationContext();
+  const queryClient = useQueryClient();
   const needsSwitch = resourceOrganizationId !== undefined && resourceOrganizationId !== current.id;
+  const isKnown = organizations.some((organization) => organization.id === resourceOrganizationId);
   useEffect(() => {
-    if (needsSwitch) selectOrganization(resourceOrganizationId);
-  }, [needsSwitch, resourceOrganizationId, selectOrganization]);
+    if (!needsSwitch) return;
+    selectOrganization(resourceOrganizationId);
+    // Created elsewhere (e.g. another tab): refetch so the switch can resolve instead of hanging.
+    if (!isKnown) void queryClient.invalidateQueries({ queryKey: queryKeys.organizations });
+  }, [needsSwitch, isKnown, resourceOrganizationId, selectOrganization, queryClient]);
   return !needsSwitch;
 }
