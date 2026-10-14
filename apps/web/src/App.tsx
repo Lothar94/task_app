@@ -4,6 +4,9 @@ import { AgentDetailPage } from './features/agents/AgentDetailPage';
 import { AgentEditorPage } from './features/agents/AgentEditorPage';
 import { AgentsPage } from './features/agents/AgentsPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
+import { OrganizationSelect } from './features/organizations/OrganizationSelect';
+import { OrganizationsPage } from './features/organizations/OrganizationsPage';
+import { useCurrentOrganization } from './features/organizations/OrganizationContext';
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
 import { ThemeToggle } from './features/theme/ThemeToggle';
@@ -14,6 +17,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 function Layout() {
   const { pathname } = useLocation();
+  const { id: organizationId } = useCurrentOrganization();
   return (
     <div className="min-h-screen">
       <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
@@ -32,11 +36,17 @@ function Layout() {
               Agentes
             </NavLink>
           </nav>
+          <div className="flex items-center gap-1">
+            <OrganizationSelect />
+            <NavLink to="/organizations" className={navLinkClass}>
+              Organizaciones
+            </NavLink>
+          </div>
           <ThemeToggle />
         </div>
       </header>
       <main className="mx-auto max-w-[1800px] px-4 py-8 lg:px-8">
-        <ErrorBoundary key={pathname}>
+        <ErrorBoundary key={`${organizationId}:${pathname}`}>
           <Outlet />
         </ErrorBoundary>
       </main>
@@ -53,6 +63,7 @@ export function App() {
         <Route path="projects/:projectId" element={<ProjectPage />} />
         <Route path="projects/:projectId/tasks/:taskId" element={<TaskPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="organizations" element={<OrganizationsPage />} />
         <Route path="agents" element={<AgentsPage />} />
         <Route path="agents/new" element={<AgentEditorPage />} />
         <Route path="agents/:agentId" element={<AgentDetailPage />} />

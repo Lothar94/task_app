@@ -1,17 +1,26 @@
+import type { ProjectInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectsApi } from '../../api/projectsApi';
 import { queryKeys } from '../../api/queryKeys';
+import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
-export const useProjects = () => useQuery({ queryKey: queryKeys.projects, queryFn: projectsApi.list });
+export function useProjects() {
+  const { id: organizationId } = useCurrentOrganization();
+  return useQuery({
+    queryKey: queryKeys.projects(organizationId),
+    queryFn: () => projectsApi.list(organizationId),
+  });
+}
 
 export const useProject = (id: string) =>
-  useQuery({ queryKey: queryKeys.project(id), queryFn: () => projectsApi.get(id) });
+  useQuery({ queryKey: queryKeys.project(id), queryFn: () => projectsApi.get(id), enabled: id !== '' });
 
 export function useCreateProject() {
   const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
   return useMutation({
-    mutationFn: projectsApi.create,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.projects }),
+    mutationFn: (input: ProjectInput) => projectsApi.create(organizationId, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.projects(organizationId) }),
   });
 }
 

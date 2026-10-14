@@ -5,6 +5,7 @@ import { Dialog } from '../../components/Dialog';
 import { Button, Card, ErrorMessage, Loading, PageHeader } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
+import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { ConversationView } from './ConversationView';
 import { ResultPanel } from './ResultPanel';
 import { TaskNumber, taskLabel } from './taskLabel';
@@ -218,11 +219,14 @@ function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string,
 export function TaskPage() {
   const { projectId = '', taskId = '' } = useParams();
   const task = useTask(taskId);
+  const project = useProject(projectId);
+  const isInOrganization = useSyncOrganization(project.data?.organizationId);
   const agents = useAgents();
   useFleetEvents(projectId);
 
-  if (task.isPending || agents.isPending) return <Loading />;
-  if (task.error || agents.error) return <ErrorMessage error={task.error ?? agents.error} />;
+  const failed = [task, project, agents].find((query) => query.error);
+  if (failed) return <ErrorMessage error={failed.error} />;
+  if (!task.data || !project.data || !agents.data || !isInOrganization) return <Loading />;
   return (
     <TaskView task={task.data} agentNames={new Map(agents.data.map((agent) => [agent.id, agent.name]))} />
   );
