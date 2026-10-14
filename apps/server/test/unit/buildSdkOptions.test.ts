@@ -14,6 +14,8 @@ function requestWith(overrides: Partial<AgentRunRequest> = {}): AgentRunRequest 
     model: 'sonnet',
     effort: 'low',
     allowedTools: ['Read', 'Bash', 'mcp__other__tool'],
+    skills: [],
+    skillsDirectory: null,
     permissionMode: 'dontAsk',
     maxTurns: 5,
     workspacePath: '/workspace',
@@ -92,5 +94,36 @@ describe('buildSdkOptions', () => {
       signal: new AbortController().signal,
     });
     expect(result).toMatchObject({ hookSpecificOutput: { permissionDecision: 'deny' } });
+  });
+
+  describe('skills', () => {
+    it('keeps skills off when the agent has none', () => {
+      const options = build({ skillsDirectory: '/bridge' });
+      expect(options.skills).toEqual([]);
+      expect(options.tools).not.toContain('Skill');
+      expect(options.allowedTools).not.toContain('Skill');
+      expect(options).not.toHaveProperty('additionalDirectories');
+    });
+
+    it('enables only the assigned skills and the Skill tool', () => {
+      const options = build({ skills: ['graphify'], skillsDirectory: '/bridge' });
+      expect(options.skills).toEqual(['graphify']);
+      expect(options.tools).toEqual(['Read', 'Bash', 'Skill']);
+      expect(options.allowedTools).toContain('Skill');
+      expect(options.additionalDirectories).toEqual(['/bridge']);
+      expect(options.settingSources).toEqual(['project']);
+    });
+
+    it('does not duplicate the Skill tool when the agent already lists it', () => {
+      const options = build({ skills: ['graphify'], allowedTools: ['Read', 'Skill'] });
+      expect((options.tools as string[]).filter((tool) => tool === 'Skill')).toHaveLength(1);
+      expect(options.allowedTools?.filter((tool) => tool === 'Skill')).toHaveLength(1);
+    });
+
+    it('adds no additional directory without a skills directory', () => {
+      const options = build({ skills: ['graphify'], skillsDirectory: null });
+      expect(options.skills).toEqual(['graphify']);
+      expect(options).not.toHaveProperty('additionalDirectories');
+    });
   });
 });

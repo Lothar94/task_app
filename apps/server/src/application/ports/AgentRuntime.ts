@@ -38,6 +38,10 @@ export interface AgentRunRequest {
   model: AgentModel;
   effort: AgentEffort;
   allowedTools: string[];
+  /** Skills the agent must use; empty disables skills. */
+  skills: string[];
+  /** Directory whose `.claude/skills` links the agent's skills, or null when there is none. */
+  skillsDirectory: string | null;
   permissionMode: AgentPermissionMode;
   maxTurns: number;
   workspacePath: string;

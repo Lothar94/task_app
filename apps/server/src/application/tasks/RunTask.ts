@@ -10,6 +10,7 @@ import type { TaskRepository } from '../ports/TaskRepository.js';
 import { requireAgent, requireProject, requireTask } from '../shared/lookups.js';
 import type { AgentBriefing } from './AgentBriefing.js';
 import type { DelegateSubtask } from './DelegateSubtask.js';
+import type { SkillWorkspace } from '../ports/SkillWorkspace.js';
 import type { RunningTasks } from './RunningTasks.js';
 import { TaskDelegationGateway } from './TaskDelegationGateway.js';
 import type { ExecutionOptions, TaskExecutor } from './TaskExecutor.js';
@@ -31,6 +32,7 @@ export interface RunTaskDependencies {
   recorder: TaskRecorder;
   running: RunningTasks;
   briefing: AgentBriefing;
+  skillWorkspace: SkillWorkspace;
   delegateSubtask: DelegateSubtask;
   clock: Clock;
   ids: IdGenerator;
@@ -78,6 +80,7 @@ export class RunTask implements TaskExecutor {
     const { runtime, briefing, delegateSubtask, recorder } = this.deps;
     const collaborators = this.collaboratorsOf(agent, project);
     const profile = agent.toSnapshot();
+    const skillsDirectory = await this.deps.skillWorkspace.prepare(profile.skills);
     const events = runtime.run({
       prompt,
       systemPromptAppendix: briefing.systemPromptAppendix({
@@ -88,6 +91,8 @@ export class RunTask implements TaskExecutor {
       model: profile.model,
       effort: profile.effort,
       allowedTools: profile.allowedTools,
+      skills: profile.skills,
+      skillsDirectory,
       permissionMode: profile.permissionMode,
       maxTurns: profile.maxTurns,
       workspacePath: project.workspacePath,

@@ -21,6 +21,7 @@ function describeBrief(brief: AgentBrief): string {
     `Role: ${brief.role}`,
     `Description: ${brief.description || '(none)'}`,
     `Tools available: ${brief.allowedTools.join(', ') || '(none)'}`,
+    `Skills: ${brief.skills.join(', ') || '(none)'}`,
     `Collaborators it can delegate to:\n${collaborators}`,
     ...(brief.guidance
       ? [`Additional requests from the project manager (follow them):\n${brief.guidance}`]

@@ -1,3 +1,6 @@
+import type { SkillDto } from '@fleet/shared';
+import type { SkillCatalog } from '../../src/application/ports/SkillCatalog.js';
+import type { SkillWorkspace } from '../../src/application/ports/SkillWorkspace.js';
 import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import type { AgentProfile } from '../../src/domain/agent/Agent.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
@@ -25,28 +28,54 @@ export function profile(name: string, overrides: Partial<AgentProfile> = {}): Ag
     model: 'sonnet',
     effort: 'high',
     allowedTools: ['Read'],
+    skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 10,
     ...overrides,
   };
 }
 
+export class FakeSkillCatalog implements SkillCatalog {
+  constructor(readonly skills: SkillDto[] = []) {}
+
+  async list(): Promise<SkillDto[]> {
+    return this.skills;
+  }
+}
+
+/** Records the preparations and returns a fake bridge directory for agents with skills. */
+export class FakeSkillWorkspace implements SkillWorkspace {
+  readonly prepared: (readonly string[])[] = [];
+
+  async prepare(skills: readonly string[]): Promise<string | null> {
+    this.prepared.push(skills);
+    return skills.length > 0 ? `/tmp/skill-bridges/${[...skills].sort().join('+')}` : null;
+  }
+}
+
+export function fakeSkillSupport(skills: SkillDto[] = []) {
+  return { skillCatalog: new FakeSkillCatalog(skills), skillWorkspace: new FakeSkillWorkspace() };
+}
+
 export function createTestFleet(
   behaviours: Record<string, AgentBehaviour> = {},
   maxDelegationDepth = 4,
   reservedPorts: number[] = [],
+  catalogSkills: SkillDto[] = [],
 ) {
   const runtime = new FakeAgentRuntime(behaviours);
   const instructionWriter = new FakeInstructionWriter();
+  const skillSupport = fakeSkillSupport(catalogSkills);
   const container = createContainer({
     db: openDatabase(':memory:'),
     runtime,
     instructionWriter,
+    ...skillSupport,
     logger: silentLogger,
     maxDelegationDepth,
     reservedPorts,
   });
-  return { runtime, instructionWriter, ...container };
+  return { runtime, instructionWriter, skillWorkspace: skillSupport.skillWorkspace, ...container };
 }
 
 /** Creates a CTO that can delegate to the given teammates, all members of a fresh project. */

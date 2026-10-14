@@ -172,4 +172,17 @@ describe('organizations migration', () => {
     expect(() => openDatabase(file)).toThrow(/foreign key violation/);
     expect(new Database(file).pragma('user_version', { simple: true })).toBe(5);
   });
+
+  it('gives agents created before skills existed an empty skill list', () => {
+    const file = legacyDatabase(
+      6,
+      `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools,
+        permission_mode, max_turns, created_at, updated_at) VALUES ('a1', '${DEFAULT_ORGANIZATION_ID}', 'CTO', 'Lead', '',
+        'Lead', 'opus', 'high', '["Read"]', 'dontAsk', 10, '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');`,
+    );
+
+    const agent = new SqliteAgentRepository(openDatabase(file)).findById('a1');
+
+    expect(agent?.skills).toEqual([]);
+  });
 });

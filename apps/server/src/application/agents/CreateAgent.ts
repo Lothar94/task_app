@@ -46,12 +46,13 @@ export class CreateAgent {
   }
 
   private draft(profile: AgentProfile, collaboratorIds: string[], guidance?: string): Promise<string> {
-    const { name, role, description, allowedTools } = profile;
+    const { name, role, description, allowedTools, skills } = profile;
     return this.draftInstructions.execute({
       name,
       role,
       description,
       allowedTools,
+      skills,
       collaboratorIds,
       guidance,
     });

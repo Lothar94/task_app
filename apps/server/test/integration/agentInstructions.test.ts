@@ -25,6 +25,7 @@ describe('agent instructions', () => {
         role: 'Chief Technology Officer',
         description: '',
         allowedTools: ['Read'],
+        skills: [],
         collaborators: [{ name: 'Backend', role: 'Backend role' }],
         guidance: '',
       },

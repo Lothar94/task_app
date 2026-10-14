@@ -111,7 +111,11 @@ describe('task delegation', () => {
 
     fleet.useCases.assignTask.execute(project.id, { agentId: cto.id, title: 'Go', description: 'Go' });
 
-    expect(fleet.runtime.requests[0]?.delegation.listCollaborators().map((c) => c.name)).toEqual(['Backend']);
+    await eventually(() =>
+      expect(fleet.runtime.requests[0]?.delegation.listCollaborators().map((c) => c.name)).toEqual([
+        'Backend',
+      ]),
+    );
   });
 
   it('rejects delegating to an agent that is not a collaborator', async () => {
@@ -173,7 +177,11 @@ describe('task delegation', () => {
       .find((agent) => agent.id === subtask?.agentId);
     expect(delegate?.name).toBe('Backend');
     expect(failure).toMatch(/not one of your collaborators/);
-    expect(fleet.runtime.requests[0]?.delegation.listCollaborators().map((c) => c.name)).toEqual(['Backend']);
+    await eventually(() =>
+      expect(fleet.runtime.requests[0]?.delegation.listCollaborators().map((c) => c.name)).toEqual([
+        'Backend',
+      ]),
+    );
   });
 
   it('prevents delegating back to an agent higher in the chain', async () => {

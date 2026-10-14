@@ -13,6 +13,7 @@ export interface ClaudeRuntimeConfig {
 }
 
 const MCP_TOOL_PREFIX = 'mcp__';
+const SKILL_TOOL = 'Skill';
 
 // In acceptEdits mode, calls to tools outside the allow-list would wait for an approval nobody gives.
 const denyUnlistedTool: CanUseTool = async (toolName) => ({
@@ -66,13 +67,18 @@ function settingsFor(config: ClaudeRuntimeConfig): NonNullable<Options['settings
 
 /**
  * Builds the SDK options of a run keeping the model's base context small: only the built-in
- * tools the agent may use are defined, and no skills, memory or foreign MCP servers are loaded.
+ * tools the agent may use are defined, and no memory or foreign MCP servers are loaded. Skills are
+ * off unless the agent was assigned some: then only those are enabled, the `Skill` tool is added,
+ * and the user's skills are found through `skillsDirectory` (never through the `user` setting
+ * source, which would also load the user's hooks, permissions and plugins).
  */
 export function buildSdkOptions(
   request: AgentRunRequest,
   config: ClaudeRuntimeConfig,
   abortController: AbortController,
 ): Options {
+  const hasSkills = request.skills.length > 0;
+  const withSkillTool = (tools: string[]) => (hasSkills ? [...new Set([...tools, SKILL_TOOL])] : tools);
   return {
     cwd: request.workspacePath,
     model: request.model,
@@ -80,13 +86,14 @@ export function buildSdkOptions(
     maxTurns: request.maxTurns,
     permissionMode: request.permissionMode,
     allowDangerouslySkipPermissions: request.permissionMode === 'bypassPermissions',
-    tools: request.allowedTools.filter((tool) => !tool.startsWith(MCP_TOOL_PREFIX)),
-    allowedTools: [...request.allowedTools, ...FLEET_TOOL_NAMES],
+    tools: withSkillTool(request.allowedTools.filter((tool) => !tool.startsWith(MCP_TOOL_PREFIX))),
+    allowedTools: withSkillTool([...request.allowedTools, ...FLEET_TOOL_NAMES]),
     ...(request.permissionMode === 'acceptEdits' ? { canUseTool: denyUnlistedTool } : {}),
     systemPrompt: { type: 'preset', preset: 'claude_code', append: request.systemPromptAppendix },
     settingSources: ['project'],
     settings: settingsFor(config),
-    skills: [],
+    skills: request.skills,
+    ...(hasSkills && request.skillsDirectory ? { additionalDirectories: [request.skillsDirectory] } : {}),
     strictMcpConfig: true,
     env: environmentFor(config),
     hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [guardProcessCommands] }] },

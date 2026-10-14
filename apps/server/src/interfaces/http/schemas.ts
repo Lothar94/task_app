@@ -15,6 +15,7 @@ export const agentProfileSchema = z.object({
   model: z.enum(AGENT_MODELS),
   effort: z.enum(EFFORT_LEVELS).default('high'),
   allowedTools: z.array(z.string()).default([]),
+  skills: z.array(z.string()).default([]),
   permissionMode: z.enum(PERMISSION_MODES).default('dontAsk'),
   maxTurns: z.number().int(),
 });
@@ -29,6 +30,7 @@ export const draftInstructionsSchema = z.object({
   role: z.string(),
   description: z.string().default(''),
   allowedTools: z.array(z.string()).default([]),
+  skills: z.array(z.string()).default([]),
   collaboratorIds: ids,
   guidance: z.string().default(''),
 });
