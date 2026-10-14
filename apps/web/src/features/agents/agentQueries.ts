@@ -1,6 +1,7 @@
 import type { AgentInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
+import { skillsApi } from '../../api/skillsApi';
 import { queryKeys } from '../../api/queryKeys';
 import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
@@ -11,6 +12,8 @@ export function useAgents() {
     queryFn: () => agentsApi.list(organizationId),
   });
 }
+
+export const useSkills = () => useQuery({ queryKey: queryKeys.skills, queryFn: skillsApi.list });
 
 export const useAgent = (id: string) =>
   useQuery({ queryKey: queryKeys.agent(id), queryFn: () => agentsApi.get(id), enabled: id !== '' });
