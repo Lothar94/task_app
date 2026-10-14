@@ -165,6 +165,15 @@ describe('agent import', () => {
       expect(await listAgents()).toHaveLength(0);
     });
 
+    it('answers 400, not 409, when unknown collaborators come with a name conflict', async () => {
+      await createAgent('A');
+
+      const response = await importAgents({ file: fileOf(exported('A', ['Ghost'])), onConflict: 'fail' });
+
+      expect(response.statusCode).toBe(400);
+      expect(await listAgents()).toHaveLength(1);
+    });
+
     it('rejects self references', async () => {
       expect((await importAgents({ file: fileOf(exported('A', ['A'])) })).statusCode).toBe(400);
     });

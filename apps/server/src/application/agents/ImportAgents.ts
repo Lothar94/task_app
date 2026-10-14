@@ -28,6 +28,7 @@ export class ImportAgents {
     requireOrganization(this.organizations, organizationId);
     const entries = file.agents.map((agent) => ({ ...agent, name: agent.name.trim() }));
     this.ensureNamesAreUniqueInFile(entries);
+    this.ensureCollaboratorsAreInFile(entries);
     const conflicts = entries.filter((entry) => this.agents.findByName(organizationId, entry.name));
     if (conflicts.length > 0 && onConflict === 'fail') {
       throw new ConflictError(
@@ -72,6 +73,14 @@ export class ImportAgents {
     for (const { name } of entries) {
       if (seen.has(name)) throw new ValidationError(`The file contains the agent "${name}" more than once`);
       seen.add(name);
+    }
+  }
+
+  private ensureCollaboratorsAreInFile(entries: readonly ExportedAgent[]): void {
+    const fileNames = new Set(entries.map((entry) => entry.name));
+    for (const entry of entries) {
+      const unknown = entry.collaborators.find((raw) => !fileNames.has(raw.trim()));
+      if (unknown !== undefined) throw new ValidationError(`"${entry.name}" lists the unknown collaborator "${unknown}"`);
     }
   }
 
