@@ -1,7 +1,15 @@
 import { MAX_AGENT_SKILLS } from '@fleet/shared';
 import { type KeyboardEvent, useId, useState } from 'react';
 import { Button, CheckboxList, TextInput } from '../../components/ui';
-import { addSkill, canAddSkill, removeSkill, SKILL_LIMIT_MESSAGE } from './agentFormModel';
+import {
+  addSkill,
+  canAddSkill,
+  groupSkills,
+  missingSkillNote,
+  removeSkill,
+  SKILL_LIMIT_MESSAGE,
+  type SkillGroup,
+} from './agentFormModel';
 import { useSkills } from './agentQueries';
 
 interface SkillsFieldProps {
@@ -22,6 +30,27 @@ function SkillChip({ name, onRemove }: { name: string; onRemove: () => void }) {
         ×
       </button>
     </li>
+  );
+}
+
+function SkillGroupList({
+  group,
+  skills,
+  limitReached,
+  onChange,
+}: SkillsFieldProps & { group: SkillGroup; limitReached: boolean }) {
+  const groupNames = new Set(group.skills.map((skill) => skill.name));
+  return (
+    <fieldset className="mt-2">
+      <legend className="mb-1 text-xs font-medium text-zinc-300">{group.label}</legend>
+      <CheckboxList
+        options={group.skills.map(({ name, description }) => ({ id: name, name, description }))}
+        selected={skills.filter((name) => groupNames.has(name))}
+        onChange={(selected) => onChange([...skills.filter((name) => !groupNames.has(name)), ...selected])}
+        describe={(skill) => skill.description}
+        isDisabled={(skill) => limitReached && !skills.includes(skill.id)}
+      />
+    </fieldset>
   );
 }
 
@@ -48,19 +77,21 @@ function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
   const limitReached = !canAddSkill(skills);
   return (
     <>
-      <CheckboxList
-        options={catalog.map(({ name, description }) => ({ id: name, name, description }))}
-        selected={skills.filter((name) => catalogNames.has(name))}
-        onChange={(selected) => onChange([...outsideCatalog, ...selected])}
-        describe={(skill) => skill.description}
-        isDisabled={(skill) => limitReached && !skills.includes(skill.id)}
-      />
+      {groupSkills(catalog).map((group) => (
+        <SkillGroupList
+          key={group.key}
+          group={group}
+          skills={skills}
+          limitReached={limitReached}
+          onChange={onChange}
+        />
+      ))}
       {limitReached && <p className="mt-2 text-xs text-amber-300">{SKILL_LIMIT_MESSAGE}</p>}
       {outsideCatalog.length > 0 && (
         <ul className="mt-2 space-y-1 text-xs text-zinc-500">
           {outsideCatalog.map((name) => (
             <li key={name}>
-              <code>{name}</code>: no instalada en ~/.claude/skills: debe existir en el proyecto
+              <code>{name}</code>: {missingSkillNote(name)}
             </li>
           ))}
         </ul>
@@ -90,13 +121,13 @@ function CustomSkillInput({ skills, onChange }: SkillsFieldProps) {
   return (
     <div className="mt-3">
       <label htmlFor={id} className="text-xs text-zinc-400">
-        Añadir por nombre (skills de Claude Code o del proyecto)
+        Añadir por nombre (skill del proyecto, de Claude Code o de un plugin)
       </label>
       <div className="mt-1 flex gap-2">
         <TextInput
           id={id}
           value={draft}
-          placeholder="code-review"
+          placeholder="code-review o plugin:skill"
           aria-invalid={error !== null}
           aria-describedby={error ? `${id}-error` : undefined}
           onChange={(e) => setDraft(e.target.value)}

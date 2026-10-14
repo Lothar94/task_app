@@ -9,6 +9,8 @@ import {
   toAgentInput,
   toFormValues,
   toInstructionsBrief,
+  groupSkills,
+  missingSkillNote,
   validateSkillName,
 } from './agentFormModel';
 
@@ -63,6 +65,15 @@ describe('agent form model', () => {
       expect(validateSkillName('a'.repeat(65))).toMatch(/64/);
     });
 
+    it('accepts plugin skills and rejects malformed ones', () => {
+      expect(validateSkillName('caveman:caveman')).toBeNull();
+      for (const bad of [':x', 'x:', 'a:b:c', 'Caveman:x', 'x:Y'])
+        expect(validateSkillName(bad), bad).toMatch(/plugin:skill/);
+      expect(validateSkillName(`${'a'.repeat(65)}:x`)).toMatch(/64/);
+      expect(validateSkillName(`x:${'a'.repeat(65)}`)).toMatch(/64/);
+      expect(addSkill([], 'caveman:caveman').skills).toEqual(['caveman:caveman']);
+    });
+
     it('adds trimmed, unique, valid skills', () => {
       expect(addSkill(['pdf'], '  docx ')).toEqual({ skills: ['pdf', 'docx'], error: null });
       expect(addSkill(['pdf'], 'pdf')).toEqual({ skills: ['pdf'], error: null });
@@ -90,5 +101,31 @@ describe('agent form model', () => {
     it('removes a skill', () => {
       expect(removeSkill(['a', 'b'], 'a')).toEqual(['b']);
     });
+  });
+});
+
+describe('skill catalog helpers', () => {
+  const catalog = [
+    { name: 'zeta:z', description: '', plugin: 'zeta' },
+    { name: 'pdf', description: '', plugin: null },
+    { name: 'caveman:caveman', description: '', plugin: 'caveman' },
+    { name: 'caveman:other', description: '', plugin: 'caveman' },
+  ];
+
+  it('groups own skills first, then one group per plugin', () => {
+    expect(groupSkills(catalog).map((g) => [g.label, g.skills.map((s) => s.name)])).toEqual([
+      ['Tus skills', ['pdf']],
+      ['Plugin caveman', ['caveman:caveman', 'caveman:other']],
+      ['Plugin zeta', ['zeta:z']],
+    ]);
+  });
+
+  it('omits the own group when there are no user skills', () => {
+    expect(groupSkills(catalog.slice(0, 1)).map((g) => g.label)).toEqual(['Plugin zeta']);
+  });
+
+  it('explains missing skills differently for plain and plugin names', () => {
+    expect(missingSkillNote('code-review')).toMatch(/debe existir en el proyecto/);
+    expect(missingSkillNote('caveman:caveman')).toMatch(/plugin no instalado o desactivado/);
   });
 });
