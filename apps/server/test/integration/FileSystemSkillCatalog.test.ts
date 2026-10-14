@@ -31,7 +31,13 @@ describe('FileSystemSkillCatalog', () => {
     ]);
   });
 
-  it('falls back to the folder name and an empty description', async () => {
+  it('identifies a skill by its folder name, not by the frontmatter name', async () => {
+    await addSkill('foo', '---\nname: bar\ndescription: Renamed\n---\n');
+
+    expect(await new FileSystemSkillCatalog(dir).list()).toEqual([{ name: 'foo', description: 'Renamed' }]);
+  });
+
+  it('uses an empty description when there is none', async () => {
     await addSkill('plain', '# No frontmatter');
     await addSkill('partial', '---\ndescription: Only a description\n---\n');
 
@@ -45,7 +51,7 @@ describe('FileSystemSkillCatalog', () => {
     await addSkill('empty-folder');
     await writeFile(join(dir, 'README.md'), 'not a skill');
     await addSkill('Bad_Name', '---\nname: Bad_Name\n---\n');
-    await addSkill('plugin-dir', '---\nname: plugin:skill\n---\n');
+    await addSkill('plugin:skill', '---\nname: plugin-skill\n---\n');
     await addSkill('good', '---\nname: good\n---\n');
 
     expect((await new FileSystemSkillCatalog(dir).list()).map((skill) => skill.name)).toEqual(['good']);

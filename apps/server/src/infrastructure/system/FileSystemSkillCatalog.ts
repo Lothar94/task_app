@@ -6,7 +6,10 @@ import type { SkillCatalog } from '../../application/ports/SkillCatalog.js';
 const SKILL_FILE = 'SKILL.md';
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 
-/** Lists the skills found in a directory: each subdirectory with a SKILL.md is one skill. */
+/**
+ * Lists the skills found in a directory: each subdirectory with a SKILL.md is one skill, identified by
+ * its directory name (the frontmatter only provides the description).
+ */
 export class FileSystemSkillCatalog implements SkillCatalog {
   constructor(private readonly skillsDir: string) {}
 
@@ -26,13 +29,12 @@ export class FileSystemSkillCatalog implements SkillCatalog {
     const content = await readFile(join(this.skillsDir, directoryName, SKILL_FILE), 'utf8').catch(() => null);
     if (content === null) return null;
     const fields = parseFrontmatter(content);
-    const name = fields.get('name') || directoryName;
-    if (name.length > MAX_SKILL_NAME_LENGTH || !SKILL_NAME_PATTERN.test(name)) return null;
-    return { name, description: fields.get('description') ?? '' };
+    if (directoryName.length > MAX_SKILL_NAME_LENGTH || !SKILL_NAME_PATTERN.test(directoryName)) return null;
+    return { name: directoryName, description: fields.get('description') ?? '' };
   }
 }
 
-/** Reads the flat `key: value` lines of the frontmatter; enough for `name` and `description`. */
+/** Reads the flat `key: value` lines of the frontmatter; enough for `description`. */
 function parseFrontmatter(content: string): Map<string, string> {
   const fields = new Map<string, string>();
   const block = FRONTMATTER.exec(content)?.[1] ?? '';
