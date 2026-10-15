@@ -1,4 +1,4 @@
-import type { TaskDto } from '@fleet/shared';
+import { type TaskDto, isArchivedProject } from '@fleet/shared';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { Dialog } from '../../components/Dialog';
@@ -124,7 +124,15 @@ function ActionError({ error }: { error: unknown }) {
   );
 }
 
-function TaskActions({ task, onEdit }: { task: TaskDto; onEdit?: () => void }) {
+function TaskActions({
+  task,
+  onEdit,
+  isReadOnly,
+}: {
+  task: TaskDto;
+  onEdit?: () => void;
+  isReadOnly: boolean;
+}) {
   const isPlanned = isTaskPlanned(task.status);
   return (
     <>
@@ -133,7 +141,7 @@ function TaskActions({ task, onEdit }: { task: TaskDto; onEdit?: () => void }) {
           Editar
         </Button>
       )}
-      {isPlanned && task.parentTaskId === null && <PlannedActions task={task} />}
+      {isPlanned && !isReadOnly && task.parentTaskId === null && <PlannedActions task={task} />}
       {(isPlanned || isTaskActive(task.status)) && <CancelTaskButton taskId={task.id} />}
     </>
   );
@@ -177,7 +185,15 @@ function Breadcrumbs({ task }: { task: TaskDto }) {
   );
 }
 
-function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
+function TaskView({
+  task,
+  agentNames,
+  isReadOnly,
+}: {
+  task: TaskDto;
+  agentNames: Map<string, string>;
+  isReadOnly: boolean;
+}) {
   const isActive = isTaskActive(task.status);
   const isRoot = task.parentTaskId === null;
   const [isEditing, setIsEditing] = useState(false);
@@ -187,7 +203,13 @@ function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string,
       <PageHeader
         title={task.title}
         subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} />}
-        actions={<TaskActions task={task} onEdit={isRoot ? () => setIsEditing(true) : undefined} />}
+        actions={
+          <TaskActions
+            task={task}
+            isReadOnly={isReadOnly}
+            onEdit={isRoot ? () => setIsEditing(true) : undefined}
+          />
+        }
       />
       <div className="space-y-6">
         {task.resultSummary && <ResultPanel key={task.resultSummary} task={task} />}
@@ -196,7 +218,7 @@ function TaskView({ task, agentNames }: { task: TaskDto; agentNames: Map<string,
             <Card title="Conversación">
               <ConversationPanel taskId={task.id} projectId={task.projectId} />
             </Card>
-            {!isActive && !isTaskPlanned(task.status) && (
+            {!isReadOnly && !isActive && !isTaskPlanned(task.status) && (
               <Card title="Continuar la conversación">
                 <FollowUpForm taskId={task.id} />
               </Card>
@@ -228,6 +250,10 @@ export function TaskPage() {
   if (failed) return <ErrorMessage error={failed.error} />;
   if (!task.data || !project.data || !agents.data || !isInOrganization) return <Loading />;
   return (
-    <TaskView task={task.data} agentNames={new Map(agents.data.map((agent) => [agent.id, agent.name]))} />
+    <TaskView
+      task={task.data}
+      isReadOnly={isArchivedProject(project.data)}
+      agentNames={new Map(agents.data.map((agent) => [agent.id, agent.name]))}
+    />
   );
 }

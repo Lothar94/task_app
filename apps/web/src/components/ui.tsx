@@ -117,7 +117,9 @@ export const ROW_CLASS =
 
 export function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-300">{children}</span>
+    <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-300">
+      {children}
+    </span>
   );
 }
 

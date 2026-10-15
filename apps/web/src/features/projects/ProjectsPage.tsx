@@ -40,9 +40,7 @@ function ProjectRow({ project }: { project: ProjectDto }) {
               </>
             )}
           </p>
-          {project.description && (
-            <p className="line-clamp-1 text-sm text-zinc-400">{project.description}</p>
-          )}
+          {project.description && <p className="line-clamp-1 text-sm text-zinc-400">{project.description}</p>}
         </div>
         <code className="hidden max-w-[40%] truncate font-mono text-xs text-zinc-500 md:block">
           {project.workspacePath}
