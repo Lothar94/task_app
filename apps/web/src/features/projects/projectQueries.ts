@@ -31,3 +31,16 @@ export function useSetProjectMembers(projectId: string) {
     onSuccess: (project) => queryClient.setQueryData(queryKeys.project(projectId), project),
   });
 }
+
+export function useSetProjectArchived(projectId: string) {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  return useMutation({
+    mutationFn: (archived: boolean) =>
+      archived ? projectsApi.archive(projectId) : projectsApi.unarchive(projectId),
+    onSuccess: (project) => {
+      queryClient.setQueryData(queryKeys.project(projectId), project);
+      return queryClient.invalidateQueries({ queryKey: queryKeys.projects(organizationId) });
+    },
+  });
+}

@@ -32,3 +32,8 @@ export function formatDay(isoDate: string): string {
     month: 'short',
   });
 }
+
+/** "2026-10-12T08:00:00Z" → "12 oct 2026". */
+export function formatDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
