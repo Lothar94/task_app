@@ -21,28 +21,30 @@ function Layout() {
   return (
     <div className="min-h-screen">
       <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
-        <div className="mx-auto flex max-w-[1800px] items-center gap-6 px-4 py-3 lg:px-8">
-          <span className="font-semibold tracking-tight">
-            <span className="text-indigo-400">◆</span> Agent Fleet
-          </span>
-          <nav className="flex gap-1">
+        <div className="mx-auto flex max-w-[1800px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 lg:px-8">
+          <div className="flex items-center gap-3">
+            <span className="font-semibold tracking-tight whitespace-nowrap">
+              <span className="text-indigo-400">◆</span> Agent Fleet
+            </span>
+            <OrganizationSelect />
+          </div>
+          <nav aria-label="Principal" className="flex gap-1">
             <NavLink to="/projects" className={navLinkClass}>
               Proyectos
-            </NavLink>
-            <NavLink to="/dashboard" className={navLinkClass}>
-              Dashboard
             </NavLink>
             <NavLink to="/agents" className={navLinkClass}>
               Agentes
             </NavLink>
+            <NavLink to="/dashboard" className={navLinkClass}>
+              Dashboard
+            </NavLink>
           </nav>
-          <div className="flex items-center gap-1">
-            <OrganizationSelect />
+          <div className="ml-auto flex items-center gap-2">
             <NavLink to="/organizations" className={navLinkClass}>
               Organizaciones
             </NavLink>
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
         </div>
       </header>
       <main className="mx-auto max-w-[1800px] px-4 py-8 lg:px-8">
