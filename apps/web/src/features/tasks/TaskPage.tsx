@@ -207,7 +207,7 @@ function TaskView({
           <TaskActions
             task={task}
             isReadOnly={isReadOnly}
-            onEdit={isRoot ? () => setIsEditing(true) : undefined}
+            onEdit={isRoot && !isReadOnly ? () => setIsEditing(true) : undefined}
           />
         }
       />
