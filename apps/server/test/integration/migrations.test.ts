@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_ORGANIZATION_NAME } from '@fleet/shared';
 import { DEFAULT_ORGANIZATION_ID, migrate } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
+import { SqliteProjectRepository } from '../../src/infrastructure/persistence/sqlite/SqliteProjectRepository.js';
 import { SqliteAgentRepository } from '../../src/infrastructure/persistence/sqlite/SqliteAgentRepository.js';
 
 /** Creates a database file at an old schema version, filled by `seed`. */
@@ -184,5 +185,18 @@ describe('organizations migration', () => {
     const agent = new SqliteAgentRepository(openDatabase(file)).findById('a1');
 
     expect(agent?.skills).toEqual([]);
+  });
+
+  it('adds a nullable archived_at to existing projects, leaving them active', () => {
+    const file = legacyDatabase(
+      7,
+      `INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at)
+        VALUES ('p1', '${DEFAULT_ORGANIZATION_ID}', 'Old', '', '/tmp/old', '2026-01-01T00:00:00Z');`,
+    );
+
+    const project = new SqliteProjectRepository(openDatabase(file)).findById('p1');
+
+    expect(project?.isArchived).toBe(false);
+    expect(project?.toSnapshot().archivedAt).toBeNull();
   });
 });
