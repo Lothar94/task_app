@@ -42,6 +42,13 @@ export function requireProject(projects: ProjectRepository, id: string): Project
   return project;
 }
 
+/** Looks the project up and rejects (409) archived ones: they are read-only. */
+export function requireActiveProject(projects: ProjectRepository, id: string): Project {
+  const project = requireProject(projects, id);
+  project.ensureActive();
+  return project;
+}
+
 export function requireTask(tasks: TaskRepository, id: string): Task {
   const task = tasks.findById(id);
   if (!task) throw new NotFoundError('Task', id);

@@ -1,5 +1,5 @@
 import { isAbsolute } from 'node:path';
-import { ValidationError } from '../errors/DomainError.js';
+import { ConflictError, ValidationError } from '../errors/DomainError.js';
 import { requireText } from '../shared/guards.js';
 
 export interface ProjectDetails {
@@ -13,6 +13,7 @@ export interface ProjectSnapshot extends ProjectDetails {
   organizationId: string;
   memberIds: string[];
   createdAt: Date;
+  archivedAt: Date | null;
 }
 
 export class Project {
@@ -31,6 +32,7 @@ export class Project {
       ...Project.validateDetails(details),
       memberIds: [],
       createdAt: now,
+      archivedAt: null,
     });
     project.setMembers(memberIds);
     return project;
@@ -54,6 +56,25 @@ export class Project {
 
   get memberIds(): readonly string[] {
     return this.state.memberIds;
+  }
+
+  get isArchived(): boolean {
+    return this.state.archivedAt !== null;
+  }
+
+  /** Archived projects are read-only: mutating operations call this first. */
+  ensureActive(): void {
+    if (this.isArchived) throw new ConflictError(`Project "${this.state.name}" is archived`);
+  }
+
+  /** Idempotent: archiving an archived project keeps the original date. */
+  archive(now: Date): void {
+    if (this.isArchived) return;
+    this.state = { ...this.state, archivedAt: now };
+  }
+
+  unarchive(): void {
+    this.state = { ...this.state, archivedAt: null };
   }
 
   hasMember(agentId: string): boolean {

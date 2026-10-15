@@ -9,6 +9,7 @@ interface ProjectRow {
   description: string;
   workspace_path: string;
   created_at: string;
+  archived_at: string | null;
 }
 
 export class SqliteProjectRepository implements ProjectRepository {
@@ -19,12 +20,16 @@ export class SqliteProjectRepository implements ProjectRepository {
     this.db.transaction(() => {
       this.db
         .prepare(
-          `INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at)
-           VALUES (@id, @organizationId, @name, @description, @workspacePath, @createdAt)
+          `INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at, archived_at)
+           VALUES (@id, @organizationId, @name, @description, @workspacePath, @createdAt, @archivedAt)
            ON CONFLICT(id) DO UPDATE SET name = @name, description = @description,
-             workspace_path = @workspacePath`,
+             workspace_path = @workspacePath, archived_at = @archivedAt`,
         )
-        .run({ ...snapshot, createdAt: snapshot.createdAt.toISOString() });
+        .run({
+          ...snapshot,
+          createdAt: snapshot.createdAt.toISOString(),
+          archivedAt: snapshot.archivedAt?.toISOString() ?? null,
+        });
       this.db.prepare('DELETE FROM project_agents WHERE project_id = ?').run(snapshot.id);
       const insertMember = this.db.prepare('INSERT INTO project_agents (project_id, agent_id) VALUES (?, ?)');
       for (const memberId of snapshot.memberIds) insertMember.run(snapshot.id, memberId);
@@ -62,6 +67,7 @@ export class SqliteProjectRepository implements ProjectRepository {
       workspacePath: row.workspace_path,
       memberIds: this.memberIdsOf(row.id),
       createdAt: new Date(row.created_at),
+      archivedAt: row.archived_at ? new Date(row.archived_at) : null,
     });
   }
 

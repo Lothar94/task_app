@@ -1,6 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import type { CreateProject } from '../../../application/projects/CreateProject.js';
 import type { GetProject, ListProjects } from '../../../application/projects/QueryProjects.js';
+import type { ArchiveProject } from '../../../application/projects/ArchiveProject.js';
+import type { UnarchiveProject } from '../../../application/projects/UnarchiveProject.js';
 import type { SetProjectMembers } from '../../../application/projects/SetProjectMembers.js';
 import { toProjectDto } from '../../../application/shared/dtos.js';
 import { createProjectSchema, idParams, membersSchema } from '../schemas.js';
@@ -10,6 +12,8 @@ export interface ProjectUseCases {
   listProjects: ListProjects;
   getProject: GetProject;
   setProjectMembers: SetProjectMembers;
+  archiveProject: ArchiveProject;
+  unarchiveProject: UnarchiveProject;
 }
 
 export function registerProjectRoutes(app: FastifyInstance, useCases: ProjectUseCases): void {
@@ -34,5 +38,15 @@ export function registerProjectRoutes(app: FastifyInstance, useCases: ProjectUse
     const { id } = idParams.parse(request.params);
     const { memberIds } = membersSchema.parse(request.body);
     return toProjectDto(useCases.setProjectMembers.execute(id, memberIds));
+  });
+
+  app.post('/api/projects/:id/archive', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toProjectDto(useCases.archiveProject.execute(id));
+  });
+
+  app.post('/api/projects/:id/unarchive', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toProjectDto(useCases.unarchiveProject.execute(id));
   });
 }
