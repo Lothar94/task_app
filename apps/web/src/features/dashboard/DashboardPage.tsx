@@ -4,6 +4,7 @@ import { StatTile } from '../../components/StatTile';
 import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { formatCost, formatDuration, formatPercent, formatTokens } from '../../lib/format';
+import { projectOptionLabel } from '../projects/projectListModel';
 import { useProjects } from '../projects/projectQueries';
 import { AgentUsageTable } from './AgentUsageTable';
 import { DailyActivityChart } from './charts/DailyActivityChart';
@@ -39,7 +40,7 @@ function Filters(props: {
           <option value="">Todos los proyectos</option>
           {projects.data?.map((project) => (
             <option key={project.id} value={project.id}>
-              {project.name}
+              {projectOptionLabel(project)}
             </option>
           ))}
         </Select>

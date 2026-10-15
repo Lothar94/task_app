@@ -18,6 +18,8 @@ import type { Logger } from '../application/ports/Logger.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
 import { GetProject, ListProjects } from '../application/projects/QueryProjects.js';
+import { ArchiveProject } from '../application/projects/ArchiveProject.js';
+import { UnarchiveProject } from '../application/projects/UnarchiveProject.js';
 import { SetProjectMembers } from '../application/projects/SetProjectMembers.js';
 import { AgentBriefing } from '../application/tasks/AgentBriefing.js';
 import { AssignTask } from '../application/tasks/AssignTask.js';
@@ -124,6 +126,19 @@ function createAgentTransferUseCases(
   };
 }
 
+function createProjectMemberAndArchiveUseCases(
+  projects: SqliteProjectRepository,
+  agents: SqliteAgentRepository,
+  tasks: SqliteTaskRepository,
+  clock: SystemClock,
+) {
+  return {
+    setProjectMembers: new SetProjectMembers(projects, agents),
+    archiveProject: new ArchiveProject(projects, tasks, clock),
+    unarchiveProject: new UnarchiveProject(projects),
+  };
+}
+
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
   const { db, instructionWriter, skillCatalog } = options;
@@ -171,13 +186,13 @@ export function createContainer(options: ContainerOptions) {
       ),
       listProjects: new ListProjects(organizations, projects),
       getProject: new GetProject(projects),
-      setProjectMembers: new SetProjectMembers(projects, agents),
+      ...createProjectMemberAndArchiveUseCases(projects, agents, tasks, clock),
       assignTask: new AssignTask({ projects, agents, tasks, recorder, launcher, queue, ids, clock }),
-      sendFollowUp: new SendFollowUp(tasks, recorder, launcher),
+      sendFollowUp: new SendFollowUp(projects, tasks, recorder, launcher),
       cancelTask: new CancelTask(tasks, running, recorder, clock, queue),
       updateTask: new UpdateTask(tasks, agents, projects, recorder),
-      startTask: new StartTask(tasks, launcher, queue),
-      enqueueTask: new EnqueueTask(tasks, recorder, queue),
+      startTask: new StartTask(projects, tasks, launcher, queue),
+      enqueueTask: new EnqueueTask(projects, tasks, recorder, queue),
       dequeueTask: new DequeueTask(tasks, recorder, queue),
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),

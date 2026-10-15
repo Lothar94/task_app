@@ -1,4 +1,4 @@
-import type { AgentDto, ProjectDto } from '@fleet/shared';
+import { type AgentDto, type ProjectDto, isArchivedProject } from '@fleet/shared';
 import { useState } from 'react';
 import { Button, Card, CheckboxList, ErrorMessage } from '../../components/ui';
 import { useSetProjectMembers } from './projectQueries';
@@ -7,6 +7,7 @@ export function ProjectMembers({ project, agents }: { project: ProjectDto; agent
   const [isEditing, setIsEditing] = useState(false);
   const [selected, setSelected] = useState(project.memberIds);
   const setMembers = useSetProjectMembers(project.id);
+  const isArchived = isArchivedProject(project);
   const members = agents.filter((agent) => project.memberIds.includes(agent.id));
 
   const save = () => setMembers.mutate(selected, { onSuccess: () => setIsEditing(false) });
@@ -29,9 +30,11 @@ export function ProjectMembers({ project, agents }: { project: ProjectDto; agent
             </Button>
           </div>
         ) : (
-          <Button variant="secondary" onClick={startEditing}>
-            Editar
-          </Button>
+          !isArchived && (
+            <Button variant="secondary" onClick={startEditing}>
+              Editar
+            </Button>
+          )
         )
       }
     >

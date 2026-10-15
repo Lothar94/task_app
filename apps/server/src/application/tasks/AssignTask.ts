@@ -6,7 +6,7 @@ import type { Clock } from '../ports/Clock.js';
 import type { IdGenerator } from '../ports/IdGenerator.js';
 import type { ProjectRepository } from '../ports/ProjectRepository.js';
 import type { TaskRepository } from '../ports/TaskRepository.js';
-import { requireAgent, requireProject } from '../shared/lookups.js';
+import { requireActiveProject, requireAgent } from '../shared/lookups.js';
 import type { TaskLauncher } from './TaskLauncher.js';
 import type { TaskQueue } from './TaskQueue.js';
 import type { TaskRecorder } from './TaskRecorder.js';
@@ -28,7 +28,7 @@ export class AssignTask {
 
   execute(projectId: string, input: AssignTaskInput): Task {
     const { projects, agents, tasks, recorder, launcher, queue, ids, clock } = this.deps;
-    const project = requireProject(projects, projectId);
+    const project = requireActiveProject(projects, projectId);
     const agent = requireAgent(agents, input.agentId);
     if (!project.hasMember(agent.id)) {
       throw new ValidationError(`"${agent.name}" is not a member of this project`);
