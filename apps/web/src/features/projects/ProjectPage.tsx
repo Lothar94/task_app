@@ -13,6 +13,7 @@ import { TaskList } from '../tasks/TaskList';
 import { useTaskTree } from '../tasks/taskQueries';
 import { existingMilestones, existingTags, queuedTasks } from '../tasks/taskListModel';
 import { collectActiveAgentIds } from '../tasks/taskTreeModel';
+import { ArchiveError, useProjectArchive } from './ProjectArchive';
 import { ProjectMembers } from './ProjectMembers';
 import { useProject } from './projectQueries';
 import { ProjectStats } from './ProjectStats';
@@ -68,6 +69,7 @@ function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDt
   const [isAssigning, setIsAssigning] = useState(false);
   const members = agents.filter((agent) => project.memberIds.includes(agent.id));
   const tree = useTaskTree(project.id);
+  const archive = useProjectArchive(project);
   return (
     <>
       <PageHeader
@@ -78,8 +80,15 @@ function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDt
             <code className="text-xs text-zinc-500">{project.workspacePath}</code>
           </>
         }
-        actions={<Button onClick={() => setIsAssigning(true)}>+ Nueva tarea</Button>}
+        actions={
+          <>
+            {archive.button}
+            {!archive.isArchived && <Button onClick={() => setIsAssigning(true)}>Nueva tarea</Button>}
+          </>
+        }
       />
+      {archive.banner}
+      <ArchiveError error={archive.error} />
       <div className="space-y-6">
         <ProjectTasks projectId={project.id} agents={agents} />
         <ProjectTeam project={project} agents={agents} members={members} />

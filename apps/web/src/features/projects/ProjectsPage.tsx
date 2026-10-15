@@ -1,9 +1,55 @@
+import type { ProjectDto } from '@fleet/shared';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Button, Card, EmptyState, ErrorMessage, Loading, PageHeader } from '../../components/ui';
+import { Dialog } from '../../components/Dialog';
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorMessage,
+  Loading,
+  PageHeader,
+  ROW_CLASS,
+  RowList,
+  SegmentedControl,
+} from '../../components/ui';
+import { formatDate } from '../../lib/format';
 import { useAgents } from '../agents/agentQueries';
+import { type ProjectFilter, groupProjects } from './projectListModel';
 import { useCreateProject, useProjects } from './projectQueries';
 import { ProjectForm } from './ProjectForm';
+
+const EMPTY_MESSAGES: Record<ProjectFilter, string> = {
+  active: 'No hay proyectos activos. Crea uno con «Nuevo proyecto».',
+  archived: 'No hay proyectos archivados.',
+};
+
+function ProjectRow({ project }: { project: ProjectDto }) {
+  return (
+    <li>
+      <Link to={`/projects/${project.id}`} className={ROW_CLASS}>
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-2">
+            <span className="truncate font-semibold">{project.name}</span>
+            {project.archivedAt && (
+              <>
+                <Badge>Archivado</Badge>
+                <span className="text-xs whitespace-nowrap text-zinc-500">
+                  {formatDate(project.archivedAt)}
+                </span>
+              </>
+            )}
+          </p>
+          {project.description && <p className="line-clamp-1 text-sm text-zinc-400">{project.description}</p>}
+        </div>
+        <code className="hidden max-w-[40%] truncate font-mono text-xs text-zinc-500 md:block">
+          {project.workspacePath}
+        </code>
+        <span className="text-xs whitespace-nowrap text-zinc-500">{project.memberIds.length} agente(s)</span>
+      </Link>
+    </li>
+  );
+}
 
 export function ProjectsPage() {
   const projects = useProjects();
@@ -11,57 +57,47 @@ export function ProjectsPage() {
   const createProject = useCreateProject();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
+  const [filter, setFilter] = useState<ProjectFilter>('active');
 
   if (projects.isPending || agents.isPending) return <Loading />;
   if (projects.error || agents.error) return <ErrorMessage error={projects.error ?? agents.error} />;
+
+  const groups = groupProjects(projects.data);
+  const visible = groups[filter];
+  const options = [
+    { value: 'active' as const, label: `Activos (${groups.active.length})` },
+    { value: 'archived' as const, label: `Archivados (${groups.archived.length})` },
+  ];
 
   return (
     <>
       <PageHeader
         title="Proyectos"
         subtitle="Cada proyecto tiene una carpeta de trabajo y un equipo de agentes."
-        actions={!isCreating && <Button onClick={() => setIsCreating(true)}>Nuevo proyecto</Button>}
+        actions={<Button onClick={() => setIsCreating(true)}>Nuevo proyecto</Button>}
       />
-      {isCreating && (
-        <div className="mb-6">
-          <Card
-            title="Nuevo proyecto"
-            actions={
-              <Button variant="secondary" onClick={() => setIsCreating(false)}>
-                Cancelar
-              </Button>
-            }
-          >
-            <ProjectForm
-              agents={agents.data}
-              isSubmitting={createProject.isPending}
-              error={createProject.error}
-              onSubmit={(input) =>
-                createProject.mutate(input, { onSuccess: (project) => navigate(`/projects/${project.id}`) })
-              }
-            />
-          </Card>
-        </div>
-      )}
-      {projects.data.length === 0 ? (
-        <EmptyState>No hay proyectos todavía.</EmptyState>
+      <div className="mb-4">
+        <SegmentedControl label="Filtrar proyectos" options={options} value={filter} onChange={setFilter} />
+      </div>
+      {visible.length === 0 ? (
+        <EmptyState>{EMPTY_MESSAGES[filter]}</EmptyState>
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2">
-          {projects.data.map((project) => (
-            <li key={project.id}>
-              <Link
-                to={`/projects/${project.id}`}
-                className="block rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 transition hover:border-indigo-500/60"
-              >
-                <h2 className="font-semibold">{project.name}</h2>
-                {project.description && <p className="mt-1 text-sm text-zinc-400">{project.description}</p>}
-                <p className="mt-2 font-mono text-xs text-zinc-500">{project.workspacePath}</p>
-                <p className="mt-1 text-xs text-zinc-500">{project.memberIds.length} agente(s)</p>
-              </Link>
-            </li>
+        <RowList>
+          {visible.map((project) => (
+            <ProjectRow key={project.id} project={project} />
           ))}
-        </ul>
+        </RowList>
       )}
+      <Dialog open={isCreating} title="Nuevo proyecto" onClose={() => setIsCreating(false)}>
+        <ProjectForm
+          agents={agents.data}
+          isSubmitting={createProject.isPending}
+          error={createProject.error}
+          onSubmit={(input) =>
+            createProject.mutate(input, { onSuccess: (project) => navigate(`/projects/${project.id}`) })
+          }
+        />
+      </Dialog>
     </>
   );
 }

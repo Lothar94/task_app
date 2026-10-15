@@ -98,8 +98,28 @@ export function PageHeader({
         <h1 className="text-2xl font-semibold">{title}</h1>
         {subtitle && <div className="mt-1 text-sm text-zinc-400">{subtitle}</div>}
       </div>
-      {actions && <div className="flex gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
+  );
+}
+
+/** Divided list container; rows are `<li>` using ROW_CLASS. */
+export function RowList({ children }: { children: ReactNode }) {
+  return (
+    <ul className="divide-y divide-zinc-800 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/40">
+      {children}
+    </ul>
+  );
+}
+
+export const ROW_CLASS =
+  'flex items-center gap-4 px-4 py-3 transition hover:bg-zinc-800/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo-400';
+
+export function Badge({ children }: { children: ReactNode }) {
+  return (
+    <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-300">
+      {children}
+    </span>
   );
 }
 
