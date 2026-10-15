@@ -7,6 +7,8 @@ import {
   LinkButton,
   Loading,
   PageHeader,
+  ROW_CLASS,
+  RowList,
   SegmentedControl,
 } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
@@ -22,8 +24,6 @@ const VIEW_OPTIONS = [
   { value: 'list' as const, label: 'Lista' },
   { value: 'diagram' as const, label: 'Diagrama' },
 ];
-
-const CARD_STYLES = 'block rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 transition';
 
 function ExportStarters({
   onStart,
@@ -46,23 +46,20 @@ function ExportStarters({
   );
 }
 
-function AgentCardBody({ agent, teammates }: { agent: AgentDto; teammates: Map<string, string> }) {
+function AgentRowBody({ agent, teammates }: { agent: AgentDto; teammates: Map<string, string> }) {
   const collaborators = agent.collaboratorIds.map((id) => teammates.get(id)).filter(Boolean);
   return (
     <>
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h2 className="font-semibold">{agent.name}</h2>
-          <p className="text-sm text-zinc-400">{agent.role}</p>
-        </div>
-        <span className="rounded bg-zinc-800 px-2 py-0.5 font-mono text-xs whitespace-nowrap text-zinc-300">
-          {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
-        </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-semibold">{agent.name}</p>
+        <p className="truncate text-sm text-zinc-400">{agent.role}</p>
       </div>
-      {agent.description && <p className="mt-2 line-clamp-2 text-sm text-zinc-500">{agent.description}</p>}
-      <p className="mt-3 text-xs text-zinc-500">
+      <p className="hidden min-w-0 max-w-[35%] flex-1 truncate text-xs text-zinc-500 md:block">
         {collaborators.length > 0 ? `Delega en: ${collaborators.join(', ')}` : 'Sin colaboradores'}
       </p>
+      <span className="rounded bg-zinc-800 px-2 py-0.5 font-mono text-xs whitespace-nowrap text-zinc-300">
+        {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
+      </span>
     </>
   );
 }
@@ -72,7 +69,7 @@ interface Selection {
   onToggle: (id: string) => void;
 }
 
-function AgentCard({
+function AgentRow({
   agent,
   teammates,
   selection,
@@ -81,39 +78,42 @@ function AgentCard({
   teammates: Map<string, string>;
   selection?: Selection;
 }) {
-  const body = <AgentCardBody agent={agent} teammates={teammates} />;
+  const body = <AgentRowBody agent={agent} teammates={teammates} />;
   if (!selection) {
     return (
-      <Link to={`/agents/${agent.id}`} className={`${CARD_STYLES} hover:border-indigo-500/60`}>
-        {body}
-      </Link>
+      <li>
+        <Link to={`/agents/${agent.id}`} className={ROW_CLASS}>
+          {body}
+        </Link>
+      </li>
     );
   }
   const checked = selection.selected.has(agent.id);
   return (
-    <label
-      className={`${CARD_STYLES} cursor-pointer ${checked ? 'border-indigo-500' : 'hover:border-indigo-500/60'}`}
-    >
-      <input
-        type="checkbox"
-        className="mb-2"
-        checked={checked}
-        onChange={() => selection.onToggle(agent.id)}
-        aria-label={`Seleccionar ${agent.name}`}
-      />
-      {body}
-    </label>
+    <li>
+      <label
+        className={`${ROW_CLASS} cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-indigo-400 ${checked ? 'bg-indigo-500/10' : ''}`}
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => selection.onToggle(agent.id)}
+          aria-label={`Seleccionar ${agent.name}`}
+        />
+        {body}
+      </label>
+    </li>
   );
 }
 
 function AgentList({ agents, selection }: { agents: AgentDto[]; selection?: Selection }) {
   const names = new Map(agents.map((agent) => [agent.id, agent.name]));
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <RowList>
       {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} teammates={names} selection={selection} />
+        <AgentRow key={agent.id} agent={agent} teammates={names} selection={selection} />
       ))}
-    </div>
+    </RowList>
   );
 }
 
@@ -133,19 +133,23 @@ export function AgentsPage() {
         subtitle="Tu flota: identidad, instrucciones y con quién puede colaborar cada uno."
         actions={
           <>
-            <SegmentedControl label="Vista" options={VIEW_OPTIONS} value={view} onChange={setView} />
-            {agents.data.length > 0 && !selected && (
-              <ExportStarters
-                onStart={exporting.start}
-                onExportAll={exporting.exportAll}
-                isPending={exporting.isPending}
-              />
-            )}
-            <ImportButton existingAgents={agents.data} disabled={Boolean(selected)} />
+            <div className="flex flex-wrap items-center gap-2">
+              <ImportButton existingAgents={agents.data} disabled={Boolean(selected)} />
+              {agents.data.length > 0 && !selected && (
+                <ExportStarters
+                  onStart={exporting.start}
+                  onExportAll={exporting.exportAll}
+                  isPending={exporting.isPending}
+                />
+              )}
+            </div>
             <LinkButton to="/agents/new">Nuevo agente</LinkButton>
           </>
         }
       />
+      <div className="mb-4">
+        <SegmentedControl label="Vista" options={VIEW_OPTIONS} value={view} onChange={setView} />
+      </div>
       {!selected && <ErrorMessage error={exporting.error} />}
       {selected && (
         <ExportToolbar
