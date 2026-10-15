@@ -18,8 +18,8 @@ export function toOrganizationDto(organization: Organization): OrganizationDto {
 }
 
 export function toProjectDto(project: Project): ProjectDto {
-  const { createdAt, ...rest } = project.toSnapshot();
-  return { ...rest, createdAt: createdAt.toISOString() };
+  const { createdAt, archivedAt, ...rest } = project.toSnapshot();
+  return { ...rest, createdAt: createdAt.toISOString(), archivedAt: toIso(archivedAt) };
 }
 
 export function toTaskDto(task: Task): TaskDto {

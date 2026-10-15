@@ -146,6 +146,7 @@ const MIGRATIONS: readonly string[] = [
   CREATE INDEX projects_organization_idx ON projects(organization_id);
   `,
   `ALTER TABLE agents ADD COLUMN skills TEXT NOT NULL DEFAULT '[]';`,
+  `ALTER TABLE projects ADD COLUMN archived_at TEXT;`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */
