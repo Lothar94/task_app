@@ -11,6 +11,7 @@ const task = (number: number, extra: Partial<TaskNodeDto> = {}): TaskNodeDto =>
     number,
     projectId: 'p',
     parentTaskId: null,
+    proposedByAgentId: null,
     agentId: 'a',
     title: `Tarea ${number}`,
     description: '',

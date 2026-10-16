@@ -1,12 +1,20 @@
 import type { TaskNodeDto, TaskStatus } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { buildTaskList, existingMilestones, existingTags, queuedTasks } from './taskListModel';
+import {
+  awaitsConfirmation,
+  buildTaskList,
+  existingMilestones,
+  existingTags,
+  proposalLabel,
+  queuedTasks,
+} from './taskListModel';
 
 const task = (number: number, extra: Partial<TaskNodeDto> = {}): TaskNodeDto => ({
   id: `t${number}`,
   number,
   projectId: 'p',
   parentTaskId: null,
+  proposedByAgentId: null,
   agentId: 'a',
   title: `Tarea ${number}`,
   description: '',
@@ -143,5 +151,30 @@ describe('task list model', () => {
       expect(group?.label).toBe('Bug');
       expect(existingTags(spelled)).toEqual(['Bug']);
     });
+  });
+});
+
+describe('agent proposals', () => {
+  const names = new Map([['a1', 'Ana']]);
+  const proposal = (n: number, extra: Partial<TaskNodeDto> = {}) =>
+    task(n, { status: 'draft', proposedByAgentId: 'a1', ...extra });
+
+  it('labels proposals with the agent name, falling back to a generic one', () => {
+    expect(proposalLabel(proposal(1), names)).toBe('Propuesta por Ana');
+    expect(proposalLabel(proposal(1, { proposedByAgentId: 'gone' }), names)).toBe('Propuesta por un agente');
+    expect(proposalLabel(task(1), names)).toBeNull();
+  });
+
+  it('awaits confirmation only while an agent-proposed task is a draft', () => {
+    expect(awaitsConfirmation(proposal(1))).toBe(true);
+    expect(awaitsConfirmation(proposal(1, { status: 'queued' }))).toBe(false);
+    expect(awaitsConfirmation(task(1, { status: 'draft' }))).toBe(false);
+  });
+
+  it('filters the list to proposals awaiting confirmation', () => {
+    const roots = [proposal(1), proposal(2, { status: 'queued' }), task(3, { status: 'draft' })];
+    const view = { groupBy: 'none', sortBy: 'number', tag: '', proposalsOnly: true } as const;
+    expect(buildTaskList(roots, view)[0]?.nodes.map((n) => n.number)).toEqual([1]);
+    expect(buildTaskList(roots, { ...view, proposalsOnly: false })[0]?.nodes).toHaveLength(3);
   });
 });

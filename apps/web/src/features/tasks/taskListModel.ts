@@ -23,6 +23,8 @@ export interface TaskListView {
   sortBy: SortBy;
   /** Only root tasks carrying this tag (case-insensitive); empty shows every task. */
   tag: string;
+  /** Only root tasks proposed by an agent that still await the project manager's confirmation. */
+  proposalsOnly?: boolean;
 }
 
 export interface TaskGroup {
@@ -100,6 +102,18 @@ export const existingMilestones = (roots: TaskNodeDto[]) => distinct(milestonesO
 
 export const existingTags = (roots: TaskNodeDto[]) => distinct(tagsOf(roots));
 
+type Proposable = Pick<TaskNodeDto, 'proposedByAgentId' | 'status'>;
+
+/** A draft an agent proposed: it must not start until the project manager confirms it. */
+export const awaitsConfirmation = (task: Proposable) =>
+  task.proposedByAgentId !== null && task.status === 'draft';
+
+/** "Propuesta por <agente>", or null when the project manager created the task. */
+export const proposalLabel = (task: Pick<TaskNodeDto, 'proposedByAgentId'>, agentNames: Map<string, string>) =>
+  task.proposedByAgentId === null
+    ? null
+    : `Propuesta por ${agentNames.get(task.proposedByAgentId) ?? 'un agente'}`;
+
 /** Queued root tasks in the order the project will run them. */
 export const queuedTasks = (roots: TaskNodeDto[]) =>
   roots
@@ -154,7 +168,8 @@ function groupTasks(nodes: TaskNodeDto[], groupBy: GroupBy, spelling: Map<string
 
 /** Filters, sorts and groups the root tasks; subtasks stay nested under their root. */
 export function buildTaskList(roots: TaskNodeDto[], view: TaskListView): TaskGroup[] {
-  const visible = view.tag === ALL_TAGS ? roots : roots.filter((node) => hasTag(node, view.tag));
+  const tagged = view.tag === ALL_TAGS ? roots : roots.filter((node) => hasTag(node, view.tag));
+  const visible = view.proposalsOnly ? tagged.filter(awaitsConfirmation) : tagged;
   const spelling = spellings(view.groupBy === 'milestone' ? milestonesOf(roots) : tagsOf(roots));
   return groupTasks(sortTasks(visible, view.sortBy), view.groupBy, spelling);
 }

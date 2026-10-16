@@ -1,8 +1,10 @@
 import type { TaskNodeDto } from '@fleet/shared';
+import { useState } from 'react';
 import { EmptyState, Field, Select } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import {
   ALL_TAGS,
+  awaitsConfirmation,
   buildTaskList,
   existingTags,
   GROUP_OPTIONS,
@@ -29,7 +31,10 @@ export function TaskList({ projectId, roots, agentNames }: TaskListProps) {
   const [storedTag, setTagFilter] = useStoredChoice<string>('fleet.tasks.tag', [ALL_TAGS, ...tags], ALL_TAGS);
   // The remembered tag may no longer exist in this project: fall back to showing everything.
   const tagFilter = tags.includes(storedTag) ? storedTag : ALL_TAGS;
-  const groups = buildTaskList(roots, { groupBy, sortBy, tag: tagFilter });
+  const [proposalsOnly, setProposalsOnly] = useState(false);
+  const proposalCount = roots.filter(awaitsConfirmation).length;
+  const onlyProposals = proposalsOnly && proposalCount > 0;
+  const groups = buildTaskList(roots, { groupBy, sortBy, tag: tagFilter, proposalsOnly: onlyProposals });
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
@@ -63,12 +68,22 @@ export function TaskList({ projectId, roots, agentNames }: TaskListProps) {
             </Select>
           </Field>
         )}
+        {proposalCount > 0 && (
+          <label className="flex items-center gap-2 pb-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={onlyProposals}
+              onChange={(e) => setProposalsOnly(e.target.checked)}
+            />
+            Propuestas por agentes pendientes de confirmación ({proposalCount})
+          </label>
+        )}
       </div>
       {groups.length === 0 ? (
         roots.length === 0 ? (
           <TaskTree projectId={projectId} nodes={[]} agentNames={agentNames} />
         ) : (
-          <EmptyState>Ninguna tarea tiene el tag «{tagFilter}».</EmptyState>
+          <EmptyState>Ninguna tarea coincide con los filtros.</EmptyState>
         )
       ) : (
         groups.map((group, index) => (
