@@ -72,6 +72,7 @@ export class AgentBriefing {
       '- Call `delegate_task` several times in the same turn to run independent work in parallel.',
       '- Each call waits until the collaborator finishes and returns its summary; review it before moving on.',
       "- Delegate only what fits the collaborator's role; do the rest yourself.",
+      '- Use `create_task` to propose follow-up work outside your task: it is only a draft until the project manager starts it.',
     ].join('\n');
   }
 

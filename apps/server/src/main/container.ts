@@ -24,6 +24,7 @@ import { SetProjectMembers } from '../application/projects/SetProjectMembers.js'
 import { AgentBriefing } from '../application/tasks/AgentBriefing.js';
 import { AssignTask } from '../application/tasks/AssignTask.js';
 import { CancelTask } from '../application/tasks/CancelTask.js';
+import { ProposeTask } from '../application/tasks/ProposeTask.js';
 import { DelegateSubtask } from '../application/tasks/DelegateSubtask.js';
 import { GetTask, GetTaskConversation, GetTaskTree } from '../application/tasks/QueryTasks.js';
 import { DequeueTask } from '../application/tasks/DequeueTask.js';
@@ -85,6 +86,7 @@ function createTaskExecution(
     clock,
     maxDelegationDepth,
   );
+  const proposeTask = new ProposeTask(tasks, agents, projects, recorder, ids, clock);
   const runTask = new RunTask({
     tasks,
     agents,
@@ -95,6 +97,7 @@ function createTaskExecution(
     briefing: new AgentBriefing(reservedPorts),
     skillWorkspace,
     delegateSubtask,
+    proposeTask,
     clock,
     ids,
   });

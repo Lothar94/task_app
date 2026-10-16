@@ -44,12 +44,15 @@ export interface NewTask {
   description: string;
   milestone?: string | null;
   tags?: string[];
+  /** Agent that proposed the task on its own; only top-level tasks can be proposed. */
+  proposedByAgentId?: string | null;
 }
 
-export interface TaskSnapshot extends Omit<NewTask, 'milestone' | 'tags'> {
+export interface TaskSnapshot extends Omit<NewTask, 'milestone' | 'tags' | 'proposedByAgentId'> {
   id: string;
   status: TaskStatus;
   milestone: string | null;
+  proposedByAgentId: string | null;
   tags: string[];
   queuePosition: number | null;
   resultSummary: string | null;
@@ -63,6 +66,10 @@ export class Task {
   private constructor(private state: TaskSnapshot) {}
 
   static create(id: string, task: NewTask, now: Date, status: 'pending' | 'draft' = 'pending'): Task {
+    const proposedByAgentId = task.proposedByAgentId ?? null;
+    if (proposedByAgentId && task.parentTaskId) {
+      throw new ValidationError('A proposed task must be top-level, not a subtask');
+    }
     return new Task({
       ...task,
       id,
@@ -71,6 +78,7 @@ export class Task {
       description: requireText(task.description, 'description'),
       milestone: normalizeMilestone(task.milestone),
       tags: normalizeTags(task.tags),
+      proposedByAgentId,
       queuePosition: null,
       status,
       resultSummary: null,
@@ -115,6 +123,10 @@ export class Task {
 
   get description(): string {
     return this.state.description;
+  }
+
+  get proposedByAgentId(): string | null {
+    return this.state.proposedByAgentId;
   }
 
   get status(): TaskStatus {
