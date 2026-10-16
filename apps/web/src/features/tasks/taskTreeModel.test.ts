@@ -29,6 +29,7 @@ const node = (
   number: 1,
   projectId: 'p',
   parentTaskId: null,
+  proposedByAgentId: null,
   agentId,
   title: 't',
   description: 'd',
