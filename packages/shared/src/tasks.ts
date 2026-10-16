@@ -21,6 +21,12 @@ export interface TaskDto {
   projectId: string;
   parentTaskId: string | null;
   agentId: string;
+  /**
+   * Agent that proposed the task while working on another one, or null when the project manager
+   * created it. Proposed tasks are always top-level drafts: they never start without the project
+   * manager's confirmation (start or queue).
+   */
+  proposedByAgentId: string | null;
   title: string;
   description: string;
   status: TaskStatus;
