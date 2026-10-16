@@ -66,6 +66,23 @@ describe('Task', () => {
     ).toThrow(ValidationError);
   });
 
+  describe('proposed tasks', () => {
+    const base = { projectId: 'p1', number: 1, agentId: 'a1', title: 'Build', description: 'Do it' };
+
+    it('defaults to no proposer and keeps the proposer of top-level tasks', () => {
+      expect(newTask().proposedByAgentId).toBeNull();
+      const proposed = Task.createDraft('t2', { ...base, parentTaskId: null, proposedByAgentId: 'a2' }, now);
+      expect(proposed.proposedByAgentId).toBe('a2');
+      expect(proposed.toSnapshot().proposedByAgentId).toBe('a2');
+    });
+
+    it('rejects a proposer on subtasks', () => {
+      expect(() =>
+        Task.createDraft('t2', { ...base, parentTaskId: 't1', proposedByAgentId: 'a2' }, now),
+      ).toThrow(ValidationError);
+    });
+  });
+
   describe('planning', () => {
     const draft = (extra: Partial<Parameters<typeof Task.createDraft>[1]> = {}) =>
       Task.createDraft(
