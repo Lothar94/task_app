@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { DelegationGateway, DelegationOutcome } from '../../../application/ports/AgentRuntime.js';
 
 export const FLEET_SERVER_NAME = 'fleet';
-export const FLEET_TOOL_NAMES = ['list_collaborators', 'delegate_task', 'report_result'].map(
+export const FLEET_TOOL_NAMES = ['list_collaborators', 'delegate_task', 'create_task', 'report_result'].map(
   (name) => `mcp__${FLEET_SERVER_NAME}__${name}`,
 );
 
@@ -28,6 +28,35 @@ function describeOutcome(collaboratorName: string, outcome: DelegationOutcome): 
     'Summary:',
     outcome.summary || '(no summary provided)',
   ].join('\n');
+}
+
+function createTaskTool(gateway: DelegationGateway) {
+  return tool(
+    'create_task',
+    'Create a new top-level task in the project as a DRAFT for the project manager to review. ' +
+      'It is NOT started and you do not wait for it. ' +
+      'Use delegate_task instead for subtasks of your current work.',
+    {
+      title: z.string().describe('Short title of the task'),
+      description: z
+        .string()
+        .describe('Self-contained description: context, expected outcome and acceptance criteria'),
+      assignee: z.string().optional().describe('Exact name of a project member; defaults to yourself'),
+      milestone: z.string().optional().describe('Milestone the task belongs to'),
+      tags: z.array(z.string()).optional().describe('Tags to classify the task'),
+    },
+    ({ title, description, assignee, milestone, tags }) =>
+      guarded(() => {
+        const proposed = gateway.proposeTask({
+          title,
+          description,
+          assigneeName: assignee,
+          milestone,
+          tags,
+        });
+        return `Task ${proposed.taskNumber} created as a draft assigned to "${proposed.assigneeName}". It will only start when the project manager confirms it.`;
+      }),
+  );
 }
 
 /** Exposes a running agent's delegation capabilities as in-process MCP tools. */
@@ -59,6 +88,7 @@ export function createFleetToolServer(gateway: DelegationGateway) {
             ),
           ),
       ),
+      createTaskTool(gateway),
       tool(
         'report_result',
         'Report the final summary of your task to whoever assigned it. Call it once when you are done.',

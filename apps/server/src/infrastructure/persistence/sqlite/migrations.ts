@@ -147,6 +147,7 @@ const MIGRATIONS: readonly string[] = [
   `,
   `ALTER TABLE agents ADD COLUMN skills TEXT NOT NULL DEFAULT '[]';`,
   `ALTER TABLE projects ADD COLUMN archived_at TEXT;`,
+  `ALTER TABLE tasks ADD COLUMN proposed_by_agent_id TEXT REFERENCES agents(id);`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */

@@ -20,6 +20,7 @@ interface TaskRow {
   milestone: string | null;
   tags: string;
   queue_position: number | null;
+  proposed_by_agent_id: string | null;
 }
 
 const ACTIVE_STATUSES = "('pending', 'running', 'waiting_subtasks')";
@@ -33,9 +34,11 @@ export class SqliteTaskRepository implements TaskRepository {
     this.db
       .prepare(
         `INSERT INTO tasks (id, number, project_id, parent_task_id, agent_id, title, description, status,
-           result_summary, session_id, created_at, started_at, finished_at, milestone, tags, queue_position)
+           result_summary, session_id, created_at, started_at, finished_at, milestone, tags, queue_position,
+           proposed_by_agent_id)
          VALUES (@id, @number, @projectId, @parentTaskId, @agentId, @title, @description, @status,
-           @resultSummary, @sessionId, @createdAt, @startedAt, @finishedAt, @milestone, @tags, @queuePosition)
+           @resultSummary, @sessionId, @createdAt, @startedAt, @finishedAt, @milestone, @tags, @queuePosition,
+           @proposedByAgentId)
          ON CONFLICT(id) DO UPDATE SET title = @title, description = @description, agent_id = @agentId,
            milestone = @milestone, tags = @tags, queue_position = @queuePosition,
            status = @status, result_summary = @resultSummary,
@@ -127,5 +130,6 @@ function toTask(row: TaskRow): Task {
     milestone: row.milestone,
     tags: JSON.parse(row.tags) as string[],
     queuePosition: row.queue_position,
+    proposedByAgentId: row.proposed_by_agent_id,
   });
 }

@@ -5,6 +5,7 @@ import { EmptyState } from '../../components/ui';
 import { useNow } from '../../hooks/useNow';
 import { formatCost, formatDuration, formatInteger, formatTokens } from '../../lib/format';
 import { TaskLabels } from './TaskLabels';
+import { ProposalNote } from './ProposalNote';
 import { TaskNumber } from './taskLabel';
 import { isTaskActive, TaskStatusBadge } from './TaskStatusBadge';
 import { countDescendants, subtreeMetrics } from './taskTreeModel';
@@ -115,6 +116,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
               {agentNames.get(node.agentId) ?? 'Agente eliminado'}
               {descendants > 0 && ` · ${descendants} subtarea${descendants === 1 ? '' : 's'}`}
             </span>
+            <ProposalNote task={node} agentNames={agentNames} />
             {depth === 0 && <TaskLabels milestone={node.milestone} tags={node.tags} />}
           </span>
         </Link>

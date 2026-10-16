@@ -25,6 +25,7 @@ import {
   useTask,
   useTaskTree,
 } from './taskQueries';
+import { ProposalNote } from './ProposalNote';
 import { isTaskActive, isTaskPlanned, TaskStatusBadge } from './TaskStatusBadge';
 import { useProject } from '../projects/projectQueries';
 
@@ -42,7 +43,15 @@ function TaskMetricsSummary({ task }: { task: TaskDto }) {
   );
 }
 
-function TaskMeta({ task, agentName }: { task: TaskDto; agentName: string }) {
+function TaskMeta({
+  task,
+  agentName,
+  agentNames,
+}: {
+  task: TaskDto;
+  agentName: string;
+  agentNames: Map<string, string>;
+}) {
   return (
     <span className="flex flex-wrap items-center gap-2">
       <TaskNumber number={task.number} />
@@ -57,6 +66,7 @@ function TaskMeta({ task, agentName }: { task: TaskDto; agentName: string }) {
         <span className="text-zinc-500">· inicio {new Date(task.startedAt).toLocaleString()}</span>
       )}
       <TaskMetricsSummary task={task} />
+      <ProposalNote task={task} agentNames={agentNames} detailed />
       <TaskLabels milestone={task.milestone} tags={task.tags} />
     </span>
   );
@@ -202,7 +212,7 @@ function TaskView({
       <Breadcrumbs task={task} />
       <PageHeader
         title={task.title}
-        subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} />}
+        subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />}
         actions={
           <TaskActions
             task={task}

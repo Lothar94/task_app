@@ -10,6 +10,7 @@ import type { TaskRepository } from '../ports/TaskRepository.js';
 import { requireAgent, requireProject, requireTask } from '../shared/lookups.js';
 import type { AgentBriefing } from './AgentBriefing.js';
 import type { DelegateSubtask } from './DelegateSubtask.js';
+import type { ProposeTask } from './ProposeTask.js';
 import type { SkillWorkspace } from '../ports/SkillWorkspace.js';
 import type { RunningTasks } from './RunningTasks.js';
 import { TaskDelegationGateway } from './TaskDelegationGateway.js';
@@ -34,6 +35,7 @@ export interface RunTaskDependencies {
   briefing: AgentBriefing;
   skillWorkspace: SkillWorkspace;
   delegateSubtask: DelegateSubtask;
+  proposeTask: ProposeTask;
   clock: Clock;
   ids: IdGenerator;
 }
@@ -77,7 +79,7 @@ export class RunTask implements TaskExecutor {
     isFollowUp: boolean,
     signal: AbortSignal,
   ): Promise<RunOutcome> {
-    const { runtime, briefing, delegateSubtask, recorder } = this.deps;
+    const { runtime, briefing, delegateSubtask, proposeTask, agents, recorder } = this.deps;
     const collaborators = this.collaboratorsOf(agent, project);
     const profile = agent.toSnapshot();
     const { skillsDirectory, pluginPaths } = await this.deps.skillWorkspace.prepare(profile.skills);
@@ -99,7 +101,14 @@ export class RunTask implements TaskExecutor {
       workspacePath: project.workspacePath,
       resumeSessionId: isFollowUp ? task.sessionId : null,
       signal,
-      delegation: new TaskDelegationGateway(task, collaborators, delegateSubtask, this, recorder, signal),
+      delegation: new TaskDelegationGateway(
+        task,
+        collaborators,
+        { delegateSubtask, proposeTask, agents },
+        this,
+        recorder,
+        signal,
+      ),
     });
     return this.consume(task, events);
   }

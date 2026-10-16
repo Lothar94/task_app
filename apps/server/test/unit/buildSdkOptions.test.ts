@@ -22,7 +22,12 @@ function requestWith(overrides: Partial<AgentRunRequest> = {}): AgentRunRequest 
     workspacePath: '/workspace',
     resumeSessionId: null,
     signal: new AbortController().signal,
-    delegation: { listCollaborators: () => [], delegate: vi.fn(), reportResult: vi.fn() },
+    delegation: {
+      listCollaborators: () => [],
+      delegate: vi.fn(),
+      proposeTask: vi.fn(),
+      reportResult: vi.fn(),
+    },
     ...overrides,
   };
 }
