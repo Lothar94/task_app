@@ -178,3 +178,28 @@ describe('agent proposals', () => {
     expect(buildTaskList(roots, { ...view, proposalsOnly: false })[0]?.nodes).toHaveLength(3);
   });
 });
+
+describe('agent proposals (QA)', () => {
+  const proposal = (extra: Partial<TaskNodeDto> = {}) =>
+    task(1, { status: 'draft', proposedByAgentId: 'a1', ...extra });
+
+  it('stops awaiting confirmation for every status other than draft', () => {
+    for (const status of ['queued', 'running', 'waiting_subtasks', 'completed', 'failed', 'cancelled'] as const) {
+      expect(awaitsConfirmation(proposal({ status })), status).toBe(false);
+    }
+  });
+
+  it('keeps the label after the proposal started and falls back when the name map is empty', () => {
+    expect(proposalLabel(proposal({ status: 'running' }), new Map())).toBe('Propuesta por un agente');
+  });
+
+  it('counts only pending proposals and drops them once confirmed', () => {
+    const view = { groupBy: 'none', sortBy: 'number', tag: '', proposalsOnly: true } as const;
+    const count = (roots: TaskNodeDto[]) =>
+      buildTaskList(roots, view).reduce((total, group) => total + group.nodes.length, 0);
+    const roots = [proposal(), { ...proposal(), id: 't9', number: 9 }, task(3, { status: 'draft' })];
+    expect(count(roots)).toBe(2);
+    expect(count([{ ...roots[0]!, status: 'queued' }, roots[1]!, roots[2]!])).toBe(1);
+    expect(count([])).toBe(0);
+  });
+});
