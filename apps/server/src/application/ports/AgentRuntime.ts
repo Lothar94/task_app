@@ -25,10 +25,25 @@ export interface DelegationOutcome {
   summary: string;
 }
 
+export interface TaskProposal {
+  title: string;
+  description: string;
+  assigneeName?: string;
+  milestone?: string;
+  tags?: string[];
+}
+
+export interface ProposedTaskInfo {
+  taskId: string;
+  taskNumber: number;
+  assigneeName: string;
+}
+
 /** Capabilities the runtime exposes to the model as tools so it can coordinate with its team. */
 export interface DelegationGateway {
   listCollaborators(): CollaboratorInfo[];
   delegate(request: DelegationRequest): Promise<DelegationOutcome>;
+  proposeTask(proposal: TaskProposal): ProposedTaskInfo;
   reportResult(summary: string): void;
 }
 
