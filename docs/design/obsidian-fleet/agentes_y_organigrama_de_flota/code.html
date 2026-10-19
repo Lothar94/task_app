@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Fleet // Flota de Agentes</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#3e2400",
+            "surface-container-low": "#1a1b22",
+            "surface-container": "#1e1f26",
+            "on-error-container": "#ffdad6",
+            "on-background": "#e3e1ec",
+            "outline-variant": "#464554",
+            "surface-bright": "#383941",
+            "inverse-on-surface": "#2f3038",
+            "on-secondary-fixed": "#002113",
+            "primary-fixed": "#e1e0ff",
+            "surface": "#12131a",
+            "on-primary": "#1000a9",
+            "tertiary-fixed": "#ffddb8",
+            "on-tertiary-fixed": "#2a1700",
+            "surface-dim": "#12131a",
+            "tertiary-container": "#ca8100",
+            "outline": "#908fa0",
+            "surface-tint": "#c0c1ff",
+            "tertiary": "#ffb95f",
+            "inverse-primary": "#494bd6",
+            "surface-container-highest": "#33343c",
+            "secondary-fixed-dim": "#4edea3",
+            "on-primary-container": "#0d0096",
+            "background": "#12131a",
+            "on-surface": "#e3e1ec",
+            "tertiary-fixed-dim": "#ffb95f",
+            "on-secondary-fixed-variant": "#005236",
+            "error-container": "#93000a",
+            "secondary-container": "#00a572",
+            "on-surface-variant": "#c7c4d7",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-error": "#690005",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#07006c",
+            "inverse-surface": "#e3e1ec",
+            "on-secondary-container": "#00311f",
+            "secondary-fixed": "#6ffbbe",
+            "surface-variant": "#33343c",
+            "secondary": "#4edea3",
+            "on-secondary": "#003824",
+            "surface-container-high": "#292931",
+            "on-primary-fixed-variant": "#2f2ebe",
+            "on-tertiary": "#472a00",
+            "surface-container-lowest": "#0d0e15",
+            "primary": "#c0c1ff",
+            "primary-fixed-dim": "#c0c1ff",
+            "primary-container": "#8083ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-compact": "0.5rem",
+            "gutter": "1rem",
+            "margin": "1.5rem",
+            "space-md": "0.75rem",
+            "space-xs": "0.25rem",
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem"
+          },
+          "fontFamily": {
+            "label-mono-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "body-md": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-mono-sm": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-mono-xs": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "label-mono-md": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "body-lg": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "fontWeight": "400" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "label-mono-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
+            "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "headline-sm": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "600" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "label-mono-xs": ["0.6875rem", { "lineHeight": "0.875rem", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      font-size: 16px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0d0e15;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #33343c;
+      border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #464554;
+    }
+    /* Animated dashed link */
+    @keyframes dashflow {
+      to {
+        stroke-dashoffset: -16;
+      }
+    }
+    .flow-line {
+      stroke-dasharray: 4, 4;
+      animation: dashflow 1.5s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased overflow-hidden font-body-sm h-screen flex flex-col select-none">
+<!-- ================= TOPBAR (Shared Component: TopNavBar Anchor) ================= -->
+<header class="flex justify-between items-center w-full px-4 border-b border-outline-variant/20 sticky top-0 z-50 bg-surface-container-lowest h-[52px] shrink-0">
+<!-- Left brand cluster + search/workspace -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center justify-center w-5 h-5 rounded bg-primary-container/20 text-primary border border-primary/40">
+<span class="material-symbols-outlined" style="font-size: 14px;">diamond</span>
+</span>
+<span class="text-headline-sm font-headline-sm font-semibold tracking-tight text-on-surface">Agent Fleet</span>
+</div>
+<!-- Workspace Picker -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-low border border-outline-variant/30 text-body-sm text-on-surface cursor-pointer hover:border-outline-variant transition-colors">
+<span class="font-label-mono-xs text-label-mono-xs text-outline">Lothar's lab</span>
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">arrow_drop_down</span>
+</div>
+<!-- Main Navigation Links -->
+<nav class="hidden md:flex items-center gap-1 ml-2 text-label-mono-sm font-label-mono-sm">
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Proyectos</a>
+<a class="border-b border-primary text-primary font-medium py-3.5 px-3 flex items-center gap-1.5" href="#">
+<span>Agentes</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Dashboard</a>
+</nav>
+</div>
+<!-- Right Controls -->
+<div class="flex items-center gap-3">
+<!-- Search on left of utility icons -->
+<div class="hidden lg:flex items-center gap-2 bg-surface-container-low border border-outline-variant/30 rounded px-2.5 py-1 text-label-mono-xs text-outline w-56">
+<span class="material-symbols-outlined" style="font-size: 13px;">search</span>
+<span class="flex-1">Filtrar agentes...</span>
+<kbd class="border border-outline-variant/40 rounded px-1 text-[10px] bg-surface-container">⌘K</kbd>
+</div>
+<div class="flex items-center gap-1 text-outline">
+<button class="p-1.5 rounded hover:bg-surface-container hover:text-on-surface transition-colors" title="Organizaciones">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container hover:text-on-surface transition-colors" title="Notificaciones">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container hover:text-on-surface transition-colors" title="Terminal">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<!-- User avatar -->
+<div class="flex items-center gap-2 pl-1 cursor-pointer">
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container font-label-mono-xs font-semibold flex items-center justify-center text-[10px]">
+          LL
+        </div>
+<span class="hidden sm:inline font-label-mono-xs text-label-mono-xs text-outline">Organizaciones</span>
+</div>
+</div>
+</header>
+<!-- ================= SUB-HEADER ACTIONS BAR ================= -->
+<div class="px-6 py-3 border-b border-outline-variant/20 bg-surface flex flex-wrap items-center justify-between gap-4 shrink-0">
+<div>
+<div class="flex items-center gap-3">
+<h1 class="text-headline-md font-headline-md font-semibold text-on-surface tracking-tight">Agentes</h1>
+<span class="px-2 py-0.5 rounded bg-secondary-container/20 border border-secondary/30 text-secondary font-label-mono-xs text-label-mono-xs flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          5 Activos en enjambre
+        </span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">
+        Tu flota: identidad, instrucciones, modelos asociados y topología de colaboración.
+      </p>
+</div>
+<!-- Toggle & Buttons cluster -->
+<div class="flex items-center gap-2.5">
+<!-- View mode switch pill -->
+<div class="inline-flex p-0.5 rounded bg-surface-container-low border border-outline-variant/30 text-label-mono-xs font-label-mono-xs">
+<button class="px-3 py-1 rounded transition-colors text-outline hover:text-on-surface flex items-center gap-1.5" id="viewBtnLista" onclick="switchView('lista')">
+<span class="material-symbols-outlined" style="font-size: 13px;">list</span>
+<span>Lista</span>
+</button>
+<button class="px-3 py-1 rounded transition-colors bg-surface-container-high text-primary font-medium border-l border-outline-variant/20 flex items-center gap-1.5" id="viewBtnDiagrama" onclick="switchView('diagrama')">
+<span class="material-symbols-outlined" style="font-size: 13px;">schema</span>
+<span>Diagrama</span>
+</button>
+<button class="px-3 py-1 rounded transition-colors text-outline hover:text-on-surface flex items-center gap-1.5" id="viewBtnDual" onclick="switchView('dual')">
+<span class="material-symbols-outlined" style="font-size: 13px;">vertical_split</span>
+<span>Dual</span>
+</button>
+</div>
+<!-- Action buttons -->
+<div class="flex items-center gap-1.5 text-label-mono-xs font-label-mono-xs">
+<button class="px-3 py-1.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface hover:border-outline-variant transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">download</span>
+<span>Importar</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface hover:border-outline-variant transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">upload</span>
+<span>Exportar</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface hover:border-outline-variant transition-colors">
+          Exportar todos
+        </button>
+<button class="px-3.5 py-1.5 rounded bg-primary text-on-primary font-medium hover:bg-primary/90 transition-all flex items-center gap-1 shadow-sm" onclick="toggleDrawer(true)">
+<span class="material-symbols-outlined" style="font-size: 15px;">add</span>
+<span>Nuevo agente</span>
+</button>
+</div>
+</div>
+</div>
+<!-- ================= MAIN WORKSPACE (SPLIT PANE) ================= -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- CANVAS AREA (Diagrama / Lista) -->
+<div class="flex-1 overflow-auto custom-scrollbar flex flex-col relative bg-[#090A0F]" id="canvasContainer">
+<!-- TOPOLOGY CANVAS VIEW -->
+<div class="flex-1 p-6 flex flex-col items-center justify-start min-w-[780px]" id="diagramaSection">
+<!-- Controls overlay on canvas -->
+<div class="w-full flex items-center justify-between mb-4">
+<div class="flex items-center gap-2 text-label-mono-xs text-outline">
+<span class="material-symbols-outlined" style="font-size: 14px;">info</span>
+<span>Las flechas indican «delega en»; las líneas punteadas marcan ciclo de auditoría. Clic en un nodo para inspeccionar configuración.</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low/90 backdrop-blur border border-outline-variant/20 rounded p-1 text-outline">
+<button class="p-1 hover:text-on-surface hover:bg-surface-container rounded" title="Zoom In"><span class="material-symbols-outlined">zoom_in</span></button>
+<button class="p-1 hover:text-on-surface hover:bg-surface-container rounded" title="Zoom Out"><span class="material-symbols-outlined">zoom_out</span></button>
+<button class="p-1 hover:text-on-surface hover:bg-surface-container rounded" title="Centrar"><span class="material-symbols-outlined">center_focus_strong</span></button>
+<span class="px-1.5 text-[10px] font-label-mono-xs text-outline/80">100%</span>
+</div>
+</div>
+<!-- GRAPH NODES & CONNECTOR SVG WRAPPER -->
+<div class="relative w-full max-w-4xl py-6 flex flex-col items-center">
+<!-- SVG CONNECTOR WIRES LAYER -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0" style="overflow: visible;">
+<defs>
+<marker id="arrow" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 8 5 L 0 9 z" fill="#464554"></path>
+</marker>
+<marker id="arrow-active" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 8 5 L 0 9 z" fill="#c0c1ff"></path>
+</marker>
+</defs>
+<!-- Line: Conde -> Acosa (Left) -->
+<path d="M 448 108 C 448 150, 180 130, 180 186" fill="none" marker-end="url(#arrow)" stroke="#464554" stroke-width="1.5"></path>
+<!-- Line: Conde -> Lara (Center) Active Stream -->
+<path class="flow-line" d="M 448 108 L 448 186" fill="none" marker-end="url(#arrow-active)" stroke="#c0c1ff" stroke-width="1.5"></path>
+<!-- Line: Conde -> Vega (Right) -->
+<path d="M 448 108 C 448 150, 715 130, 715 186" fill="none" marker-end="url(#arrow)" stroke="#464554" stroke-width="1.5"></path>
+<!-- Dotted Audit Loop: Arbeiza -> Conde -->
+<path d="M 448 316 L 448 356" fill="none" stroke="#ffb95f" stroke-dasharray="3,3" stroke-width="1.2"></path>
+</svg>
+<!-- ROOT LEVEL: CTO ORCHESTRATOR -->
+<div class="z-10 mb-20">
+<div class="w-80 p-3.5 rounded-lg bg-[#11131A] border border-primary/50 hover:border-primary cursor-pointer transition-all duration-150 shadow-[0_0_20px_-5px_rgba(99,102,241,0.25)] relative group" id="node-conde" onclick="selectAgent('conde')">
+<!-- Glow halo indicator -->
+<div class="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/30 text-[10px] font-label-mono-xs text-primary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+<span>ORQUESTADOR</span>
+</div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-primary-container/20 border border-primary/40 flex items-center justify-center font-label-mono-sm font-semibold text-primary">
+                    Cd
+                  </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Conde</h3>
+<p class="font-label-mono-xs text-label-mono-xs text-outline">Chief Technology Officer</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface">arrow_forward</span>
+</div>
+<!-- Node telemetry bar -->
+<div class="mt-3 pt-2.5 border-t border-outline-variant/20 flex items-center justify-between font-label-mono-xs text-label-mono-xs text-outline">
+<div class="flex items-center gap-1.5">
+<span class="text-on-surface font-medium">claude-3-5-opus</span>
+<span class="text-outline-variant">•</span>
+<span class="text-tertiary">temp: alta (0.7)</span>
+</div>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high text-on-surface-variant">3 deps</span>
+</div>
+</div>
+</div>
+<!-- LEVEL 1: SPECIALIZED EXECUTION TEAM (GRID) -->
+<div class="z-10 grid grid-cols-3 gap-6 w-full max-w-4xl mb-16">
+<!-- ACOSA: Frontend -->
+<div class="p-3.5 rounded-lg bg-[#11131A] border border-outline-variant/30 hover:border-outline transition-all cursor-pointer group" id="node-acosa" onclick="selectAgent('acosa')">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-label-mono-xs text-on-surface">
+                    Ac
+                  </div>
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface group-hover:text-secondary transition-colors">Acosa</h4>
+<p class="font-label-mono-xs text-label-mono-xs text-outline">Frontend engineer</p>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary" title="Listo"></span>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between font-label-mono-xs text-label-mono-xs text-outline">
+<span>sonnet-3-7 • media</span>
+<span class="text-secondary font-medium">99.2% ok</span>
+</div>
+</div>
+<!-- LARA: Backend (ACTIVE NODE) -->
+<div class="p-3.5 rounded-lg bg-[#161922] border border-secondary/60 hover:border-secondary transition-all cursor-pointer relative shadow-[0_0_16px_-4px_rgba(78,222,163,0.2)] group" id="node-lara" onclick="selectAgent('lara')">
+<div class="absolute -top-2 left-3 px-2 py-0.2 rounded bg-secondary/10 border border-secondary/40 text-[9px] font-label-mono-xs text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span>EN CURSO: refactor_db()</span>
+</div>
+<div class="flex items-start justify-between mt-1">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded bg-secondary/20 border border-secondary/50 flex items-center justify-center font-label-mono-xs text-secondary font-bold">
+                    La
+                  </div>
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface group-hover:text-secondary transition-colors">Lara</h4>
+<p class="font-label-mono-xs text-label-mono-xs text-outline">Backend engineer</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-size: 14px;">sync</span>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between font-label-mono-xs text-label-mono-xs text-outline">
+<span>sonnet-3-7 • media</span>
+<span class="text-secondary font-medium">98.4% ok</span>
+</div>
+</div>
+<!-- VEGA: QA -->
+<div class="p-3.5 rounded-lg bg-[#11131A] border border-outline-variant/30 hover:border-outline transition-all cursor-pointer group" id="node-vega" onclick="selectAgent('vega')">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-label-mono-xs text-on-surface">
+                    Vg
+                  </div>
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Vega</h4>
+<p class="font-label-mono-xs text-label-mono-xs text-outline">QA engineer</p>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-outline-variant" title="Esperando cambios"></span>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between font-label-mono-xs text-label-mono-xs text-outline">
+<span>sonnet-3-7 • baja</span>
+<span class="text-on-surface-variant font-medium">100% ok</span>
+</div>
+</div>
+</div>
+<!-- LEVEL 2: INDEPENDENT AUDITOR -->
+<div class="z-10">
+<div class="w-80 p-3.5 rounded-lg bg-[#11131A] border border-tertiary/40 hover:border-tertiary transition-all cursor-pointer group" id="node-arbeiza" onclick="selectAgent('arbeiza')">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-tertiary/10 border border-tertiary/30 flex items-center justify-center font-label-mono-xs text-tertiary font-medium">
+                    Ar
+                  </div>
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface group-hover:text-tertiary transition-colors">Arbeiza</h4>
+<p class="font-label-mono-xs text-label-mono-xs text-outline">Auditor independiente de seguridad</p>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary font-label-mono-xs text-[10px] border border-tertiary/30">
+                  Sandboxed
+                </span>
+</div>
+<div class="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between font-label-mono-xs text-label-mono-xs text-outline">
+<span>opus-3-5 • baja (0.1)</span>
+<span class="text-tertiary">Sin dependencias activas</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry Summary Cards Row (Bento style at bottom of Diagram) -->
+<div class="w-full max-w-4xl grid grid-cols-4 gap-3 mt-4 pt-4 border-t border-outline-variant/20">
+<div class="bg-surface-container-low border border-outline-variant/20 p-2.5 rounded">
+<div class="text-label-mono-xs text-outline font-label-mono-xs">TOTAL TOKENS (24H)</div>
+<div class="text-headline-sm font-label-mono-sm text-on-surface mt-1 font-semibold">1,482,910</div>
+<div class="text-[10px] font-label-mono-xs text-secondary mt-0.5">↓ 4.2% optimización de prompt</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/20 p-2.5 rounded">
+<div class="text-label-mono-xs text-outline font-label-mono-xs">COSTE ACUMULADO</div>
+<div class="text-headline-sm font-label-mono-sm text-on-surface mt-1 font-semibold">$14.28 USD</div>
+<div class="text-[10px] font-label-mono-xs text-outline mt-0.5">Límite mensual: $150.00</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/20 p-2.5 rounded">
+<div class="text-label-mono-xs text-outline font-label-mono-xs">TAREAS EJECUTADAS</div>
+<div class="text-headline-sm font-label-mono-sm text-on-surface mt-1 font-semibold">248 completadas</div>
+<div class="text-[10px] font-label-mono-xs text-secondary mt-0.5">99.1% éxito global</div>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/20 p-2.5 rounded">
+<div class="text-label-mono-xs text-outline font-label-mono-xs">HERRAMIENTAS MCP</div>
+<div class="text-headline-sm font-label-mono-sm text-on-surface mt-1 font-semibold">18 activas</div>
+<div class="text-[10px] font-label-mono-xs text-primary mt-0.5">Docker + Git + PostgreSQL</div>
+</div>
+</div>
+</div>
+<!-- DETAILED AGENT LIST / TABLE VIEW (Toggable) -->
+<div class="p-6 hidden" id="listaSection">
+<div class="border border-outline-variant/25 rounded-lg overflow-hidden bg-surface-container-lowest">
+<div class="px-4 py-3 bg-surface-container-low border-b border-outline-variant/20 flex items-center justify-between text-label-mono-xs font-label-mono-xs text-outline">
+<div class="flex items-center gap-3">
+<span class="font-semibold text-on-surface">5 AGENTES REGISTRADOS</span>
+<span>•</span>
+<span>Filtro: Todos los modelos</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2 py-0.5 rounded bg-surface border border-outline-variant/30 text-on-surface hover:border-outline transition-colors">
+                Ordenar por: Jerarquía
+              </button>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20 text-label-mono-xs font-label-mono-xs text-outline bg-surface-container/50">
+<th class="py-2.5 px-4 font-normal">AGENTE / ROL</th>
+<th class="py-2.5 px-4 font-normal">MODELO &amp; TEMP</th>
+<th class="py-2.5 px-4 font-normal">ESTADO &amp; ACTIVIDAD</th>
+<th class="py-2.5 px-4 font-normal">DELEGACIONES</th>
+<th class="py-2.5 px-4 font-normal text-right">MÉTRICAS (TOKENS / %)</th>
+<th class="py-2.5 px-4 font-normal text-right">ACCIONES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/15 font-body-sm text-body-sm">
+<!-- Row 1: Conde -->
+<tr class="hover:bg-surface-container-low/60 cursor-pointer transition-colors bg-surface-container-lowest" onclick="selectAgent('conde')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-primary-container/20 border border-primary/40 flex items-center justify-center font-label-mono-xs text-primary font-semibold">Cd</div>
+<div>
+<div class="font-headline-sm font-semibold text-on-surface">Conde</div>
+<div class="font-label-mono-xs text-outline">Chief Technology Officer</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-label-mono-xs text-on-surface">claude-3-5-opus</div>
+<div class="font-label-mono-xs text-outline">temp: alta (0.7)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary font-label-mono-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                    Supervisando enjambre
+                  </span>
+</td>
+<td class="py-3 px-4 font-label-mono-xs text-outline">
+                  Delega en: <span class="text-on-surface">Lara, Vega, Acosa</span>
+</td>
+<td class="py-3 px-4 text-right font-label-mono-xs">
+<div class="text-on-surface">624.1k tok</div>
+<div class="text-secondary">99.8% éxito</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2: Lara -->
+<tr class="hover:bg-surface-container-low/60 cursor-pointer transition-colors bg-surface-container-high/20" onclick="selectAgent('lara')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-secondary/20 border border-secondary/50 flex items-center justify-center font-label-mono-xs text-secondary font-semibold">La</div>
+<div>
+<div class="font-headline-sm font-semibold text-on-surface flex items-center gap-2">
+<span>Lara</span>
+<span class="px-1.5 py-0.2 rounded bg-secondary-container/20 text-secondary text-[10px] font-label-mono-xs">ACTIVO</span>
+</div>
+<div class="font-label-mono-xs text-outline">Backend engineer</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-label-mono-xs text-on-surface">claude-3-7-sonnet</div>
+<div class="font-label-mono-xs text-outline">temp: media (0.4)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary font-label-mono-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Ejecutando SQL migrations
+                  </span>
+</td>
+<td class="py-3 px-4 font-label-mono-xs text-outline">
+                  Sin colaboradores asignados
+                </td>
+<td class="py-3 px-4 text-right font-label-mono-xs">
+<div class="text-on-surface">412.0k tok</div>
+<div class="text-secondary">98.4% éxito</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3: Acosa -->
+<tr class="hover:bg-surface-container-low/60 cursor-pointer transition-colors bg-surface-container-lowest" onclick="selectAgent('acosa')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-label-mono-xs text-on-surface">Ac</div>
+<div>
+<div class="font-headline-sm font-semibold text-on-surface">Acosa</div>
+<div class="font-label-mono-xs text-outline">Frontend engineer</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-label-mono-xs text-on-surface">claude-3-7-sonnet</div>
+<div class="font-label-mono-xs text-outline">temp: media (0.5)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-high border border-outline-variant/30 text-outline font-label-mono-xs">
+                    En espera de spec
+                  </span>
+</td>
+<td class="py-3 px-4 font-label-mono-xs text-outline">
+                  Sin colaboradores
+                </td>
+<td class="py-3 px-4 text-right font-label-mono-xs">
+<div class="text-on-surface">210.8k tok</div>
+<div class="text-secondary">99.2% éxito</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 4: Vega -->
+<tr class="hover:bg-surface-container-low/60 cursor-pointer transition-colors bg-surface-container-lowest" onclick="selectAgent('vega')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-surface-container-high border border-outline-variant/40 flex items-center justify-center font-label-mono-xs text-on-surface">Vg</div>
+<div>
+<div class="font-headline-sm font-semibold text-on-surface">Vega</div>
+<div class="font-label-mono-xs text-outline">QA engineer</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-label-mono-xs text-on-surface">claude-3-7-sonnet</div>
+<div class="font-label-mono-xs text-outline">temp: baja (0.2)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-high border border-outline-variant/30 text-outline font-label-mono-xs">
+                    Tests unitarios listos
+                  </span>
+</td>
+<td class="py-3 px-4 font-label-mono-xs text-outline">
+                  Sin colaboradores
+                </td>
+<td class="py-3 px-4 text-right font-label-mono-xs">
+<div class="text-on-surface">144.5k tok</div>
+<div class="text-secondary">100% ok</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 5: Arbeiza -->
+<tr class="hover:bg-surface-container-low/60 cursor-pointer transition-colors bg-surface-container-lowest" onclick="selectAgent('arbeiza')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-tertiary/15 border border-tertiary/40 flex items-center justify-center font-label-mono-xs text-tertiary font-semibold">Ar</div>
+<div>
+<div class="font-headline-sm font-semibold text-on-surface">Arbeiza</div>
+<div class="font-label-mono-xs text-outline">Auditor independiente</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-label-mono-xs text-on-surface">claude-3-5-opus</div>
+<div class="font-label-mono-xs text-outline">temp: baja (0.1)</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary/10 border border-tertiary/30 text-tertiary font-label-mono-xs">
+                    Auditoría de diffs (Daemon)
+                  </span>
+</td>
+<td class="py-3 px-4 font-label-mono-xs text-outline">
+                  Supervisa a: <span class="text-on-surface">Conde, Lara</span>
+</td>
+<td class="py-3 px-4 text-right font-label-mono-xs">
+<div class="text-on-surface">91.5k tok</div>
+<div class="text-secondary">100% ok</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- ================= RIGHT CONTEXTUAL INSPECTION PANEL ================= -->
+<aside class="w-96 border-l border-outline-variant/20 bg-surface-container-lowest flex flex-col h-full shrink-0 z-20" id="inspectorDrawer">
+<!-- Panel Header -->
+<div class="px-4 py-3 border-b border-outline-variant/20 flex items-center justify-between bg-surface">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">tune</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Ficha del Agente</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" onclick="toggleDrawer(false)">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<!-- Agent Profile & Editable Configuration Form -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-5">
+<!-- Active Identity Card -->
+<div class="p-3.5 rounded bg-[#11131A] border border-outline-variant/20">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded bg-primary-container/20 border border-primary/40 flex items-center justify-center font-label-mono-md font-semibold text-primary" id="inspectorAvatar">
+              Cd
+            </div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-on-surface" id="inspectorTitle">Conde</h3>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-mono-xs bg-primary/10 border border-primary/30 text-primary" id="inspectorStatus">Orquestador</span>
+</div>
+<p class="text-label-mono-xs font-label-mono-xs text-outline" id="inspectorRole">Chief Technology Officer</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 text-label-mono-xs font-label-mono-xs pt-2 border-t border-outline-variant/20">
+<div>
+<span class="text-outline">Tareas resueltas:</span>
+<span class="text-on-surface font-medium block" id="inspectorTasks">142</span>
+</div>
+<div>
+<span class="text-outline">Tasa de fallo:</span>
+<span class="text-secondary font-medium block" id="inspectorFailRate">0.2%</span>
+</div>
+</div>
+</div>
+<!-- System Prompt Directive Block -->
+<div>
+<label class="block text-label-mono-xs font-label-mono-xs text-outline uppercase tracking-wider mb-1.5 flex items-center justify-between">
+<span>Directiva Base (System Prompt)</span>
+<span class="text-[10px] text-primary">Modo estricto</span>
+</label>
+<div class="relative">
+<textarea class="w-full bg-[#0B0C10] border border-outline-variant/30 rounded p-2.5 font-label-mono-xs text-label-mono-xs text-on-surface focus:outline-none focus:border-primary custom-scrollbar resize-none" id="inspectorPrompt" rows="5">Eres el Agente Orquestador CTO. Analiza solicitudes complejas de refactorización y despliegue. Descompón los problemas en subárboles de ejecución y deléga tareas de código a Lara y tests a Vega. Conserva el contexto de tokens y rechaza tool calls destructivas sin aprobación explícita.</textarea>
+</div>
+</div>
+<!-- Model Association & Parameters -->
+<div class="space-y-3 pt-2 border-t border-outline-variant/20">
+<div>
+<label class="block text-label-mono-xs font-label-mono-xs text-outline uppercase tracking-wider mb-1.5">
+              Modelo Asignado
+            </label>
+<select class="w-full bg-surface-container-low border border-outline-variant/30 rounded px-2.5 py-1.5 font-label-mono-xs text-on-surface focus:outline-none focus:border-primary">
+<option selected="">claude-3-5-opus-20241022 (Recomendado)</option>
+<option>claude-3-7-sonnet-20250219</option>
+<option>claude-3-5-haiku-20241022</option>
+<option>deepseek-r1-distill-qwen-32b</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-label-mono-xs font-label-mono-xs text-outline mb-1">Temperatura</label>
+<div class="flex items-center gap-2">
+<input class="w-full accent-primary h-1 bg-surface-container-high rounded cursor-pointer" max="1" min="0" step="0.1" type="range" value="0.7"/>
+<span class="font-label-mono-xs text-on-surface">0.7</span>
+</div>
+</div>
+<div>
+<label class="block text-label-mono-xs font-label-mono-xs text-outline mb-1">Max Tokens Out</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded px-2 py-1 font-label-mono-xs text-on-surface text-right" type="number" value="8192"/>
+</div>
+</div>
+</div>
+<!-- Tooling & Sandbox Permissions (MCP) -->
+<div class="pt-2 border-t border-outline-variant/20">
+<label class="block text-label-mono-xs font-label-mono-xs text-outline uppercase tracking-wider mb-2">
+            Herramientas &amp; MCP Server Tools
+          </label>
+<div class="space-y-2">
+<label class="flex items-center justify-between p-2 rounded bg-surface-container-low border border-outline-variant/25 cursor-pointer hover:border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">terminal</span>
+<span class="font-label-mono-xs text-on-surface">Bash / Shell Runner</span>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary focus:ring-0" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-2 rounded bg-surface-container-low border border-outline-variant/25 cursor-pointer hover:border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">account_tree</span>
+<span class="font-label-mono-xs text-on-surface">delegate_task (Swarm Subtasks)</span>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary focus:ring-0" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-2 rounded bg-surface-container-low border border-outline-variant/25 cursor-pointer hover:border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">difference</span>
+<span class="font-label-mono-xs text-on-surface">Git Workspace &amp; PR Read/Write</span>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary focus:ring-0" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-2 rounded bg-surface-container-low border border-outline-variant/25 cursor-pointer hover:border-outline-variant opacity-60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">database</span>
+<span class="font-label-mono-xs text-on-surface">Raw Production DB Access</span>
+</div>
+<input class="rounded border-outline-variant bg-surface text-primary focus:ring-0" disabled="" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Sandbox Path -->
+<div class="pt-2 border-t border-outline-variant/20">
+<label class="block text-label-mono-xs font-label-mono-xs text-outline uppercase tracking-wider mb-1">
+            Ruta del Sandbox Aislado
+          </label>
+<div class="flex items-center gap-1.5 p-1.5 rounded bg-[#0B0C10] border border-outline-variant/30 text-label-mono-xs font-label-mono-xs text-outline">
+<span class="material-symbols-outlined" style="font-size: 13px;">folder</span>
+<span class="text-on-surface truncate">/var/run/fleet-agents/sandboxes/conde-cto</span>
+</div>
+</div>
+</div>
+<!-- Drawer Bottom Save / Dispatch Bar -->
+<div class="p-3 border-t border-outline-variant/20 bg-surface flex items-center justify-between gap-2">
+<button class="px-3 py-1.5 rounded text-outline hover:text-error hover:bg-error-container/20 font-label-mono-xs transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
+<span>Desactivar</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 rounded bg-primary text-on-primary font-label-mono-xs font-medium hover:bg-primary/90 transition-all flex items-center gap-1 shadow-sm" onclick="saveAgentNotify()">
+<span class="material-symbols-outlined" style="font-size: 14px;">save</span>
+<span>Guardar cambios</span>
+</button>
+</div>
+</div>
+</aside>
+</main>
+<!-- ================= INLINE SCRIPT FOR ERGONOMICS & MICRO-INTERACTIONS ================= -->
+<script>
+    // Data definition for fast agent inspection switching
+    const AGENTS = {
+      conde: {
+        id: 'conde',
+        name: 'Conde',
+        role: 'Chief Technology Officer',
+        initials: 'Cd',
+        badge: 'ORQUESTADOR',
+        statusColor: 'text-primary bg-primary/10 border-primary/30',
+        tasks: '142',
+        failRate: '0.2%',
+        prompt: 'Eres el Agente Orquestador CTO. Analiza solicitudes complejas de refactorización y despliegue. Descompón los problemas en subárboles de ejecución y deléga tareas de código a Lara y tests a Vega. Conserva el contexto de tokens y rechaza tool calls destructivas sin aprobación.'
+      },
+      acosa: {
+        id: 'acosa',
+        name: 'Acosa',
+        role: 'Frontend engineer',
+        initials: 'Ac',
+        badge: 'FRONTEND SPECIALIST',
+        statusColor: 'text-secondary bg-secondary/10 border-secondary/30',
+        tasks: '89',
+        failRate: '0.8%',
+        prompt: 'Eres Acosa, especialista en interfaces web de alta fidelidad con React, Tailwind CSS y microfrontends. Diseña componentes limpios, accesibles y optimizados para rendimiento terminal y WebGL.'
+      },
+      lara: {
+        id: 'lara',
+        name: 'Lara',
+        role: 'Backend engineer',
+        initials: 'La',
+        badge: 'ACTIVE RUNNER',
+        statusColor: 'text-secondary bg-secondary/15 border-secondary/40',
+        tasks: '215',
+        failRate: '1.6%',
+        prompt: 'Eres Lara, ingeniera de backend especializada en APIs distribuidas, microservicios en Go/Rust y migraciones de esquemas en PostgreSQL. Resuelve sub-tareas delegadas por Conde con cero regresión.'
+      },
+      vega: {
+        id: 'vega',
+        name: 'Vega',
+        role: 'QA engineer',
+        initials: 'Vg',
+        badge: 'TEST SUITE RUNNER',
+        statusColor: 'text-outline bg-surface-container border-outline-variant/40',
+        tasks: '310',
+        failRate: '0.0%',
+        prompt: 'Eres Vega, auditor de cobertura de tests. Valida cada branch generada contra suites unitarias y e2e. Detén la delegación si la cobertura cae por debajo del 95% o hay variables de entorno expuestas.'
+      },
+      arbeiza: {
+        id: 'arbeiza',
+        name: 'Arbeiza',
+        role: 'Auditor independiente de seguridad',
+        initials: 'Ar',
+        badge: 'SANDBOXED DAEMON',
+        statusColor: 'text-tertiary bg-tertiary/10 border-tertiary/30',
+        tasks: '74',
+        failRate: '0.0%',
+        prompt: 'Eres Arbeiza, agente auditor independiente. Monitorea las llamadas de red salientes, diffs de Git y dependencias npm/pip introducidas por Lara y Acosa. Emite veto inmediato ante secretos o vulnerabilidades CVE.'
+      }
+    };
+
+    function selectAgent(agentKey) {
+      const data = AGENTS[agentKey];
+      if (!data) return;
+
+      // Update Inspector Panel fields
+      document.getElementById('inspectorTitle').innerText = data.name;
+      document.getElementById('inspectorRole').innerText = data.role;
+      document.getElementById('inspectorAvatar').innerText = data.initials;
+      document.getElementById('inspectorStatus').innerText = data.badge;
+      document.getElementById('inspectorStatus').className = `px-2 py-0.5 rounded text-[10px] font-label-mono-xs border ${data.statusColor}`;
+      document.getElementById('inspectorTasks').innerText = data.tasks;
+      document.getElementById('inspectorFailRate').innerText = data.failRate;
+      document.getElementById('inspectorPrompt').value = data.prompt;
+
+      // Ensure drawer is open
+      toggleDrawer(true);
+
+      // Visual focus highlight on clicked node if in diagram
+      ['conde', 'acosa', 'lara', 'vega', 'arbeiza'].forEach(id => {
+        const node = document.getElementById(`node-${id}`);
+        if (node) {
+          if (id === agentKey) {
+            node.classList.add('ring-1', 'ring-primary');
+          } else {
+            node.classList.remove('ring-1', 'ring-primary');
+          }
+        }
+      });
+    }
+
+    function switchView(mode) {
+      const diagSec = document.getElementById('diagramaSection');
+      const listSec = document.getElementById('listaSection');
+      const btnLista = document.getElementById('viewBtnLista');
+      const btnDiag = document.getElementById('viewBtnDiagrama');
+      const btnDual = document.getElementById('viewBtnDual');
+
+      // Reset button active classes
+      [btnLista, btnDiag, btnDual].forEach(b => {
+        b.className = 'px-3 py-1 rounded transition-colors text-outline hover:text-on-surface flex items-center gap-1.5';
+      });
+
+      if (mode === 'lista') {
+        diagSec.classList.add('hidden');
+        listSec.classList.remove('hidden');
+        btnLista.className = 'px-3 py-1 rounded transition-colors bg-surface-container-high text-primary font-medium flex items-center gap-1.5';
+      } else if (mode === 'diagrama') {
+        diagSec.classList.remove('hidden');
+        listSec.classList.add('hidden');
+        btnDiag.className = 'px-3 py-1 rounded transition-colors bg-surface-container-high text-primary font-medium flex items-center gap-1.5';
+      } else if (mode === 'dual') {
+        diagSec.classList.remove('hidden');
+        listSec.classList.remove('hidden');
+        btnDual.className = 'px-3 py-1 rounded transition-colors bg-surface-container-high text-primary font-medium flex items-center gap-1.5';
+      }
+    }
+
+    function toggleDrawer(show) {
+      const drawer = document.getElementById('inspectorDrawer');
+      if (show) {
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function saveAgentNotify() {
+      const btn = event.currentTarget;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">check</span><span>¡Guardado!</span>`;
+      btn.classList.add('bg-secondary', 'text-on-secondary');
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('bg-secondary', 'text-on-secondary');
+      }, 1400);
+    }
+  </script>
+</body></html>

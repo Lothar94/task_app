@@ -1,7 +1,10 @@
 import type { DailyActivity } from '@fleet/shared';
 import { EmptyState } from '../../../components/ui';
 import { formatDay, formatInteger, formatTokens } from '../../../lib/format';
+import { peakDay } from '../dashboardModel';
 import { TooltipRow, useChartTooltip } from './useChartTooltip';
+
+const SERIES_COLOR = 'var(--series-1)';
 
 const PLOT_HEIGHT = 'h-48';
 
@@ -15,11 +18,29 @@ function niceMax(value: number): number {
 function DayTooltip({ day }: { day: DailyActivity }) {
   return (
     <div className="space-y-1">
-      <p className="font-semibold text-zinc-100">{formatDay(day.date)}</p>
+      <p className="font-semibold text-fg">{formatDay(day.date)}</p>
       <TooltipRow color="var(--series-1)" label="Tokens" value={formatInteger(day.totalTokens)} />
       <TooltipRow label="Tareas completadas" value={String(day.completed)} />
       <TooltipRow label="Tareas fallidas" value={String(day.failed)} />
     </div>
+  );
+}
+
+/** Legend for the card header: the series and the peak day. */
+export function DailyLegend({ days }: { days: DailyActivity[] }) {
+  const peak = peakDay(days);
+  return (
+    <p className="label-mono flex flex-wrap items-center gap-x-4 gap-y-1 normal-case text-fg-muted">
+      <span className="flex items-center gap-1.5">
+        <span aria-hidden className="size-2.5 rounded-sm" style={{ background: SERIES_COLOR }} />
+        Consumo total
+      </span>
+      {peak && (
+        <span>
+          Pico: {formatTokens(peak.totalTokens)} ({formatDay(peak.date)})
+        </span>
+      )}
+    </p>
   );
 }
 
@@ -31,6 +52,8 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
   }
   const max = niceMax(Math.max(0, ...days.map((day) => day.totalTokens)));
   const ticks = [max, max / 2, 0];
+  const peak = peakDay(days);
+  const gapClass = days.length > 14 ? 'gap-0.5' : 'gap-1 sm:gap-2';
   const labelEvery = Math.max(1, Math.ceil(days.length / 8));
 
   return (
@@ -40,7 +63,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
           {ticks.map((tick) => (
             <span
               key={tick}
-              className="absolute right-0 -translate-y-1/2 font-mono text-[10px] text-zinc-500 tabular-nums"
+              className="absolute right-0 -translate-y-1/2 font-mono text-[0.6875rem] text-fg-subtle tabular-nums"
               style={{ top: `${(1 - tick / max) * 100}%` }}
             >
               {formatTokens(tick)}
@@ -55,16 +78,18 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
               style={{ top: `${(1 - tick / max) * 100}%` }}
             />
           ))}
-          <div className="absolute inset-0 flex items-end gap-[2px]">
+          <div className={`absolute inset-0 flex items-end ${gapClass} px-1 sm:px-2`}>
             {days.map((day) => (
               <div
                 key={day.date}
-                className="group flex h-full min-w-0 flex-1 items-end hover:bg-zinc-800/40"
+                className="group flex h-full min-w-0 flex-1 items-end hover:bg-surface-hover"
                 onMouseMove={(event) => show(event, <DayTooltip day={day} />)}
               >
                 <div
-                  className="w-full rounded-t-[4px] bg-[var(--series-1)]"
+                  data-peak={day === peak || undefined}
+                  className={`w-full ${day === peak ? 'shadow-[0_0_12px_-2px_var(--series-1)]' : 'opacity-70'}`}
                   style={{
+                    background: SERIES_COLOR,
                     height: `${(day.totalTokens / max) * 100}%`,
                     minHeight: day.totalTokens > 0 ? 2 : 0,
                   }}
@@ -74,11 +99,11 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
           </div>
         </div>
       </div>
-      <div className="ml-[4rem] flex gap-[2px] pt-1">
+      <div className={`ml-[4rem] flex ${gapClass} px-1 pt-1 sm:px-2`}>
         {days.map((day, index) => (
           <span
             key={day.date}
-            className="min-w-0 flex-1 text-center text-[10px] whitespace-nowrap text-zinc-500"
+            className="min-w-0 flex-1 text-center font-mono text-[0.6875rem] whitespace-nowrap text-fg-subtle"
           >
             {index % labelEvery === 0 ? formatDay(day.date) : ''}
           </span>

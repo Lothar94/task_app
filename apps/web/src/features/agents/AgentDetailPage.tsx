@@ -2,32 +2,37 @@ import type { AgentDto } from '@fleet/shared';
 import type { ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Markdown } from '../../components/Markdown';
-import { Button, Card, ErrorMessage, LinkButton, Loading, PageHeader } from '../../components/ui';
+import { Button, ErrorMessage, LinkButton, Loading, PageHeader } from '../../components/ui';
 import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
+import { AgentAvatar } from './AgentAvatar';
+import { AgentSection } from './AgentSection';
 import { ExportButtons } from './ExportButtons';
 import { useAgent, useAgents, useDeleteAgent } from './agentQueries';
 
 function Property({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">{label}</dt>
+      <dt className="label-mono text-fg-subtle">{label}</dt>
       <dd className="mt-1 text-sm">{children}</dd>
     </div>
   );
 }
 
 function AgentLinks({ agents }: { agents: AgentDto[] }) {
-  if (agents.length === 0) return <p className="text-sm text-zinc-500">Ninguno</p>;
+  if (agents.length === 0) return <p className="text-sm text-fg-subtle">Ninguno</p>;
   return (
     <ul className="flex flex-wrap gap-2">
       {agents.map((agent) => (
         <li key={agent.id}>
           <Link
             to={`/agents/${agent.id}`}
-            className="rounded-full bg-zinc-800 px-3 py-1 text-sm hover:bg-zinc-700"
+            className="flex items-center gap-2 rounded-sm border border-line bg-surface-raised px-2 py-1 text-sm hover:border-line-strong hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            {agent.name} <span className="text-zinc-500">· {agent.role}</span>
+            <AgentAvatar name={agent.name} />
+            <span>
+              {agent.name} <span className="text-fg-subtle">· {agent.role}</span>
+            </span>
           </Link>
         </li>
       ))}
@@ -36,11 +41,11 @@ function AgentLinks({ agents }: { agents: AgentDto[] }) {
 }
 
 function SkillChips({ skills }: { skills: string[] }) {
-  if (skills.length === 0) return <span className="text-zinc-500">Sin skills</span>;
+  if (skills.length === 0) return <span className="text-fg-subtle">Sin skills</span>;
   return (
     <div className="flex flex-wrap gap-1">
       {skills.map((skill) => (
-        <code key={skill} className="rounded bg-zinc-800 px-2 py-0.5 text-xs">
+        <code key={skill} className="rounded-sm border border-line bg-surface-raised px-2 py-0.5 text-xs">
           {skill}
         </code>
       ))}
@@ -72,6 +77,7 @@ export function AgentDetailPage() {
   return (
     <>
       <PageHeader
+        breadcrumb={<Link to="/agents">← Agentes</Link>}
         title={agent.name}
         subtitle={agent.role}
         actions={
@@ -86,8 +92,8 @@ export function AgentDetailPage() {
       />
       <div className="space-y-4">
         <ErrorMessage error={deleteAgent.error} />
-        {agent.description && <Markdown className="text-zinc-300">{agent.description}</Markdown>}
-        <Card title="Configuración">
+        {agent.description && <Markdown className="text-fg-muted">{agent.description}</Markdown>}
+        <AgentSection title="Configuración">
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <Property label="Modelo">{MODEL_LABELS[agent.model]}</Property>
             <Property label="Intensidad">{EFFORT_LABELS[agent.effort]}</Property>
@@ -99,7 +105,10 @@ export function AgentDetailPage() {
             <Property label="Herramientas">
               <div className="flex flex-wrap gap-1">
                 {agent.allowedTools.map((tool) => (
-                  <code key={tool} className="rounded bg-zinc-800 px-2 py-0.5 text-xs">
+                  <code
+                    key={tool}
+                    className="rounded-sm border border-line bg-surface-raised px-2 py-0.5 text-xs"
+                  >
                     {tool}
                   </code>
                 ))}
@@ -111,17 +120,17 @@ export function AgentDetailPage() {
               <SkillChips skills={agent.skills} />
             </Property>
           </div>
-        </Card>
-        <Card title="Instrucciones">
+        </AgentSection>
+        <AgentSection title="Instrucciones">
           <Markdown className="prose-base">{agent.instructions}</Markdown>
-        </Card>
+        </AgentSection>
         <div className="grid gap-4 md:grid-cols-2">
-          <Card title="Puede delegar en">
+          <AgentSection title="Puede delegar en">
             <AgentLinks agents={collaborators} />
-          </Card>
-          <Card title="Recibe trabajo de">
+          </AgentSection>
+          <AgentSection title="Recibe trabajo de">
             <AgentLinks agents={delegators} />
-          </Card>
+          </AgentSection>
         </div>
       </div>
     </>

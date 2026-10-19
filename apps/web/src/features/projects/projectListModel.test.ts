@@ -1,6 +1,6 @@
 import type { ProjectDto } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { groupProjects, projectOptionLabel } from './projectListModel';
+import { groupProjects, memberNames, projectOptionLabel, summarizeProjects } from './projectListModel';
 
 const project = (name: string, archivedAt: string | null = null): ProjectDto => ({
   id: name,
@@ -40,5 +40,26 @@ describe('project list model', () => {
   it('flags archived projects in option labels', () => {
     expect(projectOptionLabel(project('a'))).toBe('a');
     expect(projectOptionLabel(project('a', '2026-02-01'))).toBe('a (archivado)');
+  });
+});
+
+describe('summarizeProjects', () => {
+  it('counts projects and distinct member agents', () => {
+    const projects = [
+      { ...project('a'), memberIds: ['1', '2'] },
+      { ...project('b'), memberIds: ['2', '3'] },
+    ];
+    expect(summarizeProjects(projects)).toEqual({ activeProjects: 2, teamAgents: 3 });
+    expect(summarizeProjects([])).toEqual({ activeProjects: 0, teamAgents: 0 });
+  });
+});
+
+describe('memberNames', () => {
+  it('maps member ids to names and skips unknown agents', () => {
+    const agents = [
+      { id: '1', name: 'Conde' },
+      { id: '2', name: 'Acosa' },
+    ];
+    expect(memberNames({ ...project('a'), memberIds: ['2', 'x', '1'] }, agents)).toEqual(['Acosa', 'Conde']);
   });
 });

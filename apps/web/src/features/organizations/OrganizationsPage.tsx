@@ -1,7 +1,8 @@
 import type { OrganizationDto } from '@fleet/shared';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Button, Card, PageHeader } from '../../components/ui';
+import { Building2, Plus } from 'lucide-react';
+import { Badge, Button, Card, PageHeader, StatusChip } from '../../components/ui';
 import { useOrganizationContext } from './OrganizationContext';
 import { OrganizationNameForm } from './OrganizationNameForm';
 import { useCreateOrganization, useRenameOrganization } from './organizationQueries';
@@ -34,8 +35,8 @@ function OrganizationRow({ organization, isCurrent }: { organization: Organizati
       <span className="font-medium">
         {organization.name}
         {isCurrent && (
-          <span className="ml-2 rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs text-indigo-300">
-            Actual
+          <span className="ml-2 align-middle">
+            <StatusChip tone="success">Actual</StatusChip>
           </span>
         )}
       </span>
@@ -70,10 +71,12 @@ export function OrganizationsPage() {
     <>
       <PageHeader
         title="Organizaciones"
+        breadcrumb={`${current.name} / Organizaciones`}
+        badge={<Badge>{organizations.length} en total</Badge>}
         subtitle="Cada organización tiene sus propios proyectos y agentes."
       />
       <div className="space-y-4">
-        <Card title="Nueva organización">
+        <Card title="Nueva organización" icon={<Plus />}>
           <OrganizationNameForm
             label="Nombre"
             submitLabel="Crear organización"
@@ -82,8 +85,8 @@ export function OrganizationsPage() {
             onSubmit={handleCreate}
           />
         </Card>
-        <Card title="Tus organizaciones">
-          <ul className="divide-y divide-zinc-800">
+        <Card title="Tus organizaciones" icon={<Building2 />}>
+          <ul className="divide-y divide-line">
             {organizations.map((organization) => (
               <li key={organization.id} className="py-3 first:pt-0 last:pb-0">
                 <OrganizationRow organization={organization} isCurrent={organization.id === current.id} />

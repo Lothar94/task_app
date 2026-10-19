@@ -1,7 +1,8 @@
 import type { TaskNodeDto } from '@fleet/shared';
 import { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router';
-import { EmptyState } from '../../components/ui';
+import { EmptyState, FOCUS_RING } from '../../components/ui';
 import { useNow } from '../../hooks/useNow';
 import { formatCost, formatDuration, formatInteger, formatTokens } from '../../lib/format';
 import { TaskLabels } from './TaskLabels';
@@ -42,9 +43,9 @@ function DurationCell({ node }: { node: TaskNodeDto }) {
   const working =
     node.metrics.runs > 0 ? `Tiempo trabajando: ${formatDuration(node.metrics.durationMs)}` : '';
   return (
-    <span title={working} className="text-right font-mono text-xs text-zinc-400 tabular-nums">
+    <span title={working} className="text-right font-mono text-xs text-fg-muted tabular-nums">
       {elapsed === null ? '—' : formatDuration(elapsed)}
-      {isActive && elapsed !== null && <span className="block text-[10px] text-sky-400">en curso</span>}
+      {isActive && elapsed !== null && <span className="label-mono block text-info">en curso</span>}
     </span>
   );
 }
@@ -62,10 +63,10 @@ function TokensCell({ node }: { node: TaskNodeDto }) {
     .filter(Boolean)
     .join('\n');
   return (
-    <span title={tooltip} className="text-right font-mono text-xs text-zinc-400 tabular-nums">
+    <span title={tooltip} className="text-right font-mono text-xs text-fg-muted tabular-nums">
       {total.totalTokens === 0 ? '—' : formatTokens(total.totalTokens)}
       {node.children.length > 0 && total.totalTokens > 0 && (
-        <span className="block text-[10px] text-zinc-500">con subtareas</span>
+        <span className="label-mono block text-fg-subtle">con subtareas</span>
       )}
     </span>
   );
@@ -78,15 +79,12 @@ function ToggleButton({ isOpen, onToggle, count }: { isOpen: boolean; onToggle: 
       onClick={onToggle}
       aria-expanded={isOpen}
       aria-label={`${isOpen ? 'Ocultar' : 'Mostrar'} ${count} subtareas`}
-      className="flex h-6 w-6 items-center justify-center rounded text-zinc-400 hover:bg-zinc-700 hover:text-zinc-50"
+      className={`flex size-6 items-center justify-center rounded-sm text-fg-subtle hover:bg-surface-hover hover:text-fg ${FOCUS_RING}`}
     >
-      <svg
-        viewBox="0 0 16 16"
+      <ChevronRight
         aria-hidden
-        className={`h-3.5 w-3.5 fill-none stroke-current stroke-2 transition-transform ${isOpen ? 'rotate-90' : ''}`}
-      >
-        <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+        className={`size-4 transition-transform motion-reduce:transition-none ${isOpen ? 'rotate-90' : ''}`}
+      />
     </button>
   );
 }
@@ -97,7 +95,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
   return (
     <li>
       <div
-        className={`grid items-center gap-x-3 rounded-md px-2 py-2 hover:bg-zinc-800/60 ${compact ? 'grid-cols-[1.75rem_minmax(0,1fr)_auto]' : COLUMNS}`}
+        className={`grid items-center gap-x-3 rounded-md px-2 py-2.5 transition-colors hover:bg-surface-hover ${compact ? 'grid-cols-[1.75rem_minmax(0,1fr)_auto]' : COLUMNS}`}
       >
         <span>
           {node.children.length > 0 && (
@@ -106,13 +104,12 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
         </span>
         <Link
           to={`/projects/${projectId}/tasks/${node.id}`}
-          className="flex min-w-0 items-start gap-2"
-          style={{ paddingLeft: `${depth * 1.25}rem` }}
+          className={`flex min-w-0 items-start gap-2 rounded-sm ${FOCUS_RING}`}
         >
           <TaskNumber number={node.number} />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-medium hover:text-indigo-300">{node.title}</span>
-            <span className="text-xs text-zinc-500">
+            <span className="block truncate text-sm font-medium text-fg hover:text-accent">{node.title}</span>
+            <span className="text-xs text-fg-subtle">
               {agentNames.get(node.agentId) ?? 'Agente eliminado'}
               {descendants > 0 && ` · ${descendants} subtarea${descendants === 1 ? '' : 's'}`}
             </span>
@@ -131,7 +128,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
         </span>
       </div>
       {isOpen && node.children.length > 0 && (
-        <ul>
+        <ul className="mb-1 ml-5 border-l border-line pl-2">
           {node.children.map((child) => (
             <TaskRow
               key={child.id}
@@ -151,7 +148,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
 function HeaderRow() {
   return (
     <div
-      className={`hidden gap-x-3 border-b border-zinc-800 px-2 pb-2 text-xs font-semibold tracking-wide text-zinc-500 uppercase md:grid ${COLUMNS}`}
+      className={`hidden gap-x-3 label-mono border-b border-line px-2 pb-2 text-fg-subtle md:grid ${COLUMNS}`}
     >
       <span />
       <span>Tarea</span>
@@ -175,7 +172,7 @@ export function TaskTree({
   return (
     <div>
       {!compact && !hideHeader && <HeaderRow />}
-      <ul className="divide-y divide-zinc-800/60">
+      <ul className="divide-y divide-line">
         {(keepOrder ? nodes : [...nodes].reverse()).map((node) => (
           <TaskRow
             key={node.id}

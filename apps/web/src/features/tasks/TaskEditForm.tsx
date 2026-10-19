@@ -80,7 +80,7 @@ export function TaskEditForm({
         tagSuggestions={tags}
       />
       {labelsError && (
-        <p role="alert" className="text-sm text-red-300">
+        <p role="alert" className="text-sm text-danger">
           {labelsError}
         </p>
       )}

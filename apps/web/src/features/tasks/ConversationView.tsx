@@ -1,141 +1,232 @@
 import type { ConversationMessageDto } from '@fleet/shared';
-import { useEffect, useRef } from 'react';
+import { Bot, ChevronRight, Cpu, User } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
+import { Accordion } from '../../components/Accordion';
 import { Markdown } from '../../components/Markdown';
-import { EmptyState } from '../../components/ui';
+import { EmptyState, type ChipTone } from '../../components/ui';
 import { taskLabel } from './taskLabel';
 import { buildTimeline, describeDelegation, shortToolName, type TimelineItem } from './conversationModel';
 
 const MAX_PREVIEW = 6000;
 const CODE_BLOCK =
-  'max-h-96 max-w-full overflow-auto rounded-md bg-zinc-950 p-3 font-mono text-xs whitespace-pre-wrap [overflow-wrap:anywhere]';
+  'max-h-96 max-w-full overflow-auto rounded-md border border-line bg-canvas p-3 font-mono text-xs whitespace-pre-wrap [overflow-wrap:anywhere]';
 
 const truncate = (text: string) => (text.length > MAX_PREVIEW ? `${text.slice(0, MAX_PREVIEW)}\n…` : text);
 
-function MessageBubble({ item }: { item: Extract<TimelineItem, { type: 'message' }> }) {
+const formatTime = (isoDate: string | undefined) =>
+  isoDate ? new Date(isoDate).toLocaleTimeString([], { hour12: false }) : '';
+
+type MessageItem = Extract<TimelineItem, { type: 'message' }>;
+type ToolItem = Extract<TimelineItem, { type: 'tool' }>;
+
+function Avatar({ children }: { children: ReactNode }) {
+  return (
+    <span
+      aria-hidden
+      className="grid size-8 shrink-0 place-items-center rounded-sm border border-line-strong bg-surface-raised text-fg-muted [&>svg]:size-4"
+    >
+      {children}
+    </span>
+  );
+}
+
+function MessageHeader({ name, time, tag }: { name: string; time: string; tag?: string }) {
+  return (
+    <div className="mb-1 flex flex-wrap items-baseline gap-2">
+      <span className="font-semibold text-fg">{name}</span>
+      {time && <time className="font-mono text-xs text-fg-subtle">{time}</time>}
+      {tag && (
+        <span className="label-mono rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 text-fg-muted">
+          {tag}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function ChatRow({ avatar, children }: { avatar: ReactNode; children: ReactNode }) {
+  return (
+    <div className="flex min-w-0 gap-3">
+      <Avatar>{avatar}</Avatar>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+function MessageBubble({ item, time, agentName }: { item: MessageItem; time: string; agentName: string }) {
   const { payload } = item;
   switch (payload.kind) {
     case 'user':
       if (item.isInitialPrompt)
         return (
-          <details className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-sm">
-            <summary className="cursor-pointer text-zinc-400">Prompt enviado al agente</summary>
-            <Markdown className="mt-3">{payload.text}</Markdown>
-          </details>
+          <Accordion header={<span className="text-sm text-fg-muted">Prompt enviado al agente</span>}>
+            <Markdown className="border-t border-line p-3">{payload.text}</Markdown>
+          </Accordion>
         );
       return (
-        <div className="rounded-lg border border-indigo-900 bg-indigo-950/40 p-4">
-          <p className="mb-2 text-xs font-semibold tracking-wide text-indigo-300 uppercase">Encargo</p>
-          <Markdown>{payload.text}</Markdown>
-        </div>
+        <ChatRow avatar={<User />}>
+          <div className="rounded-lg border border-line-strong bg-surface-raised p-4">
+            <div className="mb-2 flex items-baseline justify-between gap-2">
+              <p className="flex flex-wrap items-center gap-2">
+                <span className="label-mono text-accent">Instrucción de proyecto // ENCARGO</span>
+                <span className="rounded-sm border border-line bg-canvas px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+                  project_manager
+                </span>
+              </p>
+              {time && <time className="font-mono text-xs text-fg-subtle">{time}</time>}
+            </div>
+            <Markdown>{payload.text}</Markdown>
+          </div>
+        </ChatRow>
       );
     case 'assistant_text':
-      return <Markdown className="px-1">{payload.text}</Markdown>;
+      return (
+        <ChatRow avatar={<Bot />}>
+          <MessageHeader name={agentName} time={time} />
+          <Markdown>{payload.text}</Markdown>
+        </ChatRow>
+      );
     case 'system':
-      return <p className="text-xs text-zinc-500">{payload.text}</p>;
+      return (
+        <p className="flex items-center gap-2 border border-line bg-surface px-3 py-1.5 font-mono text-xs text-fg-subtle [overflow-wrap:anywhere]">
+          <Cpu aria-hidden className="size-3.5 shrink-0" />
+          {payload.text}
+        </p>
+      );
     case 'result':
       return (
-        <div
-          className={`rounded-lg border p-4 ${payload.isError ? 'border-red-900 bg-red-950/40' : 'border-emerald-900 bg-emerald-950/30'}`}
-        >
-          <p className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
-            {payload.isError ? 'Error' : 'Respuesta final'}
-          </p>
-          <Markdown>{payload.text}</Markdown>
-        </div>
+        <ChatRow avatar={<Bot />}>
+          <MessageHeader name={agentName} time={time} tag={payload.isError ? 'Error' : 'Respuesta final'} />
+          <div
+            className={`rounded-lg border p-4 ${payload.isError ? 'border-danger-line bg-danger-soft' : 'border-success-line bg-success-soft'}`}
+          >
+            <Markdown>{payload.text}</Markdown>
+          </div>
+        </ChatRow>
       );
   }
 }
 
-function ToolSummary({
-  item,
-  projectId,
-}: {
-  item: Extract<TimelineItem, { type: 'tool' }>;
-  projectId: string;
-}) {
+function toolTone(item: ToolItem): ChipTone {
+  if (!item.result) return 'warning';
+  return item.result.isError ? 'danger' : 'success';
+}
+
+function ToolHeader({ item }: { item: ToolItem }) {
   const delegation = describeDelegation(item.call, item.result);
-  const status = item.result
-    ? item.result.isError
-      ? 'text-red-400'
-      : 'text-emerald-400'
-    : 'animate-pulse text-amber-400';
   return (
-    <summary className="flex min-w-0 cursor-pointer items-center gap-2 px-3 py-2">
-      <span className={`shrink-0 ${status}`}>●</span>
-      <code className="shrink-0 text-zinc-300">{shortToolName(item.call.toolName)}</code>
+    <>
+      <code className="shrink-0 font-mono text-sm font-bold text-fg">
+        {shortToolName(item.call.toolName)}
+      </code>
       {delegation && (
-        <span className="min-w-0 truncate text-zinc-400">
-          → <strong className="text-zinc-200">{delegation.collaborator}</strong>: {delegation.title}
+        <span className="min-w-0 truncate text-sm text-fg-muted">
+          → <strong className="text-fg">{delegation.collaborator}</strong>: {delegation.title}
         </span>
       )}
-      {delegation?.subtaskId && (
-        <Link
-          to={`/projects/${projectId}/tasks/${delegation.subtaskId}`}
-          className="ml-auto shrink-0 text-xs text-indigo-300 hover:underline"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {delegation.subtaskNumber ? `ver ${taskLabel(delegation.subtaskNumber)}` : 'ver conversación'}
-        </Link>
-      )}
-    </summary>
+    </>
   );
 }
 
-function ToolStep({ item, projectId }: { item: Extract<TimelineItem, { type: 'tool' }>; projectId: string }) {
+function DelegationLink({ item, projectId }: { item: ToolItem; projectId: string }) {
+  const delegation = describeDelegation(item.call, item.result);
+  if (!delegation?.subtaskId) return null;
+  return (
+    <Link
+      to={`/projects/${projectId}/tasks/${delegation.subtaskId}`}
+      className="flex shrink-0 items-center gap-0.5 text-xs text-accent hover:underline"
+    >
+      {delegation.subtaskNumber ? `ver ${taskLabel(delegation.subtaskNumber)}` : 'ver conversación'}
+      <ChevronRight aria-hidden className="size-3" />
+    </Link>
+  );
+}
+
+function ToolStep({
+  item,
+  projectId,
+  open,
+  onToggle,
+}: {
+  item: ToolItem;
+  projectId: string;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+}) {
   const isDelegation = describeDelegation(item.call, item.result) !== null;
   return (
-    <details className="group w-full min-w-0 rounded-md border border-zinc-800 bg-zinc-900/80 text-sm">
-      <ToolSummary item={item} projectId={projectId} />
-      <div className="grid min-w-0 gap-3 border-t border-zinc-800 p-3 lg:grid-cols-2">
+    <Accordion
+      open={open}
+      onToggle={onToggle}
+      bar={toolTone(item)}
+      pulseBar={!item.result}
+      header={<ToolHeader item={item} />}
+      trailing={<DelegationLink item={item} projectId={projectId} />}
+      bodyClassName="border-t border-line bg-canvas/60"
+    >
+      <div className="grid min-w-0 gap-3 p-3 lg:grid-cols-2">
         <section className="min-w-0">
-          <p className="mb-1 text-xs text-zinc-500">Entrada</p>
-          <pre className={`${CODE_BLOCK} text-zinc-400`}>
+          <p className="label-mono mb-1 text-fg-subtle">Entrada</p>
+          <pre className={`${CODE_BLOCK} text-fg-muted`}>
             {truncate(JSON.stringify(item.call.input, null, 2))}
           </pre>
         </section>
         <section className="min-w-0">
-          <p className="mb-1 text-xs text-zinc-500">Resultado</p>
+          <p className="label-mono mb-1 text-fg-subtle">Resultado</p>
           {!item.result ? (
-            <p className="text-xs text-amber-400">En curso…</p>
+            <p className="text-xs text-warning">En curso…</p>
           ) : isDelegation ? (
-            <Markdown className="max-h-96 overflow-auto rounded-md bg-zinc-950 p-3">
+            <Markdown className="max-h-96 overflow-auto rounded-md border border-line bg-canvas p-3">
               {item.result.content}
             </Markdown>
           ) : (
-            <pre className={`${CODE_BLOCK} text-zinc-300`}>{truncate(item.result.content)}</pre>
+            <pre className={`${CODE_BLOCK} text-fg`}>{truncate(item.result.content)}</pre>
           )}
         </section>
       </div>
-    </details>
+    </Accordion>
   );
 }
 
 export function ConversationView({
   messages,
   projectId,
+  agentName,
+  openTools,
+  onToolToggle,
 }: {
   messages: ConversationMessageDto[];
   projectId: string;
+  agentName: string;
+  openTools: ReadonlySet<string>;
+  onToolToggle: (toolId: string, open: boolean) => void;
 }) {
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [messages.length]);
+  const createdAt = new Map(messages.map((message) => [message.id, message.createdAt]));
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className="min-w-0 space-y-4">
       {messages.length === 0 && (
         <EmptyState>La conversación aparecerá aquí en cuanto el agente empiece.</EmptyState>
       )}
       {buildTimeline(messages).map((item) =>
         item.type === 'tool' ? (
-          <ToolStep key={item.id} item={item} projectId={projectId} />
+          <ToolStep
+            key={item.id}
+            item={item}
+            projectId={projectId}
+            open={openTools.has(item.id)}
+            onToggle={(open) => onToolToggle(item.id, open)}
+          />
         ) : (
-          <MessageBubble key={item.id} item={item} />
+          <MessageBubble
+            key={item.id}
+            item={item}
+            time={formatTime(createdAt.get(item.id))}
+            agentName={agentName}
+          />
         ),
       )}
-      <div ref={endRef} />
     </div>
   );
 }

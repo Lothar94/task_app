@@ -30,7 +30,7 @@ function GuidancePanel(props: {
   const { values, isGenerating, error, onGuidanceChange, onGenerate } = props;
   const isReady = canDraftInstructions(values);
   return (
-    <div className="space-y-2 rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
+    <div className="space-y-2 rounded-md border border-line bg-canvas p-3">
       <Field
         label="Indicaciones para Claude"
         hint="Se añaden al nombre, rol, herramientas y colaboradores para orientar la redacción."
@@ -43,7 +43,7 @@ function GuidancePanel(props: {
         />
       </Field>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-fg-subtle">
           {isReady
             ? 'Claude propondrá unas instrucciones que podrás editar.'
             : 'Rellena nombre y rol para poder generarlas.'}
@@ -96,7 +96,7 @@ export function InstructionsField({
       />
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+          <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
             Prompt de sistema
           </span>
           <SegmentedControl label="Modo del editor" options={MODE_OPTIONS} value={mode} onChange={setMode} />
@@ -111,10 +111,10 @@ export function InstructionsField({
               value={values.instructions}
               onChange={(e) => onInstructionsChange(e.target.value)}
             />
-            <p className="text-xs text-zinc-500">{hint}</p>
+            <p className="text-xs text-fg-subtle">{hint}</p>
           </>
         ) : values.instructions.trim() ? (
-          <div className="max-h-[32rem] overflow-auto rounded-md border border-zinc-700 bg-zinc-900 p-4">
+          <div className="max-h-[32rem] overflow-auto rounded-md border border-line-strong bg-surface p-4">
             <Markdown>{values.instructions}</Markdown>
           </div>
         ) : (

@@ -1,14 +1,22 @@
 import type { DashboardDto } from '@fleet/shared';
+import { ChartColumn, Layers, Users, Bug } from 'lucide-react';
 import { useState } from 'react';
-import { StatTile } from '../../components/StatTile';
-import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
+import {
+  Card,
+  ErrorMessage,
+  Loading,
+  PageHeader,
+  SegmentedControl,
+  Select,
+  StatusChip,
+} from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
-import { formatCost, formatDuration, formatPercent, formatTokens } from '../../lib/format';
 import { projectOptionLabel } from '../projects/projectListModel';
 import { useProjects } from '../projects/projectQueries';
 import { AgentUsageTable } from './AgentUsageTable';
-import { DailyActivityChart } from './charts/DailyActivityChart';
-import { ModelTokensChart } from './charts/ModelTokensChart';
+import { DailyActivityChart, DailyLegend } from './charts/DailyActivityChart';
+import { ModelLegend, ModelTokensChart } from './charts/ModelTokensChart';
+import { Headline } from './Headline';
 import { OutcomeBar } from './charts/OutcomeBar';
 import { useDashboard } from './dashboardQueries';
 import { ErrorList } from './ErrorList';
@@ -55,62 +63,25 @@ function Filters(props: {
   );
 }
 
-function Headline({ totals }: { totals: DashboardDto['totals'] }) {
-  return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-      <StatTile
-        label="Resueltas"
-        value={totals.completed}
-        tone="good"
-        detail={`${totals.active} en curso ahora`}
-      />
-      <StatTile
-        label="Fallidas"
-        value={totals.failed}
-        tone="critical"
-        detail={`${totals.cancelled} canceladas`}
-      />
-      <StatTile
-        label="Tasa de éxito"
-        value={formatPercent(totals.successRate)}
-        detail="completadas / (completadas + fallidas)"
-      />
-      <StatTile
-        label="Tokens"
-        value={formatTokens(totals.totalTokens)}
-        detail={`${formatTokens(totals.outputTokens)} de salida`}
-      />
-      <StatTile
-        label="Coste estimado"
-        value={formatCost(totals.costUsd)}
-        detail="según tarifas de la API; tu suscripción no lo cobra"
-      />
-      <StatTile
-        label="Tiempo de agentes"
-        value={formatDuration(totals.agentTimeMs)}
-        detail={`${totals.runs} ejecuciones`}
-      />
-    </div>
-  );
-}
-
 function DashboardContent({ data }: { data: DashboardDto }) {
   return (
     <div className="space-y-6">
       <Headline totals={data.totals} />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Card title="Tokens por día">
+        <Card title="Tokens por día" icon={<ChartColumn />} meta={<DailyLegend days={data.daily} />}>
           <DailyActivityChart days={data.daily} />
         </Card>
         <Card title="Resultado de las tareas terminadas">
           <OutcomeBar totals={data.totals} />
         </Card>
       </div>
-      <Card title="Uso por modelo">
+      <Card title="Uso por modelo" icon={<Layers />} meta={<ModelLegend />}>
         <ModelTokensChart rows={data.byModel} />
         {data.byModel.length > 0 && (
           <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-200">Ver tabla</summary>
+            <summary className="label-mono cursor-pointer text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+              Ver desglose tabular
+            </summary>
             <div className="mt-2">
               <ModelUsageTable rows={data.byModel} />
             </div>
@@ -118,10 +89,18 @@ function DashboardContent({ data }: { data: DashboardDto }) {
         )}
       </Card>
       <div className="grid items-start gap-6 xl:grid-cols-2">
-        <Card title="Por agente">
+        <Card title="Rendimiento por agente" icon={<Users />}>
           <AgentUsageTable rows={data.byAgent} />
         </Card>
-        <Card title={`Errores (${data.errors.length})`}>
+        <Card
+          title={`Errores (${data.errors.length})`}
+          icon={<Bug />}
+          meta={
+            <StatusChip tone="danger">
+              {data.filters.days ? `Últimos ${data.filters.days} días` : 'Todo el periodo'}
+            </StatusChip>
+          }
+        >
           <ErrorList errors={data.errors} />
         </Card>
       </div>
@@ -141,6 +120,7 @@ export function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
+        breadcrumb="Métricas y flota"
         subtitle="Uso de modelos y tokens, resultado de las tareas y errores recientes."
         actions={
           <Filters

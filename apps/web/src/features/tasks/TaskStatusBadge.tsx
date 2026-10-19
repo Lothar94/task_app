@@ -1,15 +1,22 @@
 import type { TaskStatus } from '@fleet/shared';
+import { StatusChip, type ChipTone } from '../../components/ui';
 import { STATUS_LABELS } from './taskListModel';
 
-const STATUS_CLASSES: Record<TaskStatus, string> = {
-  draft: 'border border-dashed border-zinc-500 text-zinc-300',
-  queued: 'bg-violet-500/20 text-violet-300',
-  pending: 'bg-zinc-700 text-zinc-200',
-  running: 'bg-sky-500/20 text-sky-300 animate-pulse',
-  waiting_subtasks: 'bg-amber-500/20 text-amber-300',
-  completed: 'bg-emerald-500/20 text-emerald-300',
-  failed: 'bg-red-500/20 text-red-300',
-  cancelled: 'bg-zinc-600/40 text-zinc-400',
+interface StatusPresentation {
+  tone: ChipTone;
+  pulse?: boolean;
+  dashed?: boolean;
+}
+
+export const STATUS_PRESENTATION: Record<TaskStatus, StatusPresentation> = {
+  draft: { tone: 'neutral', dashed: true },
+  queued: { tone: 'warning' },
+  pending: { tone: 'neutral' },
+  running: { tone: 'info', pulse: true },
+  waiting_subtasks: { tone: 'warning' },
+  completed: { tone: 'success' },
+  failed: { tone: 'danger' },
+  cancelled: { tone: 'neutral' },
 };
 
 export const isTaskActive = (status: TaskStatus) =>
@@ -19,9 +26,5 @@ export const isTaskActive = (status: TaskStatus) =>
 export const isTaskPlanned = (status: TaskStatus) => status === 'draft' || status === 'queued';
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${STATUS_CLASSES[status]}`}>
-      {STATUS_LABELS[status]}
-    </span>
-  );
+  return <StatusChip {...STATUS_PRESENTATION[status]}>{STATUS_LABELS[status]}</StatusChip>;
 }

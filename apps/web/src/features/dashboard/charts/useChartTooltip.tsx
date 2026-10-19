@@ -19,7 +19,7 @@ export function useChartTooltip() {
   const tooltip = state && (
     <div
       role="tooltip"
-      className="pointer-events-none absolute z-10 min-w-40 -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded-md border border-zinc-700 bg-zinc-950/95 px-3 py-2 text-xs text-zinc-200 shadow-xl"
+      className="pointer-events-none absolute z-10 min-w-40 -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded-sm border border-line-strong bg-surface-raised px-3 py-2 text-xs text-fg shadow-float"
       style={{ left: state.x, top: state.y }}
     >
       {state.content}
@@ -32,21 +32,21 @@ export function useChartTooltip() {
 export function TooltipRow({ color, label, value }: { color?: string; label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="flex items-center gap-1.5 text-zinc-400">
-        {color && <span className="h-2 w-2 rounded-sm" style={{ background: color }} />}
+      <span className="flex items-center gap-1.5 text-fg-muted">
+        {color && <span aria-hidden className="size-2 rounded-sm" style={{ background: color }} />}
         {label}
       </span>
-      <span className="font-mono text-zinc-100 tabular-nums">{value}</span>
+      <span className="font-mono text-fg tabular-nums">{value}</span>
     </div>
   );
 }
 
 export function Legend({ items }: { items: { label: string; color: string }[] }) {
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-400">
+    <ul className="label-mono flex flex-wrap gap-x-4 gap-y-1 text-fg-muted">
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: item.color }} />
+          <span aria-hidden className="size-2.5 rounded-sm" style={{ background: item.color }} />
           {item.label}
         </li>
       ))}

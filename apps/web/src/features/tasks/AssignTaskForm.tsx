@@ -23,7 +23,7 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
   const assignTask = useAssignTask(projectId);
 
   if (members.length === 0)
-    return <p className="text-sm text-zinc-500">Añade agentes al proyecto primero.</p>;
+    return <p className="text-sm text-fg-subtle">Añade agentes al proyecto primero.</p>;
 
   const labelsError = validateLabels(milestone, tagsText);
 
@@ -71,7 +71,7 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
         tagSuggestions={tags}
       />
       {labelsError && (
-        <p role="alert" className="text-sm text-red-300">
+        <p role="alert" className="text-sm text-danger">
           {labelsError}
         </p>
       )}

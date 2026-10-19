@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Fleet // Dashboard de Observabilidad</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#3e2400",
+            "surface-container-low": "#1a1b22",
+            "surface-container": "#1e1f26",
+            "on-error-container": "#ffdad6",
+            "on-background": "#e3e1ec",
+            "outline-variant": "#464554",
+            "surface-bright": "#383941",
+            "inverse-on-surface": "#2f3038",
+            "on-secondary-fixed": "#002113",
+            "primary-fixed": "#e1e0ff",
+            "surface": "#12131a",
+            "on-primary": "#1000a9",
+            "tertiary-fixed": "#ffddb8",
+            "on-tertiary-fixed": "#2a1700",
+            "surface-dim": "#12131a",
+            "tertiary-container": "#ca8100",
+            "outline": "#908fa0",
+            "surface-tint": "#c0c1ff",
+            "tertiary": "#ffb95f",
+            "inverse-primary": "#494bd6",
+            "surface-container-highest": "#33343c",
+            "secondary-fixed-dim": "#4edea3",
+            "on-primary-container": "#0d0096",
+            "background": "#12131a",
+            "on-surface": "#e3e1ec",
+            "tertiary-fixed-dim": "#ffb95f",
+            "on-secondary-fixed-variant": "#005236",
+            "error-container": "#93000a",
+            "secondary-container": "#00a572",
+            "on-surface-variant": "#c7c4d7",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-error": "#690005",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#07006c",
+            "inverse-surface": "#e3e1ec",
+            "on-secondary-container": "#00311f",
+            "secondary-fixed": "#6ffbbe",
+            "surface-variant": "#33343c",
+            "secondary": "#4edea3",
+            "on-secondary": "#003824",
+            "surface-container-high": "#292931",
+            "on-primary-fixed-variant": "#2f2ebe",
+            "on-tertiary": "#472a00",
+            "surface-container-lowest": "#0d0e15",
+            "primary": "#c0c1ff",
+            "primary-fixed-dim": "#c0c1ff",
+            "primary-container": "#8083ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-compact": "0.5rem",
+            "gutter": "1rem",
+            "margin": "1.5rem",
+            "space-md": "0.75rem",
+            "space-xs": "0.25rem",
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem"
+          },
+          "fontFamily": {
+            "label-mono-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "body-md": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-mono-sm": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-mono-xs": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "label-mono-md": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "body-lg": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "fontWeight": "400" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "label-mono-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
+            "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "headline-sm": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "600" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "label-mono-xs": ["0.6875rem", { "lineHeight": "0.875rem", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      display: inline-block;
+      line-height: 1;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d0e15;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #292931;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #464554;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex flex-col font-body-md select-none">
+<!-- TopNavBar (Shared Component JSON anchor) -->
+<header class="flex justify-between items-center w-full px-4 border-b border-outline-variant/20 sticky top-0 z-50 bg-surface-container-lowest h-[52px]">
+<!-- Brand / Workspace Switcher -->
+<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-2">
+<span class="w-2.5 h-2.5 bg-primary-container rotate-45 inline-block shadow-[0_0_8px_rgba(128,131,255,0.7)]"></span>
+<span class="text-headline-sm font-headline-sm font-semibold tracking-tight text-on-surface">Agent Fleet</span>
+</div>
+<div class="h-4 w-px bg-outline-variant/40"></div>
+<!-- Workspace pill -->
+<button class="flex items-center space-x-1.5 px-2 py-1 rounded bg-surface-container border border-outline-variant/30 text-body-sm font-body-sm text-on-surface hover:border-outline-variant transition-colors">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-medium text-body-sm">Lothar's lab</span>
+<span class="material-symbols-outlined text-[16px] text-outline">unfold_more</span>
+</button>
+<!-- Top Links (Navigation links from JSON & Context) -->
+<nav class="hidden md:flex items-center space-x-1 ml-3 text-body-sm font-body-sm">
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Proyectos</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Agentes</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Tareas</a>
+<!-- Active Link: Dashboard -->
+<a class="border-b border-primary text-primary font-medium py-3.5 px-3 flex items-center space-x-1" href="#">
+<span>Dashboard</span>
+</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Swarm Traces</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors" href="#">Telemetry</a>
+</nav>
+</div>
+<!-- Trailing Actions Cluster -->
+<div class="flex items-center space-x-2">
+<!-- Search Input Micro -->
+<div class="relative hidden lg:flex items-center">
+<span class="material-symbols-outlined absolute left-2 text-[16px] text-outline">search</span>
+<input class="bg-surface-container-low border border-outline-variant/30 rounded pl-7 pr-3 py-1 text-label-mono-sm font-label-mono-sm text-on-surface placeholder:text-outline/60 focus:outline-none focus:border-primary w-44 transition-all focus:w-60" placeholder="Buscar métrica, agente..." type="text"/>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center space-x-1 text-outline">
+<button class="p-1.5 hover:bg-surface-container hover:text-on-surface rounded transition-colors" title="Abrir Consola Terminal">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container hover:text-on-surface rounded transition-colors" title="Ajustes de Runtime">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container hover:text-on-surface rounded transition-colors relative" title="Notificaciones de Flota">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 bg-error rounded-full ring-2 ring-surface-container-lowest"></span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/30 mx-1"></div>
+<!-- User avatar / Org -->
+<div class="flex items-center space-x-2">
+<span class="text-label-mono-xs font-label-mono-xs text-outline hidden xl:inline">Organizaciones</span>
+<button class="w-7 h-7 rounded border border-outline-variant/40 bg-surface-container flex items-center justify-center text-primary font-label-mono-sm font-label-mono-sm overflow-hidden" title="Lead Agent Operator Profile">
+<span class="material-symbols-outlined text-[16px]">account_tree</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Viewport Layout -->
+<main class="flex-1 max-w-[1720px] w-full mx-auto px-4 md:px-6 py-5 flex flex-col space-y-5">
+<!-- Top Header Bar with Filters -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-outline-variant/20">
+<div>
+<div class="flex items-center space-x-2">
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">Dashboard</h1>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-label-mono-xs font-label-mono-xs border border-primary/20">LIVE TELEMETRY</span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5">
+          Uso de modelos y tokens, rendimiento de la flota, desglose de costes y registro de incidencias en tiempo real.
+        </p>
+</div>
+<!-- Filter Controls Cluster -->
+<div class="flex flex-wrap items-center gap-2">
+<!-- Project dropdown -->
+<div class="relative">
+<select class="bg-surface-container border border-outline-variant/40 rounded px-3 py-1.5 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary appearance-none pr-8 cursor-pointer hover:border-outline transition-colors">
+<option value="all">Todos los proyectos</option>
+<option value="scenarios">Planning Scenarios Builder</option>
+<option value="taskapp">Task app core</option>
+<option value="refactor">Autonomous Codebase Refactor</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2 top-2 text-[18px] text-outline">expand_more</span>
+</div>
+<!-- Date Range Segments -->
+<div class="inline-flex items-center p-0.5 bg-surface-container border border-outline-variant/30 rounded text-label-mono-sm font-label-mono-sm">
+<button class="px-2.5 py-1 text-outline hover:text-on-surface rounded-sm transition-colors">24h</button>
+<button class="px-2.5 py-1 bg-surface-container-highest text-primary font-medium rounded-sm border border-outline-variant/40 shadow-sm">7 días</button>
+<button class="px-2.5 py-1 text-outline hover:text-on-surface rounded-sm transition-colors">30 días</button>
+<button class="px-2.5 py-1 text-outline hover:text-on-surface rounded-sm transition-colors">90 días</button>
+<button class="px-2.5 py-1 text-outline hover:text-on-surface rounded-sm transition-colors">Todo</button>
+</div>
+<!-- Refresh button -->
+<button class="p-1.5 rounded bg-surface-container border border-outline-variant/30 text-outline hover:text-on-surface hover:border-outline transition-colors" title="Actualizar datos">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid: Top Tier KPIs -->
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+<!-- KPI 1: Resueltas -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">RESUELTAS</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">check_circle</span>
+</div>
+<div class="my-2">
+<div class="text-headline-lg font-headline-lg font-semibold text-on-surface">106</div>
+<div class="flex items-center space-x-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-mono-xs font-label-mono-xs text-secondary font-medium">2 en curso ahora</span>
+</div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline/80 border-t border-outline-variant/20 pt-1.5 flex justify-between">
+<span>Tasa cierre</span>
+<span class="text-on-surface font-medium">+14% vs sem. ant</span>
+</div>
+</div>
+<!-- KPI 2: Fallidas -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">FALLIDAS</span>
+<span class="material-symbols-outlined text-[16px] text-error">error</span>
+</div>
+<div class="my-2">
+<div class="text-headline-lg font-headline-lg font-semibold text-error">2</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-1">
+            0 canceladas manualmente
+          </div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline/80 border-t border-outline-variant/20 pt-1.5 flex justify-between">
+<span>Severidad</span>
+<span class="text-error font-medium">1.8% tasa error</span>
+</div>
+</div>
+<!-- KPI 3: Tasa de Éxito -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">TASA DE ÉXITO</span>
+<span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline space-x-1">
+<span class="text-headline-lg font-headline-lg font-semibold text-on-surface">98</span>
+<span class="text-headline-sm font-headline-sm text-outline font-normal">%</span>
+</div>
+<!-- Micro progress bar -->
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 mt-2 overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 98%"></div>
+<div class="bg-error h-full" style="width: 2%"></div>
+</div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline/80 border-t border-outline-variant/20 pt-1.5">
+          completadas / (completadas + fallidas)
+        </div>
+</div>
+<!-- KPI 4: Tokens Totales -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">TOKENS</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">memory</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline space-x-1">
+<span class="text-headline-lg font-headline-lg font-semibold text-on-surface">85,1</span>
+<span class="text-headline-sm font-headline-sm text-on-surface-variant font-medium">M</span>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-1 truncate">
+            1,6 M de salida activa
+          </div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline/80 border-t border-outline-variant/20 pt-1.5 flex justify-between">
+<span>Eficiencia</span>
+<span class="text-secondary font-medium">92% caché</span>
+</div>
+</div>
+<!-- KPI 5: Coste Estimado -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">COSTE ESTIMADO</span>
+<span class="material-symbols-outlined text-[16px] text-primary">payments</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline space-x-1">
+<span class="text-headline-lg font-headline-lg font-semibold text-on-surface">64,34</span>
+<span class="text-label-mono-sm font-label-mono-sm text-outline">US$</span>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-1 truncate">
+            según tarifas de la API
+          </div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-secondary border-t border-outline-variant/20 pt-1.5 flex justify-between">
+<span>Ahorro caché</span>
+<span class="font-medium">-$142,10</span>
+</div>
+</div>
+<!-- KPI 6: Tiempo de Agentes -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-3.5 flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-mono-xs font-label-mono-xs tracking-wider text-outline uppercase font-medium">TIEMPO AGENTES</span>
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+</div>
+<div class="my-2">
+<div class="text-headline-sm font-headline-sm font-semibold text-on-surface">10 h 54 min</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-1">
+            124 ejecuciones de enjambre
+          </div>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline/80 border-t border-outline-variant/20 pt-1.5 flex justify-between">
+<span>Promedio/tarea</span>
+<span class="text-on-surface font-medium">5m 16s</span>
+</div>
+</div>
+</div>
+<!-- Mid Section: Daily Histogram & Task Outcome Progress -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<!-- Left (8 cols): Histogram de Tokens por Día -->
+<div class="lg:col-span-8 bg-surface-container border border-outline-variant/20 rounded p-4 flex flex-col justify-between">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-[18px]">bar_chart</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Tokens por día</h2>
+</div>
+<div class="flex items-center space-x-4 text-label-mono-xs font-label-mono-xs">
+<div class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 bg-primary-container rounded-sm"></span>
+<span class="text-outline">Consumo total (Prompt + Eval)</span>
+</div>
+<span class="text-outline">Pico: 32,4 M (14 oct)</span>
+</div>
+</div>
+<!-- Custom Hairline Chart Area -->
+<div class="relative pt-6 pb-2 h-56 flex flex-col justify-end">
+<!-- Background Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none text-label-mono-xs font-label-mono-xs text-outline/40">
+<div class="flex items-center border-b border-outline-variant/10 w-full pb-1">
+<span class="w-10">50 M</span>
+<div class="flex-1 border-b border-dashed border-outline-variant/15"></div>
+</div>
+<div class="flex items-center border-b border-outline-variant/10 w-full pb-1">
+<span class="w-10">25 M</span>
+<div class="flex-1 border-b border-dashed border-outline-variant/15"></div>
+</div>
+<div class="flex items-center border-b border-outline-variant/10 w-full pb-1">
+<span class="w-10">0</span>
+<div class="flex-1 border-b border-outline-variant/20"></div>
+</div>
+</div>
+<!-- Bars container -->
+<div class="relative z-10 grid grid-cols-7 gap-3 pl-10 pr-2 h-44 items-end">
+<!-- 13 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-medium">14.2M</div>
+<div class="w-full bg-primary-container/80 hover:bg-primary rounded-t-sm transition-all" style="height: 28.4%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">13 oct</span>
+</div>
+<!-- 14 oct (Peak) -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-medium">32.4M</div>
+<div class="w-full bg-primary-container/90 hover:bg-primary rounded-t-sm transition-all shadow-[0_0_12px_rgba(128,131,255,0.25)]" style="height: 64.8%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-on-surface font-medium mt-2">14 oct</span>
+</div>
+<!-- 15 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-medium">28.1M</div>
+<div class="w-full bg-primary-container/80 hover:bg-primary rounded-t-sm transition-all" style="height: 56.2%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">15 oct</span>
+</div>
+<!-- 16 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-medium">9.8M</div>
+<div class="w-full bg-primary-container/80 hover:bg-primary rounded-t-sm transition-all" style="height: 19.6%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">16 oct</span>
+</div>
+<!-- 17 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-outline opacity-0 group-hover:opacity-100 transition-opacity mb-1">0.1M</div>
+<div class="w-full bg-primary-container/30 hover:bg-primary rounded-t-sm transition-all" style="height: 1.5%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">17 oct</span>
+</div>
+<!-- 18 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-outline opacity-0 group-hover:opacity-100 transition-opacity mb-1">0.3M</div>
+<div class="w-full bg-primary-container/30 hover:bg-primary rounded-t-sm transition-all" style="height: 2.2%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">18 oct</span>
+</div>
+<!-- 19 oct -->
+<div class="flex flex-col items-center h-full justify-end group cursor-pointer">
+<div class="text-label-mono-xs font-label-mono-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 font-medium">4.3M</div>
+<div class="w-full bg-primary-container/80 hover:bg-primary rounded-t-sm transition-all" style="height: 8.6%"></div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline mt-2">19 oct</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right (4 cols): Resultado de tareas terminadas -->
+<div class="lg:col-span-4 bg-surface-container border border-outline-variant/20 rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Resultado de las tareas terminadas</h2>
+<span class="text-label-mono-xs font-label-mono-xs text-outline">108 totales</span>
+</div>
+<!-- Segmented Execution Bar -->
+<div class="mt-5">
+<div class="w-full h-4 rounded bg-surface-container-highest overflow-hidden flex shadow-inner">
+<!-- Completadas: 106 / 108 = 98.15% -->
+<div class="bg-secondary-container hover:bg-secondary transition-colors" style="width: 98.15%" title="106 Completadas (98.1%)"></div>
+<!-- Fallidas: 2 / 108 = 1.85% -->
+<div class="bg-error hover:bg-error-container transition-colors" style="width: 1.85%" title="2 Fallidas (1.9%)"></div>
+</div>
+<!-- Badges Legend -->
+<div class="grid grid-cols-3 gap-2 mt-4">
+<div class="flex items-center space-x-1.5 p-2 rounded bg-surface-container-low border border-outline-variant/15">
+<span class="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
+<div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline">Completadas</div>
+<div class="text-body-md font-body-md font-semibold text-on-surface">106</div>
+</div>
+</div>
+<div class="flex items-center space-x-1.5 p-2 rounded bg-surface-container-low border border-outline-variant/15">
+<span class="material-symbols-outlined text-error text-[16px]">cancel</span>
+<div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline">Fallidas</div>
+<div class="text-body-md font-body-md font-semibold text-error">2</div>
+</div>
+</div>
+<div class="flex items-center space-x-1.5 p-2 rounded bg-surface-container-low border border-outline-variant/15">
+<span class="material-symbols-outlined text-outline text-[16px]">do_not_disturb_on</span>
+<div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline">Canceladas</div>
+<div class="text-body-md font-body-md font-semibold text-outline">0</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry Summary Note -->
+<div class="p-3 bg-surface-container-low rounded border border-outline-variant/20 mt-4">
+<div class="flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[16px] mt-0.5">tips_and_updates</span>
+<div class="text-body-sm font-body-sm text-on-surface-variant">
+              Tasa de resiliencia del <span class="text-on-surface font-medium">98.1%</span>. El retry-backoff automático recuperó 11 micro-bloqueos sin intervención del operador.
+            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Stacked Horizontal Bar Chart: Desglose por Modelo -->
+<div class="bg-surface-container border border-outline-variant/20 rounded p-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-[18px]">view_timeline</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Uso por modelo</h2>
+</div>
+<!-- Legend Categorías -->
+<div class="flex flex-wrap items-center gap-4 text-label-mono-xs font-label-mono-xs">
+<div class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-primary-container"></span>
+<span class="text-outline">Entrada</span>
+</div>
+<div class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-tertiary"></span>
+<span class="text-outline">Salida</span>
+</div>
+<div class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-secondary"></span>
+<span class="text-outline">Escritura en caché</span>
+</div>
+<div class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-[#ca8100]"></span>
+<span class="text-outline">Lectura de caché</span>
+</div>
+</div>
+</div>
+<!-- Models Breakdown List -->
+<div class="space-y-4 mt-4">
+<!-- Model 1: claude-sonnet-5-5 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between text-label-mono-sm font-label-mono-sm">
+<div class="flex items-center space-x-2">
+<span class="text-on-surface font-medium">claude-sonnet-5-5</span>
+<span class="px-1.5 py-0.2 bg-surface-container-high rounded text-[10px] text-outline">PRIMARY AGENT WORKER</span>
+</div>
+<span class="text-on-surface font-semibold font-label-mono-md">44,6 M <span class="text-outline font-normal">tokens</span></span>
+</div>
+<!-- Stacked Bar -->
+<div class="h-3 w-full bg-surface-container-lowest rounded-sm overflow-hidden flex">
+<!-- Entrada (1.2%) -->
+<div class="bg-primary-container h-full" style="width: 1.2%" title="Entrada: 535k"></div>
+<!-- Salida (2.1%) -->
+<div class="bg-tertiary h-full" style="width: 2.1%" title="Salida: 936k"></div>
+<!-- Escritura caché (6.5%) -->
+<div class="bg-secondary h-full" style="width: 6.5%" title="Escritura caché: 2.9M"></div>
+<!-- Lectura de caché (90.2%) -->
+<div class="bg-[#ca8100] h-full" style="width: 90.2%" title="Lectura de caché: 40.2M"></div>
+</div>
+</div>
+<!-- Model 2: claude-opus-5-5 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between text-label-mono-sm font-label-mono-sm">
+<div class="flex items-center space-x-2">
+<span class="text-on-surface font-medium">claude-opus-5-5</span>
+<span class="px-1.5 py-0.2 bg-surface-container-high rounded text-[10px] text-outline">DEEP REASONING &amp; REFACTOR</span>
+</div>
+<span class="text-on-surface font-semibold font-label-mono-md">40,1 M <span class="text-outline font-normal">tokens</span></span>
+</div>
+<!-- Stacked Bar -->
+<div class="h-3 w-full bg-surface-container-lowest rounded-sm overflow-hidden flex">
+<!-- Entrada (1.8%) -->
+<div class="bg-primary-container h-full" style="width: 1.8%" title="Entrada: 721k"></div>
+<!-- Salida (1.5%) -->
+<div class="bg-tertiary h-full" style="width: 1.5%" title="Salida: 601k"></div>
+<!-- Escritura caché (7.2%) -->
+<div class="bg-secondary h-full" style="width: 7.2%" title="Escritura caché: 2.88M"></div>
+<!-- Lectura de caché (89.5%) -->
+<div class="bg-[#ca8100] h-full" style="width: 89.5%" title="Lectura de caché: 35.9M"></div>
+</div>
+</div>
+<!-- Model 3: claude-haiku-5-5 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between text-label-mono-sm font-label-mono-sm">
+<div class="flex items-center space-x-2">
+<span class="text-on-surface font-medium">claude-haiku-5-5</span>
+<span class="px-1.5 py-0.2 bg-surface-container-high rounded text-[10px] text-outline">FAST ROUTING &amp; SANITY</span>
+</div>
+<span class="text-on-surface font-semibold font-label-mono-md">292,2 <span class="text-outline font-normal">mil tokens</span></span>
+</div>
+<!-- Stacked Bar -->
+<div class="h-3 w-full bg-surface-container-lowest rounded-sm overflow-hidden flex">
+<!-- Entrada (22%) -->
+<div class="bg-primary-container h-full" style="width: 22%" title="Entrada: 64k"></div>
+<!-- Salida (18%) -->
+<div class="bg-tertiary h-full" style="width: 18%" title="Salida: 52k"></div>
+<!-- Escritura caché (15%) -->
+<div class="bg-secondary h-full" style="width: 15%" title="Escritura caché: 43k"></div>
+<!-- Lectura de caché (45%) -->
+<div class="bg-[#ca8100] h-full" style="width: 45%" title="Lectura de caché: 133k"></div>
+</div>
+</div>
+</div>
+<!-- Toggle footer -->
+<div class="mt-3 pt-2 border-t border-outline-variant/15 flex justify-between items-center text-label-mono-xs font-label-mono-xs">
+<button class="text-primary hover:text-primary-fixed flex items-center space-x-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]">arrow_right</span>
+<span>Ver desglose tabular y costes por token</span>
+</button>
+<span class="text-outline">Tasa de ahorro por prompt-cache: 73.4% sobre facturación neta</span>
+</div>
+</div>
+<!-- Bottom Section: Dual Column High-Density Data Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pb-6">
+<!-- Left (7 cols): Rendimiento Por Agente -->
+<div class="lg:col-span-7 bg-surface-container border border-outline-variant/20 rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-[18px]">group_work</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Rendimiento por agente</h2>
+</div>
+<span class="text-label-mono-xs font-label-mono-xs text-outline">5 nodos registrados</span>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto mt-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20 text-label-mono-xs font-label-mono-xs text-outline">
+<th class="py-2.5 font-medium">AGENTE</th>
+<th class="py-2.5 text-right font-medium">COMPLETADAS</th>
+<th class="py-2.5 text-right font-medium">FALLIDAS</th>
+<th class="py-2.5 text-right font-medium">ÉXITO</th>
+<th class="py-2.5 text-right font-medium">TOKENS</th>
+<th class="py-2.5 text-right font-medium">COSTE EST.</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10 text-body-sm font-body-sm">
+<!-- Conde -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-2.5 flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">Conde</span>
+<span class="text-[10px] font-label-mono-xs text-outline px-1 rounded bg-surface-container-low border border-outline-variant/20">Lead Refactor</span>
+</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">27</td>
+<td class="py-2.5 text-right font-label-mono-sm text-outline">0</td>
+<td class="py-2.5 text-right font-label-mono-sm text-secondary font-medium">100 %</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">39,6 M</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface font-medium">38,04 US$</td>
+</tr>
+<!-- Lara -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-2.5 flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">Lara</span>
+<span class="text-[10px] font-label-mono-xs text-outline px-1 rounded bg-surface-container-low border border-outline-variant/20">Scenario Builder</span>
+</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">36</td>
+<td class="py-2.5 text-right font-label-mono-sm text-error font-medium">1</td>
+<td class="py-2.5 text-right font-label-mono-sm text-secondary font-medium">97 %</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">25,7 M</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface font-medium">13,97 US$</td>
+</tr>
+<!-- Vega -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-2.5 flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">Vega</span>
+<span class="text-[10px] font-label-mono-xs text-outline px-1 rounded bg-surface-container-low border border-outline-variant/20">QA &amp; Test Oracle</span>
+</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">26</td>
+<td class="py-2.5 text-right font-label-mono-sm text-error font-medium">1</td>
+<td class="py-2.5 text-right font-label-mono-sm text-secondary font-medium">96 %</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">14,3 M</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface font-medium">7,89 US$</td>
+</tr>
+<!-- Acosa -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-2.5 flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">Acosa</span>
+<span class="text-[10px] font-label-mono-xs text-outline px-1 rounded bg-surface-container-low border border-outline-variant/20">Telemetry Agent</span>
+</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">16</td>
+<td class="py-2.5 text-right font-label-mono-sm text-outline">0</td>
+<td class="py-2.5 text-right font-label-mono-sm text-secondary font-medium">100 %</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">4,9 M</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface font-medium">3,47 US$</td>
+</tr>
+<!-- Arbeiza -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-2.5 flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-medium text-on-surface">Arbeiza</span>
+<span class="text-[10px] font-label-mono-xs text-outline px-1 rounded bg-surface-container-low border border-outline-variant/20">Skill Dispatcher</span>
+</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">1</td>
+<td class="py-2.5 text-right font-label-mono-sm text-outline">0</td>
+<td class="py-2.5 text-right font-label-mono-sm text-secondary font-medium">100 %</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface">592,7 mil</td>
+<td class="py-2.5 text-right font-label-mono-sm text-on-surface font-medium">0,97 US$</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/15 flex items-center justify-between text-label-mono-xs font-label-mono-xs text-outline">
+<span>Total Facturado Flota: 64,34 US$</span>
+<a class="text-primary hover:underline flex items-center space-x-1" href="#">
+<span>Configurar cuotas de agente</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Right (5 cols): Registro de Errores e Incidencias (5) -->
+<div class="lg:col-span-5 bg-surface-container border border-outline-variant/20 rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-error text-[18px]">bug_report</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Errores (5)</h2>
+</div>
+<span class="px-2 py-0.5 rounded bg-error-container/30 border border-error/30 text-error text-label-mono-xs font-label-mono-xs font-medium">
+              Últimos 7 días
+            </span>
+</div>
+<!-- Incidents List -->
+<div class="space-y-2.5 mt-3 max-h-[350px] overflow-y-auto pr-1">
+<!-- Error 1 -->
+<div class="p-2.5 rounded bg-surface-container-low border-l-2 border-l-error border border-outline-variant/20 hover:border-outline-variant/40 transition-colors">
+<div class="flex items-start justify-between gap-1">
+<div class="flex items-center space-x-1.5 text-body-sm font-body-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-error text-[15px]">close</span>
+<span class="truncate">Tarea 17: Revisión de la creación de escenarios con los datos de ejemplo actuales</span>
+</div>
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container" title="Reintentar tarea">
+<span class="material-symbols-outlined text-[15px]">replay</span>
+</button>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-0.5">
+                Planning Scenarios Builder · Conde · hace 5 días
+              </div>
+<div class="mt-1.5 p-1.5 rounded bg-surface-container-lowest font-label-mono-xs text-error border border-error/20 select-text">
+                Claude Code returned an error result: You've hit your session limit · resets 2:30pm (Europe/Madrid)
+              </div>
+</div>
+<!-- Error 2 -->
+<div class="p-2.5 rounded bg-surface-container-low border-l-2 border-l-error border border-outline-variant/20 hover:border-outline-variant/40 transition-colors">
+<div class="flex items-start justify-between gap-1">
+<div class="flex items-center space-x-1.5 text-body-sm font-body-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-error text-[15px]">close</span>
+<span class="truncate">Tarea 19: Oráculo independiente + test de aceptación escenarios</span>
+</div>
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container" title="Reintentar tarea">
+<span class="material-symbols-outlined text-[15px]">replay</span>
+</button>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-0.5">
+                Planning Scenarios Builder · Vega · hace 5 días
+              </div>
+<div class="mt-1.5 p-1.5 rounded bg-surface-container-lowest font-label-mono-xs text-error border border-error/20 select-text">
+                Claude Code returned an error result: You've hit your session limit · resets 2:30pm (Europe/Madrid)
+              </div>
+</div>
+<!-- Error 3 -->
+<div class="p-2.5 rounded bg-surface-container-low border-l-2 border-l-error border border-outline-variant/20 hover:border-outline-variant/40 transition-colors">
+<div class="flex items-start justify-between gap-1">
+<div class="flex items-center space-x-1.5 text-body-sm font-body-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-error text-[15px]">close</span>
+<span class="truncate">Tarea 18: Scenario builder: selección de instantes + modelos pandapower</span>
+</div>
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container" title="Reintentar tarea">
+<span class="material-symbols-outlined text-[15px]">replay</span>
+</button>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-0.5">
+                Planning Scenarios Builder · Lara · hace 5 días
+              </div>
+<div class="mt-1.5 p-1.5 rounded bg-surface-container-lowest font-label-mono-xs text-error border border-error/20 select-text">
+                Claude Code returned an error result: You've hit your session limit · resets 2:30pm (Europe/Madrid)
+              </div>
+</div>
+<!-- Error 4 -->
+<div class="p-2.5 rounded bg-surface-container-low border-l-2 border-l-error border border-outline-variant/20 hover:border-outline-variant/40 transition-colors">
+<div class="flex items-start justify-between gap-1">
+<div class="flex items-center space-x-1.5 text-body-sm font-body-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-error text-[15px]">close</span>
+<span class="truncate">Tarea 17: Revision de la creación de escenarios con los datos de ejemplo actuales</span>
+</div>
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container" title="Reintentar tarea">
+<span class="material-symbols-outlined text-[15px]">replay</span>
+</button>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-0.5">
+                Planning Scenarios Builder · Conde · hace 5 días
+              </div>
+<div class="mt-1.5 p-1.5 rounded bg-surface-container-lowest font-label-mono-xs text-error border border-error/20 select-text">
+                Interrupted: the server stopped while the task was running
+              </div>
+</div>
+<!-- Error 5 -->
+<div class="p-2.5 rounded bg-surface-container-low border-l-2 border-l-error border border-outline-variant/20 hover:border-outline-variant/40 transition-colors">
+<div class="flex items-start justify-between gap-1">
+<div class="flex items-center space-x-1.5 text-body-sm font-body-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-error text-[15px]">close</span>
+<span class="truncate">Tarea 21: Posibilidad de asignar skills a los agentes</span>
+</div>
+<button class="p-1 text-outline hover:text-on-surface rounded hover:bg-surface-container" title="Reintentar tarea">
+<span class="material-symbols-outlined text-[15px]">replay</span>
+</button>
+</div>
+<div class="text-label-mono-xs font-label-mono-xs text-outline mt-0.5">
+                Task app · Conde · hace 5 días
+              </div>
+<div class="mt-1.5 p-1.5 rounded bg-surface-container-lowest font-label-mono-xs text-error border border-error/20 select-text">
+                Interrupted: the server stopped while the task was running
+              </div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/15 flex items-center justify-between text-label-mono-xs font-label-mono-xs">
+<span class="text-outline">Diagnóstico: 3x Rate Limit, 2x Worker SIGKILL</span>
+<button class="text-primary hover:underline flex items-center space-x-1">
+<span>Exportar Sentry traces</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Operational Status Micro-bar -->
+<footer class="h-8 border-t border-outline-variant/20 bg-surface-container-lowest px-4 flex items-center justify-between text-label-mono-xs font-label-mono-xs text-outline z-40">
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-on-surface">Fleet Status: Operational</span>
+</div>
+<div class="hidden sm:inline-block h-3 w-px bg-outline-variant/30"></div>
+<span class="hidden sm:inline">Active Nodes: Conde (98%), Lara (45%), Vega (idle)</span>
+</div>
+<div class="flex items-center space-x-4">
+<span class="hidden md:inline">Latency: 142ms</span>
+<span>v2.8.4-fleet-engine</span>
+</div>
+</footer>
+</body></html>

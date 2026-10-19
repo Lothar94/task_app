@@ -69,7 +69,7 @@ export function TaskList({ projectId, roots, agentNames }: TaskListProps) {
           </Field>
         )}
         {proposalCount > 0 && (
-          <label className="flex items-center gap-2 pb-2 text-sm text-zinc-300">
+          <label className="flex items-center gap-2 pb-2 text-sm text-fg-muted">
             <input
               type="checkbox"
               checked={onlyProposals}
@@ -89,8 +89,8 @@ export function TaskList({ projectId, roots, agentNames }: TaskListProps) {
         groups.map((group, index) => (
           <section key={group.key} aria-label={group.label ?? undefined}>
             {group.label && (
-              <h3 className="mb-1 text-sm font-semibold text-zinc-300">
-                {group.label} <span className="font-normal text-zinc-500">({group.nodes.length})</span>
+              <h3 className="mb-1 text-sm font-semibold text-fg-muted">
+                {group.label} <span className="font-normal text-fg-subtle">({group.nodes.length})</span>
               </h3>
             )}
             <TaskTree

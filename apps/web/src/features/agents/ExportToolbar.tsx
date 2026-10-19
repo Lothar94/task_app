@@ -26,7 +26,7 @@ export function ExportToolbar({
   return (
     <section
       aria-label="Exportar agentes"
-      className="mb-4 space-y-3 rounded-lg border border-indigo-500/40 bg-zinc-900/60 p-4"
+      className="mb-4 space-y-3 rounded-lg border border-accent bg-surface p-4"
     >
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="secondary" onClick={onSelectAll}>
