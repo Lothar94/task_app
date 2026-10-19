@@ -217,12 +217,16 @@ function TaskHeader({
     <header className="space-y-3">
       <Breadcrumbs task={task} projectName={projectName} />
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
-          <TaskNumber number={task.number} />
-          <h1 className="min-w-0 text-xl leading-7 font-semibold tracking-tight [overflow-wrap:anywhere] md:text-2xl md:leading-8">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <span className="mt-0.5 shrink-0">
+            <TaskNumber number={task.number} />
+          </span>
+          <h1 className="line-clamp-2 min-w-0 flex-1 text-lg leading-7 font-semibold tracking-tight [overflow-wrap:anywhere] md:text-xl">
             {task.title}
           </h1>
-          <TaskStatusBadge status={task.status} />
+          <span className="mt-1 shrink-0">
+            <TaskStatusBadge status={task.status} />
+          </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">{actions}</div>
       </div>
