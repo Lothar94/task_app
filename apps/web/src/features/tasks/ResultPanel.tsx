@@ -41,13 +41,13 @@ const IN_PROGRESS: ResultStyle = {
 
 /**
  * Full-width, collapsible summary of what the agent delivered. It is remounted whenever the
- * summary changes (see the key in TaskView), so a newly generated result always shows up expanded.
+ * summary changes (see the key in TaskWorkspace), so `defaultOpen` applies to each new result.
  */
-export function ResultPanel({ task }: { task: TaskDto }) {
+export function ResultPanel({ task, defaultOpen = true }: { task: TaskDto; defaultOpen?: boolean }) {
   const { label, tone, icon, iconClassName } = RESULT_STYLES[task.status] ?? IN_PROGRESS;
   return (
     <Accordion
-      defaultOpen
+      defaultOpen={defaultOpen}
       bar={tone}
       bodyClassName="border-t border-line bg-canvas/40 px-5 py-4"
       header={

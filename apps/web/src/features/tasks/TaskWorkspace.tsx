@@ -93,7 +93,8 @@ export function TaskWorkspace({
             <div id={anchorDomId('overview')}>{header}</div>
             {task.resultSummary && (
               <div id={anchorDomId('result')}>
-                <ResultPanel key={task.resultSummary} task={task} />
+                {/* Collapsed by default so the conversation keeps most of the viewport. */}
+                <ResultPanel key={task.resultSummary} task={task} defaultOpen={false} />
               </div>
             )}
           </div>
