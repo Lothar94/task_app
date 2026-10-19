@@ -61,6 +61,11 @@
   --status-neutral: #908fa0;
   --chart-grid: #33343c;
   --chart-axis: #464554;
+  /* Token usage breakdown (reference: input, output, cache write, cache read). */
+  --usage-input: #8083ff;
+  --usage-output: #ffb95f;
+  --usage-cache-write: #4edea3;
+  --usage-cache-read: #ca8100;
 }
 
 /*
@@ -149,6 +154,10 @@
   --status-neutral: #5f5e70;
   --chart-grid: #e4e4ec;
   --chart-axis: #9a99ab;
+  --usage-input: #494bd6;
+  --usage-output: #b45309;
+  --usage-cache-write: #047857;
+  --usage-cache-read: #7c4a03;
 }
 
 body {

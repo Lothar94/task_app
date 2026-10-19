@@ -4,10 +4,10 @@ type SegmentKey = 'inputTokens' | 'outputTokens' | 'cacheCreationTokens' | 'cach
 
 /** Token kinds of the model chart, in stacking order; colours follow the Obsidian reference. */
 export const MODEL_SEGMENTS: { key: SegmentKey; label: string; color: string }[] = [
-  { key: 'inputTokens', label: 'Entrada', color: '#8083ff' },
-  { key: 'outputTokens', label: 'Salida', color: '#ffb95f' },
-  { key: 'cacheCreationTokens', label: 'Escritura en caché', color: '#4edea3' },
-  { key: 'cacheReadTokens', label: 'Lectura de caché', color: '#ca8100' },
+  { key: 'inputTokens', label: 'Entrada', color: 'var(--usage-input)' },
+  { key: 'outputTokens', label: 'Salida', color: 'var(--usage-output)' },
+  { key: 'cacheCreationTokens', label: 'Escritura en caché', color: 'var(--usage-cache-write)' },
+  { key: 'cacheReadTokens', label: 'Lectura de caché', color: 'var(--usage-cache-read)' },
 ];
 
 export interface ModelSegment {
