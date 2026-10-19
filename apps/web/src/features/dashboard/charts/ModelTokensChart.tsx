@@ -13,7 +13,7 @@ const SEGMENTS = [
 function ModelTooltip({ row }: { row: ModelUsageRow }) {
   return (
     <div className="space-y-1">
-      <p className="font-semibold text-zinc-100">{row.model}</p>
+      <p className="font-semibold text-fg">{row.model}</p>
       {SEGMENTS.map((segment) => (
         <TooltipRow
           key={segment.key}
@@ -40,31 +40,30 @@ export function ModelTokensChart({ rows }: { rows: ModelUsageRow[] }) {
   return (
     <div className="space-y-4">
       <Legend items={SEGMENTS.map(({ label, color }) => ({ label, color }))} />
-      <div data-chart className="relative space-y-3" onMouseLeave={hide}>
+      <div data-chart className="relative space-y-4" onMouseLeave={hide}>
         {withTokens.map((row) => (
-          <div
-            key={row.model}
-            className="grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)_4.5rem] items-center gap-3"
-          >
-            <span className="truncate font-mono text-xs text-zinc-300" title={row.model}>
-              {row.model}
-            </span>
+          <div key={row.model}>
+            <div className="mb-1 flex items-baseline justify-between gap-3 font-mono text-xs">
+              <span className="truncate font-medium text-fg" title={row.model}>
+                {row.model}
+              </span>
+              <span className="whitespace-nowrap text-fg-muted tabular-nums">
+                {formatTokens(row.totalTokens)} <span className="text-fg-subtle">tokens</span>
+              </span>
+            </div>
             <div
-              className="flex h-5 gap-[2px] border-l border-[var(--chart-axis)]"
+              className="flex h-2.5 gap-[2px]"
               style={{ width: `${(row.totalTokens / max) * 100}%` }}
               onMouseMove={(event) => show(event, <ModelTooltip row={row} />)}
             >
               {SEGMENTS.filter((segment) => row[segment.key] > 0).map((segment, index, visible) => (
                 <span
                   key={segment.key}
-                  className={`h-full min-w-[2px] ${index === visible.length - 1 ? 'rounded-r-[4px]' : ''}`}
+                  className={`h-full min-w-[2px] ${index === visible.length - 1 ? 'rounded-r-[2px]' : ''}`}
                   style={{ flexGrow: row[segment.key], background: segment.color }}
                 />
               ))}
             </div>
-            <span className="text-right font-mono text-xs text-zinc-300 tabular-nums">
-              {formatTokens(row.totalTokens)}
-            </span>
           </div>
         ))}
         {tooltip}
