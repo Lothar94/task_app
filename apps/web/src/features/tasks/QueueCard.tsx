@@ -22,14 +22,14 @@ export function QueueCard({ projectId, queued, agentNames }: QueueCardProps) {
     reorder.mutate(moveItem(queued, index, offset).map((task) => task.id));
   return (
     <Card title={`Cola (${queued.length})`}>
-      <p className="mb-3 text-sm text-zinc-500">
+      <p className="mb-3 text-sm text-fg-subtle">
         Se ejecutan en orden, de una en una: la primera arranca cuando el proyecto no tiene ninguna tarea en
         curso.
       </p>
-      <ol className="divide-y divide-zinc-800/60">
+      <ol className="divide-y divide-line">
         {queued.map((task, index) => (
           <li key={task.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-2">
-            <span className="w-6 text-right font-mono text-sm text-zinc-400" aria-hidden>
+            <span className="w-6 text-right font-mono text-sm text-fg-muted" aria-hidden>
               {index + 1}.
             </span>
             <Link
@@ -38,8 +38,8 @@ export function QueueCard({ projectId, queued, agentNames }: QueueCardProps) {
             >
               <TaskNumber number={task.number} />
               <span className="min-w-0">
-                <span className="block truncate text-sm font-medium hover:text-indigo-300">{task.title}</span>
-                <span className="text-xs text-zinc-500">
+                <span className="block truncate text-sm font-medium hover:text-accent">{task.title}</span>
+                <span className="text-xs text-fg-subtle">
                   {agentNames.get(task.agentId) ?? 'Agente eliminado'}
                 </span>
                 <TaskLabels milestone={task.milestone} tags={task.tags} />
