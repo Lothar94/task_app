@@ -1,5 +1,5 @@
 import { type FormEvent, useId, useState } from 'react';
-import { Button, ErrorMessage } from '../../components/ui';
+import { Button, ErrorMessage, TextInput } from '../../components/ui';
 import { ORGANIZATION_NAME_MAX_LENGTH, validateOrganizationName } from './organizationModel';
 
 interface OrganizationNameFormProps {
@@ -39,13 +39,10 @@ export function OrganizationNameForm({
     <form onSubmit={handleSubmit} noValidate className="space-y-2">
       <div className="flex flex-wrap items-end gap-2">
         <div className="min-w-56 flex-1 space-y-1">
-          <label
-            htmlFor={inputId}
-            className="block text-xs font-semibold tracking-wide text-zinc-400 uppercase"
-          >
+          <label htmlFor={inputId} className="label-mono block text-fg-subtle">
             {label}
           </label>
-          <input
+          <TextInput
             id={inputId}
             value={value}
             autoFocus={autoFocus}
@@ -53,7 +50,6 @@ export function OrganizationNameForm({
             aria-invalid={validationError !== null}
             aria-describedby={validationError ? errorId : undefined}
             onChange={(event) => setValue(event.target.value)}
-            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm outline-none focus:border-indigo-400"
           />
         </div>
         <Button type="submit" disabled={isSubmitting}>
@@ -66,7 +62,7 @@ export function OrganizationNameForm({
         )}
       </div>
       {validationError && (
-        <p id={errorId} role="alert" className="text-sm text-red-300">
+        <p id={errorId} role="alert" className="text-sm text-danger">
           {validationError}
         </p>
       )}
