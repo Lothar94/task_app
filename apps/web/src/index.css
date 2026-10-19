@@ -18,7 +18,7 @@
   --color-line-strong: rgb(255 255 255 / 0.16);
   --color-fg: #e3e1ec;
   --color-fg-muted: #c7c4d7;
-  --color-fg-subtle: #908fa0;
+  --color-fg-subtle: #a3a2b5; /* lighter than the reference outline for AA on tinted rows */
   --color-accent: #c0c1ff;
   --color-accent-hover: #e1e0ff;
   --color-on-accent: #1000a9;
@@ -128,10 +128,10 @@
   --color-fg: #1a1b22;
   --color-fg-muted: #464554;
   --color-fg-subtle: #5f5e70;
-  --color-accent: #494bd6;
+  --color-accent: #3d3fc4;
   --color-accent-hover: #2f2ebe;
   --color-on-accent: #ffffff;
-  --color-success: #047857;
+  --color-success: #065f46;
   --color-success-soft: rgb(4 120 87 / 0.1);
   --color-success-line: rgb(4 120 87 / 0.3);
   --color-warning: #92400e;
@@ -155,7 +155,7 @@
   --chart-grid: #e4e4ec;
   --chart-axis: #9a99ab;
   --usage-input: #494bd6;
-  --usage-output: #b45309;
+  --usage-output: #d97706;
   --usage-cache-write: #047857;
   --usage-cache-read: #7c4a03;
 }
