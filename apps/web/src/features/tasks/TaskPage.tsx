@@ -7,6 +7,7 @@ import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { ConversationView } from './ConversationView';
+import { TaskBrief } from './TaskBrief';
 import { ResultPanel } from './ResultPanel';
 import { TaskNumber, taskLabel } from './taskLabel';
 import { FollowUpForm } from './FollowUpForm';
@@ -74,9 +75,18 @@ function TaskMeta({
 
 function ConversationPanel({ task }: { task: TaskDto }) {
   const conversation = useConversation(task.id);
-  if (conversation.isPending) return <Loading />;
-  if (conversation.error) return <ErrorMessage error={conversation.error} />;
-  return <ConversationView messages={conversation.data} projectId={task.projectId} task={task} />;
+  return (
+    <div className="space-y-3">
+      <TaskBrief task={task} />
+      {conversation.isPending ? (
+        <Loading />
+      ) : conversation.error ? (
+        <ErrorMessage error={conversation.error} />
+      ) : (
+        <ConversationView messages={conversation.data} projectId={task.projectId} />
+      )}
+    </div>
+  );
 }
 
 function SubtasksPanel({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
@@ -212,7 +222,9 @@ function TaskView({
       <Breadcrumbs task={task} />
       <PageHeader
         title={task.title}
-        subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />}
+        subtitle={
+          <TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />
+        }
         actions={
           <TaskActions
             task={task}

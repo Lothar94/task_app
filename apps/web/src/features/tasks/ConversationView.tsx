@@ -1,15 +1,10 @@
-import type { ConversationMessageDto, TaskDto } from '@fleet/shared';
+import type { ConversationMessageDto } from '@fleet/shared';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { Markdown } from '../../components/Markdown';
 import { EmptyState } from '../../components/ui';
 import { taskLabel } from './taskLabel';
-import {
-  buildTimeline,
-  describeDelegation,
-  hasDescription,   shortToolName,
-  type TimelineItem,
-} from './conversationModel';
+import { buildTimeline, describeDelegation, shortToolName, type TimelineItem } from './conversationModel';
 
 const MAX_PREVIEW = 6000;
 const CODE_BLOCK =
@@ -50,27 +45,6 @@ function MessageBubble({ item }: { item: Extract<TimelineItem, { type: 'message'
         </div>
       );
   }
-}
-
-type BriefTask = Pick<TaskDto, 'number' | 'title' | 'description'>;
-
-function TaskBrief({ task }: { task: BriefTask }) {
-  return (
-    <article
-      aria-labelledby="task-brief-title"
-      className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4"
-    >
-      <p className="mb-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase">Tarea</p>
-      <h3 id="task-brief-title" className="mb-2 font-semibold text-zinc-100">
-        {taskLabel(task.number)}: {task.title}
-      </h3>
-      {hasDescription(task.description) ? (
-        <Markdown>{task.description}</Markdown>
-      ) : (
-        <p className="text-sm text-zinc-500">Sin descripción.</p>
-      )}
-    </article>
-  );
 }
 
 function ToolSummary({
@@ -140,11 +114,9 @@ function ToolStep({ item, projectId }: { item: Extract<TimelineItem, { type: 'to
 export function ConversationView({
   messages,
   projectId,
-  task,
 }: {
   messages: ConversationMessageDto[];
   projectId: string;
-  task: BriefTask;
 }) {
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -153,7 +125,6 @@ export function ConversationView({
 
   return (
     <div className="min-w-0 space-y-3">
-      <TaskBrief task={task} />
       {messages.length === 0 && (
         <EmptyState>La conversación aparecerá aquí en cuanto el agente empiece.</EmptyState>
       )}
