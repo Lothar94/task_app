@@ -1,3 +1,4 @@
+import { Bot, Building2, FolderKanban, LayoutDashboard } from 'lucide-react';
 import { NavLink, Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AgentDetailPage } from './features/agents/AgentDetailPage';
@@ -12,39 +13,44 @@ import { ProjectsPage } from './features/projects/ProjectsPage';
 import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
 
+const NAV_ITEMS = [
+  { to: '/projects', label: 'Proyectos', icon: FolderKanban },
+  { to: '/agents', label: 'Agentes', icon: Bot },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+];
+
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-md px-3 py-1.5 text-sm ${isActive ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400 hover:text-zinc-50'}`;
+  `flex items-center gap-1.5 border-b px-3 py-[0.9rem] text-sm transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${isActive ? 'border-accent font-medium text-accent' : 'border-transparent text-fg-subtle hover:text-fg'}`;
 
 function Layout() {
   const { pathname } = useLocation();
   const { id: organizationId } = useCurrentOrganization();
   return (
     <div className="min-h-screen">
-      <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
-        <div className="mx-auto flex max-w-[1800px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 lg:px-8">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold tracking-tight whitespace-nowrap">
-              <span className="text-indigo-400">◆</span> Agent Fleet
-            </span>
-            <OrganizationSelect />
-          </div>
-          <nav aria-label="Principal" className="flex gap-1">
-            <NavLink to="/projects" className={navLinkClass}>
-              Proyectos
+      <header className="sticky top-0 z-50 flex min-h-[52px] w-full flex-wrap items-center gap-x-3 border-b border-line bg-canvas px-4">
+        <div className="flex items-center gap-2">
+          <span
+            aria-hidden
+            className="inline-block size-2.5 rotate-45 bg-accent shadow-[0_0_8px_rgb(128_131_255/0.7)]"
+          />
+          <span className="font-semibold tracking-tight whitespace-nowrap">Agent Fleet</span>
+        </div>
+        <span aria-hidden className="h-4 w-px bg-line-strong" />
+        <OrganizationSelect />
+        <nav aria-label="Principal" className="ml-3 flex items-center">
+          {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+            <NavLink key={to} to={to} className={navLinkClass}>
+              <Icon aria-hidden className="size-4" />
+              {label}
             </NavLink>
-            <NavLink to="/agents" className={navLinkClass}>
-              Agentes
-            </NavLink>
-            <NavLink to="/dashboard" className={navLinkClass}>
-              Dashboard
-            </NavLink>
-          </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <NavLink to="/organizations" className={navLinkClass}>
-              Organizaciones
-            </NavLink>
-            <ThemeToggle />
-          </div>
+          ))}
+        </nav>
+        <div className="ml-auto flex items-center gap-2">
+          <NavLink to="/organizations" className={navLinkClass}>
+            <Building2 aria-hidden className="size-4" />
+            Organizaciones
+          </NavLink>
+          <ThemeToggle />
         </div>
       </header>
       <main className="mx-auto max-w-[1800px] px-4 py-8 lg:px-8">
