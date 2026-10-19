@@ -47,11 +47,11 @@ export function ProjectMembers({ project, agents }: { project: ProjectDto; agent
         />
       ) : (
         <ul className="space-y-1 text-sm">
-          {members.length === 0 && <li className="text-zinc-500">Sin agentes asignados.</li>}
+          {members.length === 0 && <li className="text-fg-subtle">Sin agentes asignados.</li>}
           {members.map((agent) => (
             <li key={agent.id}>
               <span className="font-medium">{agent.name}</span>{' '}
-              <span className="text-zinc-500">· {agent.role}</span>
+              <span className="text-fg-subtle">· {agent.role}</span>
             </li>
           ))}
         </ul>

@@ -1,4 +1,16 @@
 import type { DashboardDto } from '@fleet/shared';
+import {
+  Banknote,
+  CircleAlert,
+  CircleCheck,
+  Clock,
+  Cpu,
+  ShieldCheck,
+  ChartColumn,
+  Layers,
+  Users,
+  Bug,
+} from 'lucide-react';
 import { useState } from 'react';
 import { StatTile } from '../../components/StatTile';
 import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
@@ -62,31 +74,37 @@ function Headline({ totals }: { totals: DashboardDto['totals'] }) {
         label="Resueltas"
         value={totals.completed}
         tone="good"
+        icon={<CircleCheck />}
         detail={`${totals.active} en curso ahora`}
       />
       <StatTile
         label="Fallidas"
         value={totals.failed}
         tone="critical"
+        icon={<CircleAlert />}
         detail={`${totals.cancelled} canceladas`}
       />
       <StatTile
         label="Tasa de éxito"
+        icon={<ShieldCheck />}
         value={formatPercent(totals.successRate)}
         detail="completadas / (completadas + fallidas)"
       />
       <StatTile
         label="Tokens"
+        icon={<Cpu />}
         value={formatTokens(totals.totalTokens)}
         detail={`${formatTokens(totals.outputTokens)} de salida`}
       />
       <StatTile
         label="Coste estimado"
+        icon={<Banknote />}
         value={formatCost(totals.costUsd)}
         detail="según tarifas de la API; tu suscripción no lo cobra"
       />
       <StatTile
         label="Tiempo de agentes"
+        icon={<Clock />}
         value={formatDuration(totals.agentTimeMs)}
         detail={`${totals.runs} ejecuciones`}
       />
@@ -99,18 +117,20 @@ function DashboardContent({ data }: { data: DashboardDto }) {
     <div className="space-y-6">
       <Headline totals={data.totals} />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Card title="Tokens por día">
+        <Card title="Tokens por día" icon={<ChartColumn />}>
           <DailyActivityChart days={data.daily} />
         </Card>
         <Card title="Resultado de las tareas terminadas">
           <OutcomeBar totals={data.totals} />
         </Card>
       </div>
-      <Card title="Uso por modelo">
+      <Card title="Uso por modelo" icon={<Layers />}>
         <ModelTokensChart rows={data.byModel} />
         {data.byModel.length > 0 && (
           <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-200">Ver tabla</summary>
+            <summary className="label-mono cursor-pointer text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+              Ver desglose tabular
+            </summary>
             <div className="mt-2">
               <ModelUsageTable rows={data.byModel} />
             </div>
@@ -118,10 +138,10 @@ function DashboardContent({ data }: { data: DashboardDto }) {
         )}
       </Card>
       <div className="grid items-start gap-6 xl:grid-cols-2">
-        <Card title="Por agente">
+        <Card title="Rendimiento por agente" icon={<Users />}>
           <AgentUsageTable rows={data.byAgent} />
         </Card>
-        <Card title={`Errores (${data.errors.length})`}>
+        <Card title={`Errores (${data.errors.length})`} icon={<Bug />}>
           <ErrorList errors={data.errors} />
         </Card>
       </div>
@@ -141,6 +161,7 @@ export function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
+        breadcrumb="Métricas y flota"
         subtitle="Uso de modelos y tokens, resultado de las tareas y errores recientes."
         actions={
           <Filters

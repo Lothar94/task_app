@@ -1,6 +1,7 @@
 import type { AgentDto, ProjectDto } from '@fleet/shared';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Folder, ListChecks, Plus } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router';
 import { Dialog } from '../../components/Dialog';
 import { Button, Card, ErrorMessage, Loading, PageHeader } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
@@ -28,7 +29,7 @@ function ProjectTasks({ projectId, agents }: { projectId: string; agents: AgentD
     <div className="space-y-6">
       <ProjectStats nodes={tree.data} />
       {queued.length > 0 && <QueueCard projectId={projectId} queued={queued} agentNames={agentNames} />}
-      <Card title="Tareas">
+      <Card title="Pila de ejecución" icon={<ListChecks />}>
         <TaskList projectId={projectId} roots={tree.data} agentNames={agentNames} />
       </Card>
     </div>
@@ -47,13 +48,13 @@ function ProjectTeam({
   const tree = useTaskTree(project.id);
   const navigate = useNavigate();
   return (
-    <details className="group rounded-lg border border-zinc-800 bg-zinc-900/40">
-      <summary className="flex cursor-pointer items-center justify-between px-4 py-3">
-        <span className="text-sm font-semibold text-zinc-300">Equipo · {members.length} agente(s)</span>
-        <span className="text-xs text-zinc-500 group-open:hidden">Mostrar</span>
-        <span className="hidden text-xs text-zinc-500 group-open:inline">Ocultar</span>
+    <details className="group rounded-lg border border-line bg-surface">
+      <summary className="flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent">
+        <span className="text-sm font-semibold text-fg">Equipo · {members.length} agente(s)</span>
+        <span className="text-xs text-fg-subtle group-open:hidden">Mostrar</span>
+        <span className="hidden text-xs text-fg-subtle group-open:inline">Ocultar</span>
       </summary>
-      <div className="grid gap-6 border-t border-zinc-800 p-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid gap-6 border-t border-line p-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <AgentGraph
           agents={members}
           highlightedIds={collectActiveAgentIds(tree.data ?? [])}
@@ -74,16 +75,32 @@ function ProjectView({ project, agents }: { project: ProjectDto; agents: AgentDt
     <>
       <PageHeader
         title={project.name}
+        breadcrumb={
+          <>
+            <Link to="/projects" className="hover:text-fg">
+              Proyectos
+            </Link>{' '}
+            / {project.name}
+          </>
+        }
         subtitle={
           <>
             {project.description && <span className="block">{project.description}</span>}
-            <code className="text-xs text-zinc-500">{project.workspacePath}</code>
+            <code className="mt-1 flex items-center gap-1.5 font-mono text-xs text-fg-subtle">
+              <Folder aria-hidden className="size-3.5 shrink-0" />
+              {project.workspacePath}
+            </code>
           </>
         }
         actions={
           <>
             {archive.button}
-            {!archive.isArchived && <Button onClick={() => setIsAssigning(true)}>Nueva tarea</Button>}
+            {!archive.isArchived && (
+              <Button onClick={() => setIsAssigning(true)}>
+                <Plus aria-hidden className="size-4" />
+                Nueva tarea
+              </Button>
+            )}
           </>
         }
       />

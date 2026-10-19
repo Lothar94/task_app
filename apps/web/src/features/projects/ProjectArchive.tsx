@@ -6,7 +6,7 @@ export function ArchiveBanner({ onUnarchive, isPending }: { onUnarchive: () => v
   return (
     <div
       role="status"
-      className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-900 bg-amber-950/40 px-4 py-3 text-sm text-amber-200"
+      className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-warning-line bg-warning-soft px-4 py-3 text-sm text-warning"
     >
       <span>Proyecto archivado — solo lectura</span>
       <Button variant="secondary" onClick={onUnarchive} disabled={isPending}>

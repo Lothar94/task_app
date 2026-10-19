@@ -15,7 +15,7 @@ function niceMax(value: number): number {
 function DayTooltip({ day }: { day: DailyActivity }) {
   return (
     <div className="space-y-1">
-      <p className="font-semibold text-zinc-100">{formatDay(day.date)}</p>
+      <p className="font-semibold text-fg">{formatDay(day.date)}</p>
       <TooltipRow color="var(--series-1)" label="Tokens" value={formatInteger(day.totalTokens)} />
       <TooltipRow label="Tareas completadas" value={String(day.completed)} />
       <TooltipRow label="Tareas fallidas" value={String(day.failed)} />
@@ -40,7 +40,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
           {ticks.map((tick) => (
             <span
               key={tick}
-              className="absolute right-0 -translate-y-1/2 font-mono text-[10px] text-zinc-500 tabular-nums"
+              className="absolute right-0 -translate-y-1/2 font-mono text-[0.6875rem] text-fg-subtle tabular-nums"
               style={{ top: `${(1 - tick / max) * 100}%` }}
             >
               {formatTokens(tick)}
@@ -59,11 +59,11 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
             {days.map((day) => (
               <div
                 key={day.date}
-                className="group flex h-full min-w-0 flex-1 items-end hover:bg-zinc-800/40"
+                className="group flex h-full min-w-0 flex-1 items-end hover:bg-surface-hover"
                 onMouseMove={(event) => show(event, <DayTooltip day={day} />)}
               >
                 <div
-                  className="w-full rounded-t-[4px] bg-[var(--series-1)]"
+                  className="w-full rounded-t-[2px] bg-[var(--series-1)]"
                   style={{
                     height: `${(day.totalTokens / max) * 100}%`,
                     minHeight: day.totalTokens > 0 ? 2 : 0,
@@ -78,7 +78,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
         {days.map((day, index) => (
           <span
             key={day.date}
-            className="min-w-0 flex-1 text-center text-[10px] whitespace-nowrap text-zinc-500"
+            className="min-w-0 flex-1 text-center font-mono text-[0.6875rem] whitespace-nowrap text-fg-subtle"
           >
             {index % labelEvery === 0 ? formatDay(day.date) : ''}
           </span>
