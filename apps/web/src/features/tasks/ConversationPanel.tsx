@@ -6,7 +6,7 @@ import { ConversationView } from './ConversationView';
 import { buildTimeline, toolStepIds } from './conversationModel';
 import { FollowUpForm } from './FollowUpForm';
 import { TaskBrief } from './TaskBrief';
-import { SCROLL_PANEL, anchorDomId } from './taskPanelStyles';
+import { SCROLL_PANEL } from './taskPanelStyles';
 import { useStickToBottom } from './stickToBottom';
 import { useConversation } from './taskQueries';
 
@@ -55,7 +55,6 @@ export function ConversationPanel({
   isExpanded,
   onToggleExpanded,
   canFollowUp,
-  leading,
   trailing,
 }: {
   task: TaskDto;
@@ -63,7 +62,6 @@ export function ConversationPanel({
   isExpanded: boolean;
   onToggleExpanded: () => void;
   canFollowUp: boolean;
-  leading?: ReactNode;
   trailing?: ReactNode;
 }) {
   const conversation = useConversation(task.id);
@@ -79,18 +77,13 @@ export function ConversationPanel({
     });
 
   return (
-    <section
-      id={anchorDomId('conversation')}
-      aria-label="Conversación de la tarea"
-      className="flex min-h-0 flex-1 flex-col"
-    >
+    <section aria-label="Conversación de la tarea" className="flex min-h-0 flex-1 flex-col">
       <ConversationHeader
         isExpanded={isExpanded}
         onToggleExpanded={onToggleExpanded}
         canToggleTools={toolIds.length > 0}
         onExpandTools={() => setOpenTools(new Set(toolIds))}
         onCollapseTools={() => setOpenTools(new Set())}
-        leading={leading}
         trailing={trailing}
       />
       {conversation.isPending ? (

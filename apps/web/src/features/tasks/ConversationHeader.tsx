@@ -12,7 +12,6 @@ export function ConversationHeader({
   canToggleTools,
   onExpandTools,
   onCollapseTools,
-  leading,
   trailing,
 }: {
   isExpanded: boolean;
@@ -20,12 +19,10 @@ export function ConversationHeader({
   canToggleTools: boolean;
   onExpandTools: () => void;
   onCollapseTools: () => void;
-  leading?: ReactNode;
   trailing?: ReactNode;
 }) {
   return (
     <div className="flex shrink-0 items-center gap-1 border-b border-line bg-canvas px-3 py-1.5">
-      {leading}
       <h2 className="label-mono-md mr-auto pl-1 text-fg-muted">Conversación</h2>
       <button type="button" disabled={!canToggleTools} onClick={onExpandTools} className={TEXT_BUTTON}>
         <ChevronsUpDown aria-hidden className="size-3.5" />

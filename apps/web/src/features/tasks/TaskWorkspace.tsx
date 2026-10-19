@@ -3,18 +3,14 @@ import { type ReactNode, useState } from 'react';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { ConversationPanel } from './ConversationPanel';
 import { ResultPanel } from './ResultPanel';
-import { type AnchorId, TaskAnchors } from './TaskAnchors';
 import { TaskInspector } from './TaskInspector';
-import { InspectorToggles, SidebarToggle } from './TaskPanelToggles';
-import { TaskSidebar } from './TaskSidebar';
+import { InspectorToggles } from './TaskPanelToggles';
 import { isTaskActive, isTaskPlanned } from './TaskStatusBadge';
 import { useInspectorDrawer } from './useInspectorDrawer';
 import { useMastheadHeight } from './useMastheadHeight';
-import { prefersReducedMotion } from './stickToBottom';
-import { SCROLL_PANEL, anchorDomId } from './taskPanelStyles';
+import { SCROLL_PANEL } from './taskPanelStyles';
 
 const PANEL_CHOICES = ['shown', 'hidden'] as const;
-const WIDE_QUERY = '(min-width: 1280px)';
 
 /** Drawer below 1280px (only while open); a fixed-width rail above it unless the user hid it. */
 function inspectorLayout(isDrawerOpen: boolean, isRailShown: boolean) {
@@ -23,16 +19,9 @@ function inspectorLayout(isDrawerOpen: boolean, isRailShown: boolean) {
   return `${drawer} ${rail}`;
 }
 
-function scrollToAnchor(id: AnchorId) {
-  document
-    .getElementById(anchorDomId(id))
-    ?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
-}
-
 /**
- * Viewport-high workspace of the task page (masthead excluded): navigation rail, central column
- * and inspector, each scrolling on its own. Below 1280px the rail becomes a tab row and the
- * inspector a drawer.
+ * Viewport-high workspace of the task page (masthead excluded): central column and inspector,
+ * each scrolling on its own. Below 1280px the inspector becomes a drawer.
  */
 export function TaskWorkspace({
   task,
@@ -47,23 +36,11 @@ export function TaskWorkspace({
   isReadOnly: boolean;
   header: ReactNode;
 }) {
-  const [sidebar, setSidebar] = useStoredChoice('fleet.task.sidebar', PANEL_CHOICES, 'shown');
   const [inspector, setInspector] = useStoredChoice('fleet.task.inspector', PANEL_CHOICES, 'shown');
   const [isExpanded, setExpanded] = useState(false);
   const drawer = useInspectorDrawer();
-  const [active, setActive] = useState<AnchorId>('overview');
   const mastheadHeight = useMastheadHeight();
-  const isSidebarShown = sidebar === 'shown';
   const isInspectorShown = inspector === 'shown';
-
-  const goTo = (id: AnchorId) => {
-    setActive(id);
-    if (id === 'subtasks') {
-      if (window.matchMedia(WIDE_QUERY).matches) setInspector('shown');
-      else drawer.open();
-    } else setExpanded(false);
-    requestAnimationFrame(() => scrollToAnchor(id));
-  };
 
   const canFollowUp = !isReadOnly && !isTaskActive(task.status) && !isTaskPlanned(task.status);
 
@@ -72,30 +49,18 @@ export function TaskWorkspace({
       style={{ height: `calc(100dvh - ${mastheadHeight}px)` }}
       className="-mx-4 -my-8 flex overflow-hidden bg-canvas lg:-mx-8"
     >
-      <aside
-        aria-label="Navegación de la tarea"
-        className={`${isSidebarShown ? 'xl:flex' : ''} hidden w-60 shrink-0 flex-col border-r border-line bg-canvas`}
-      >
-        <TaskSidebar task={task} agentName={agentName} active={active} onSelect={goTo} />
-      </aside>
-
       <section aria-label="Detalle de la tarea" className="flex min-w-0 flex-1 flex-col">
         <div className={isExpanded ? 'hidden' : 'flex max-h-[35%] shrink flex-col md:max-h-[40%]'}>
-          <div className="shrink-0 border-b border-line xl:hidden">
-            <TaskAnchors variant="tabs" active={active} onSelect={goTo} />
-          </div>
           <div
             tabIndex={0}
             role="region"
             aria-label="Cabecera y resultado de la tarea"
             className={`min-h-0 flex-1 space-y-4 p-4 md:p-5 ${SCROLL_PANEL}`}
           >
-            <div id={anchorDomId('overview')}>{header}</div>
+            {header}
             {task.resultSummary && (
-              <div id={anchorDomId('result')}>
-                {/* Collapsed by default so the conversation keeps most of the viewport. */}
-                <ResultPanel key={task.resultSummary} task={task} defaultOpen={false} />
-              </div>
+              // Collapsed by default so the conversation keeps most of the viewport.
+              <ResultPanel key={task.resultSummary} task={task} defaultOpen={false} />
             )}
           </div>
         </div>
@@ -105,12 +70,6 @@ export function TaskWorkspace({
           isExpanded={isExpanded}
           onToggleExpanded={() => setExpanded((expanded) => !expanded)}
           canFollowUp={canFollowUp}
-          leading={
-            <SidebarToggle
-              isShown={isSidebarShown}
-              onToggle={() => setSidebar(isSidebarShown ? 'hidden' : 'shown')}
-            />
-          }
           trailing={
             <InspectorToggles
               isShown={isInspectorShown}
