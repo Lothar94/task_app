@@ -15,7 +15,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger';
 const BUTTON_BASE = `inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`;
 
 const BUTTON_STYLES: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
+  primary: 'bg-accent text-on-accent hover:bg-accent-hover focus-visible:outline-fg',
   secondary: 'border border-line-strong bg-transparent text-fg hover:bg-fg/5 hover:border-fg-subtle',
   danger: 'border border-danger-line bg-danger-soft text-danger hover:bg-danger/20',
 };
