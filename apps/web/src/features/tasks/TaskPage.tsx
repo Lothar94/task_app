@@ -7,6 +7,7 @@ import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { ConversationView } from './ConversationView';
+import { TaskBrief } from './TaskBrief';
 import { ResultPanel } from './ResultPanel';
 import { TaskNumber, taskLabel } from './taskLabel';
 import { FollowUpForm } from './FollowUpForm';
@@ -72,11 +73,20 @@ function TaskMeta({
   );
 }
 
-function ConversationPanel({ taskId, projectId }: { taskId: string; projectId: string }) {
-  const conversation = useConversation(taskId);
-  if (conversation.isPending) return <Loading />;
-  if (conversation.error) return <ErrorMessage error={conversation.error} />;
-  return <ConversationView messages={conversation.data} projectId={projectId} />;
+function ConversationPanel({ task }: { task: TaskDto }) {
+  const conversation = useConversation(task.id);
+  return (
+    <div className="space-y-3">
+      <TaskBrief task={task} />
+      {conversation.isPending ? (
+        <Loading />
+      ) : conversation.error ? (
+        <ErrorMessage error={conversation.error} />
+      ) : (
+        <ConversationView messages={conversation.data} projectId={task.projectId} />
+      )}
+    </div>
+  );
 }
 
 function SubtasksPanel({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
@@ -212,7 +222,9 @@ function TaskView({
       <Breadcrumbs task={task} />
       <PageHeader
         title={task.title}
-        subtitle={<TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />}
+        subtitle={
+          <TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />
+        }
         actions={
           <TaskActions
             task={task}
@@ -226,7 +238,7 @@ function TaskView({
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0 space-y-4">
             <Card title="Conversación">
-              <ConversationPanel taskId={task.id} projectId={task.projectId} />
+              <ConversationPanel task={task} />
             </Card>
             {!isReadOnly && !isActive && !isTaskPlanned(task.status) && (
               <Card title="Continuar la conversación">
