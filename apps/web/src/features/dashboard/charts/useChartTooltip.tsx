@@ -19,7 +19,7 @@ export function useChartTooltip() {
   const tooltip = state && (
     <div
       role="tooltip"
-      className="pointer-events-none absolute z-10 min-w-40 -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded border border-line-strong bg-surface-raised px-3 py-2 text-xs text-fg shadow-float"
+      className="pointer-events-none absolute z-10 min-w-40 -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded-sm border border-line-strong bg-surface-raised px-3 py-2 text-xs text-fg shadow-float"
       style={{ left: state.x, top: state.y }}
     >
       {state.content}

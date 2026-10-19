@@ -58,7 +58,7 @@ export function LabelFields({
               type="button"
               aria-label={`Añadir tag ${tag}`}
               onClick={() => onTagsChange(addTag(tagsText, tag))}
-              className="rounded border border-line-strong px-1.5 py-0.5 text-fg-muted hover:border-accent"
+              className="rounded-sm border border-line-strong px-1.5 py-0.5 text-fg-muted hover:border-accent"
             >
               +{tag}
             </button>

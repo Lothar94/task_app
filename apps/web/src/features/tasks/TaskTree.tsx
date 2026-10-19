@@ -79,7 +79,7 @@ function ToggleButton({ isOpen, onToggle, count }: { isOpen: boolean; onToggle: 
       onClick={onToggle}
       aria-expanded={isOpen}
       aria-label={`${isOpen ? 'Ocultar' : 'Mostrar'} ${count} subtareas`}
-      className={`flex size-6 items-center justify-center rounded text-fg-subtle hover:bg-surface-hover hover:text-fg ${FOCUS_RING}`}
+      className={`flex size-6 items-center justify-center rounded-sm text-fg-subtle hover:bg-surface-hover hover:text-fg ${FOCUS_RING}`}
     >
       <ChevronRight
         aria-hidden
@@ -104,7 +104,7 @@ function TaskRow({ node, depth, projectId, agentNames, compact }: RowProps) {
         </span>
         <Link
           to={`/projects/${projectId}/tasks/${node.id}`}
-          className={`flex min-w-0 items-start gap-2 rounded ${FOCUS_RING}`}
+          className={`flex min-w-0 items-start gap-2 rounded-sm ${FOCUS_RING}`}
         >
           <TaskNumber number={node.number} />
           <span className="min-w-0">

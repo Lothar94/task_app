@@ -44,7 +44,7 @@ export function OutcomeBar({ totals }: { totals: DashboardTotals }) {
       )}
       <ul className="grid grid-cols-3 gap-2">
         {OUTCOMES.map(({ key, label, icon: Icon, color }) => (
-          <li key={key} className="rounded border border-line bg-surface-raised/50 p-2.5">
+          <li key={key} className="rounded-sm border border-line bg-surface-raised/50 p-2.5">
             <p className="label-mono flex items-center gap-1.5 text-fg-subtle">
               <Icon aria-hidden className="size-3.5" style={{ color }} />
               {label}

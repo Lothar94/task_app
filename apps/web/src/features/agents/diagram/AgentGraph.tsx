@@ -88,7 +88,7 @@ function AgentNode(props: {
       <rect
         width={W}
         height={H}
-        rx={8}
+        rx={0}
         strokeWidth={1}
         className={`fill-surface ${isHighlighted ? `stroke-accent ${HALO}` : 'stroke-line-strong'} ${isWorking ? 'motion-safe:animate-pulse' : ''}`}
       />
@@ -97,7 +97,7 @@ function AgentNode(props: {
         y={(H - AVATAR) / 2}
         width={AVATAR}
         height={AVATAR}
-        rx={4}
+        rx={0}
         className="fill-surface-raised stroke-line-strong"
       />
       <text

@@ -27,7 +27,7 @@ function AgentLinks({ agents }: { agents: AgentDto[] }) {
         <li key={agent.id}>
           <Link
             to={`/agents/${agent.id}`}
-            className="flex items-center gap-2 rounded border border-line bg-surface-raised px-2 py-1 text-sm hover:border-line-strong hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="flex items-center gap-2 rounded-sm border border-line bg-surface-raised px-2 py-1 text-sm hover:border-line-strong hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <AgentAvatar name={agent.name} />
             <span>
@@ -45,7 +45,7 @@ function SkillChips({ skills }: { skills: string[] }) {
   return (
     <div className="flex flex-wrap gap-1">
       {skills.map((skill) => (
-        <code key={skill} className="rounded border border-line bg-surface-raised px-2 py-0.5 text-xs">
+        <code key={skill} className="rounded-sm border border-line bg-surface-raised px-2 py-0.5 text-xs">
           {skill}
         </code>
       ))}
@@ -107,7 +107,7 @@ export function AgentDetailPage() {
                 {agent.allowedTools.map((tool) => (
                   <code
                     key={tool}
-                    className="rounded border border-line bg-surface-raised px-2 py-0.5 text-xs"
+                    className="rounded-sm border border-line bg-surface-raised px-2 py-0.5 text-xs"
                   >
                     {tool}
                   </code>
