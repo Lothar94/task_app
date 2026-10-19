@@ -11,7 +11,12 @@ export function TaskBrief({ task }: { task: Pick<TaskDto, 'number' | 'title' | '
       aria-labelledby={titleId}
       className="rounded-lg border border-line-strong bg-surface-raised p-4 shadow-float"
     >
-      <p className="label-mono mb-2 text-accent">Encargo</p>
+      <p className="mb-2 flex flex-wrap items-center gap-2">
+        <span className="label-mono text-accent">Instrucción de proyecto // ENCARGO</span>
+        <span className="rounded-sm border border-line bg-canvas px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+          project_manager
+        </span>
+      </p>
       <h3 id={titleId} className="mb-2 font-semibold text-fg">
         {taskLabel(task.number)}: {task.title}
       </h3>

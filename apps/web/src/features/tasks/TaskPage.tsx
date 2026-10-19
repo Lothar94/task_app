@@ -6,20 +6,15 @@ import { Button, ErrorMessage, Loading } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
-import { ConversationView } from './ConversationView';
-import { TaskBrief } from './TaskBrief';
-import { ResultPanel } from './ResultPanel';
 import { TaskNumber, taskLabel } from './taskLabel';
-import { TaskInspector } from './TaskInspector';
-import { FollowUpForm } from './FollowUpForm';
 import { findNode, subtreeMetrics } from './taskTreeModel';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
+import { TaskWorkspace } from './TaskWorkspace';
 import { TaskEditForm } from './TaskEditForm';
 import { TaskLabels } from './TaskLabels';
 import { existingMilestones, existingTags } from './taskListModel';
 import {
   useCancelTask,
-  useConversation,
   useDequeueTask,
   useEnqueueTask,
   useStartTask,
@@ -86,22 +81,6 @@ function TaskMeta({
       </div>
       <ProposalNote task={task} agentNames={agentNames} detailed />
       <TaskLabels milestone={task.milestone} tags={task.tags} />
-    </div>
-  );
-}
-
-function ConversationPanel({ task, agentName }: { task: TaskDto; agentName: string }) {
-  const conversation = useConversation(task.id);
-  return (
-    <div className="space-y-4">
-      <TaskBrief task={task} />
-      {conversation.isPending ? (
-        <Loading />
-      ) : conversation.error ? (
-        <ErrorMessage error={conversation.error} />
-      ) : (
-        <ConversationView messages={conversation.data} projectId={task.projectId} agentName={agentName} />
-      )}
     </div>
   );
 }
@@ -225,19 +204,22 @@ function Breadcrumbs({ task, projectName }: { task: TaskDto; projectName: string
 
 function TaskHeader({
   task,
+  projectName,
   agentNames,
   actions,
 }: {
   task: TaskDto;
+  projectName: string;
   agentNames: Map<string, string>;
   actions: ReactNode;
 }) {
   return (
-    <header className="mb-6 space-y-3">
+    <header className="space-y-3">
+      <Breadcrumbs task={task} projectName={projectName} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
           <TaskNumber number={task.number} />
-          <h1 className="min-w-0 text-[1.5rem] leading-8 font-semibold tracking-tight [overflow-wrap:anywhere]">
+          <h1 className="min-w-0 text-xl leading-7 font-semibold tracking-tight [overflow-wrap:anywhere] md:text-2xl md:leading-8">
             {task.title}
           </h1>
           <TaskStatusBadge status={task.status} />
@@ -260,37 +242,30 @@ function TaskView({
   agentNames: Map<string, string>;
   isReadOnly: boolean;
 }) {
-  const isActive = isTaskActive(task.status);
   const isRoot = task.parentTaskId === null;
   const [isEditing, setIsEditing] = useState(false);
   return (
     <>
-      <Breadcrumbs task={task} projectName={projectName} />
-      <TaskHeader
+      <TaskWorkspace
         task={task}
+        agentName={agentNames.get(task.agentId) ?? '?'}
         agentNames={agentNames}
-        actions={
-          <TaskActions
+        isReadOnly={isReadOnly}
+        header={
+          <TaskHeader
             task={task}
-            isReadOnly={isReadOnly}
-            onEdit={isRoot && !isReadOnly ? () => setIsEditing(true) : undefined}
+            projectName={projectName}
+            agentNames={agentNames}
+            actions={
+              <TaskActions
+                task={task}
+                isReadOnly={isReadOnly}
+                onEdit={isRoot && !isReadOnly ? () => setIsEditing(true) : undefined}
+              />
+            }
           />
         }
       />
-      <div className="space-y-6">
-        {task.resultSummary && <ResultPanel key={task.resultSummary} task={task} />}
-        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <div className="min-w-0 space-y-4">
-            <ConversationPanel task={task} agentName={agentNames.get(task.agentId) ?? '?'} />
-            {!isReadOnly && !isActive && !isTaskPlanned(task.status) && (
-              <div className="sticky bottom-0 z-10 -mx-1 bg-canvas px-1 pt-2 pb-3">
-                <FollowUpForm taskId={task.id} />
-              </div>
-            )}
-          </div>
-          <TaskInspector task={task} agentNames={agentNames} />
-        </div>
-      </div>
       {isRoot && (
         <Dialog open={isEditing} title="Editar tarea" onClose={() => setIsEditing(false)}>
           <EditTaskDialog task={task} onClose={() => setIsEditing(false)} />

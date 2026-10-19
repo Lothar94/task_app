@@ -37,6 +37,9 @@ export function buildTimeline(messages: ConversationMessageDto[]): TimelineItem[
   return items;
 }
 
+export const toolStepIds = (timeline: TimelineItem[]): string[] =>
+  timeline.flatMap((item) => (item.type === 'tool' ? [item.id] : []));
+
 export const hasDescription = (text: string): boolean => text.trim().length > 0;
 
 export function shortToolName(toolName: string): string {
