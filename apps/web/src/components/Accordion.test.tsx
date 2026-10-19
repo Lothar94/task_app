@@ -29,4 +29,22 @@ describe('Accordion (static render)', () => {
     expect(id).toBeTruthy();
     expect(html).toContain(`id="${id}"`);
   });
+
+  it('is controlled by the open prop, ignoring defaultOpen', () => {
+    const closed = renderToStaticMarkup(
+      <Accordion header="Detalle" defaultOpen open={false}>
+        Contenido
+      </Accordion>,
+    );
+    const opened = renderToStaticMarkup(
+      <Accordion header="Detalle" open>
+        Contenido
+      </Accordion>,
+    );
+
+    expect(closed).toContain('aria-expanded="false"');
+    expect(closed).not.toContain('Contenido');
+    expect(opened).toContain('aria-expanded="true"');
+    expect(opened).toContain('Contenido');
+  });
 });

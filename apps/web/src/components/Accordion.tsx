@@ -20,23 +20,36 @@ interface AccordionProps {
   /** Dim the bar and header text while something is still running. */
   pulseBar?: boolean;
   defaultOpen?: boolean;
+  /** Controlled state: when set, the parent owns it and `onToggle` reports the requested value. */
+  open?: boolean;
+  onToggle?: (open: boolean) => void;
   className?: string;
   bodyClassName?: string;
   children: ReactNode;
 }
 
-/** Collapsible panel: a `button` with aria-expanded/aria-controls toggles the body. */
+/**
+ * Collapsible panel: a `button` with aria-expanded/aria-controls toggles the body.
+ * Uncontrolled by default; pass `open` (+ `onToggle`) to control it from outside.
+ */
 export function Accordion({
   header,
   trailing,
   bar,
   pulseBar = false,
   defaultOpen = false,
+  open,
+  onToggle,
   className = '',
   bodyClassName = '',
   children,
 }: AccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [ownOpen, setOwnOpen] = useState(defaultOpen);
+  const isOpen = open ?? ownOpen;
+  const toggle = () => {
+    onToggle?.(!isOpen);
+    if (open === undefined) setOwnOpen(!isOpen);
+  };
   const bodyId = useId();
   return (
     <div className={`relative min-w-0 overflow-hidden rounded-lg border border-line bg-surface ${className}`}>
@@ -51,7 +64,7 @@ export function Accordion({
           type="button"
           aria-expanded={isOpen}
           aria-controls={bodyId}
-          onClick={() => setIsOpen((open) => !open)}
+          onClick={toggle}
           className={`flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left hover:bg-surface-hover ${FOCUS_RING} focus-visible:-outline-offset-2`}
         >
           <ChevronDown
