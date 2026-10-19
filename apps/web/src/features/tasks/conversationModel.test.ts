@@ -1,6 +1,6 @@
 import type { ConversationMessageDto, MessagePayload } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { buildTimeline, DELEGATE_TOOL, describeDelegation, shortToolName } from './conversationModel';
+import { buildTimeline, DELEGATE_TOOL, describeDelegation, hasDescription, shortToolName } from './conversationModel';
 
 const message = (seq: number, payload: MessagePayload): ConversationMessageDto => ({
   id: `m${seq}`,
@@ -75,5 +75,34 @@ describe('shortToolName', () => {
   it('strips the MCP prefix', () => {
     expect(shortToolName('mcp__fleet__report_result')).toBe('report_result');
     expect(shortToolName('Bash')).toBe('Bash');
+  });
+});
+
+describe('initial prompt detection', () => {
+  const flags = (messages: ConversationMessageDto[]) =>
+    buildTimeline(messages).map((item) => item.type === 'message' && item.isInitialPrompt);
+
+  it('marks only the first user message as the initial prompt', () => {
+    expect(
+      flags([
+        message(1, { kind: 'system', text: 'init' }),
+        message(2, { kind: 'user', text: '# Task 1' }),
+        message(3, { kind: 'assistant_text', text: 'ok' }),
+        message(4, { kind: 'user', text: 'follow-up' }),
+      ]),
+    ).toEqual([false, true, false, false]);
+  });
+
+  it('marks nothing when there are no user messages', () => {
+    expect(flags([message(1, { kind: 'assistant_text', text: 'hi' })])).toEqual([false]);
+    expect(flags([])).toEqual([]);
+  });
+});
+
+describe('hasDescription', () => {
+  it('rejects empty and whitespace-only text', () => {
+    expect(hasDescription('')).toBe(false);
+    expect(hasDescription(' \n\t ')).toBe(false);
+    expect(hasDescription('Do it')).toBe(true);
   });
 });

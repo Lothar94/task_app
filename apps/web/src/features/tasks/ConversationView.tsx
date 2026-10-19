@@ -16,6 +16,13 @@ function MessageBubble({ item }: { item: Extract<TimelineItem, { type: 'message'
   const { payload } = item;
   switch (payload.kind) {
     case 'user':
+      if (item.isInitialPrompt)
+        return (
+          <details className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-sm">
+            <summary className="cursor-pointer text-zinc-400">Prompt enviado al agente</summary>
+            <Markdown className="mt-3">{payload.text}</Markdown>
+          </details>
+        );
       return (
         <div className="rounded-lg border border-indigo-900 bg-indigo-950/40 p-4">
           <p className="mb-2 text-xs font-semibold tracking-wide text-indigo-300 uppercase">Encargo</p>
@@ -116,10 +123,11 @@ export function ConversationView({
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [messages.length]);
 
-  if (messages.length === 0)
-    return <EmptyState>La conversación aparecerá aquí en cuanto el agente empiece.</EmptyState>;
   return (
     <div className="min-w-0 space-y-3">
+      {messages.length === 0 && (
+        <EmptyState>La conversación aparecerá aquí en cuanto el agente empiece.</EmptyState>
+      )}
       {buildTimeline(messages).map((item) =>
         item.type === 'tool' ? (
           <ToolStep key={item.id} item={item} projectId={projectId} />
