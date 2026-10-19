@@ -9,12 +9,15 @@ export type TimelineItem =
       type: 'message';
       id: string;
       payload: Exclude<MessagePayload, Payload<'tool_use'> | Payload<'tool_result'>>;
+      /** True only for the first user message: the prompt the server generated for the agent. */
+      isInitialPrompt: boolean;
     }
   | { type: 'tool'; id: string; call: Payload<'tool_use'>; result: Payload<'tool_result'> | null };
 
 /** Groups each tool call with its result so the conversation reads as a sequence of steps. */
 export function buildTimeline(messages: ConversationMessageDto[]): TimelineItem[] {
   const items: TimelineItem[] = [];
+  let initialPromptSeen = false;
   const toolItems = new Map<string, Extract<TimelineItem, { type: 'tool' }>>();
 
   for (const { id, payload } of messages) {
@@ -26,11 +29,15 @@ export function buildTimeline(messages: ConversationMessageDto[]): TimelineItem[
       const item = toolItems.get(payload.toolUseId);
       if (item) item.result = payload;
     } else {
-      items.push({ type: 'message', id, payload });
+      const isInitialPrompt = payload.kind === 'user' && !initialPromptSeen;
+      if (isInitialPrompt) initialPromptSeen = true;
+      items.push({ type: 'message', id, payload, isInitialPrompt });
     }
   }
   return items;
 }
+
+export const hasDescription = (text: string): boolean => text.trim().length > 0;
 
 export function shortToolName(toolName: string): string {
   return toolName.replace(/^mcp__[^_]+__/, '');
