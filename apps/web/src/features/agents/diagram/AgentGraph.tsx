@@ -1,11 +1,14 @@
 import type { AgentDto } from '@fleet/shared';
 import { useMemo, useState } from 'react';
 import { EmptyState } from '../../../components/ui';
+import { agentInitials } from '../AgentAvatar';
 import { EFFORT_LABELS } from '../agentLabels';
 import { DEFAULT_LAYOUT, type GraphEdge, type GraphNode, layoutAgentGraph } from './agentGraphLayout';
 
 const { nodeWidth: W, nodeHeight: H } = DEFAULT_LAYOUT;
 const BACK_EDGE_BULGE = 48;
+const AVATAR = 36;
+const TEXT_X = 12 + AVATAR + 10;
 
 interface AgentGraphProps {
   agents: AgentDto[];
@@ -45,32 +48,36 @@ function Edge({ edge, nodes, state }: { edge: GraphEdge; nodes: Map<string, Grap
 
 type EdgeState = 'idle' | 'active' | 'dimmed';
 const EDGE_STYLES: Record<EdgeState, string> = {
-  idle: 'stroke-zinc-600',
-  active: 'stroke-indigo-400',
-  dimmed: 'stroke-zinc-700 opacity-30',
+  idle: 'stroke-fg-subtle/60',
+  active: 'stroke-accent',
+  dimmed: 'stroke-fg-subtle/60 opacity-30',
 };
 const MARKER_FILLS: Record<EdgeState, string> = {
-  idle: 'fill-zinc-600',
-  active: 'fill-indigo-400',
-  dimmed: 'fill-zinc-700',
+  idle: 'fill-fg-subtle/60',
+  active: 'fill-accent',
+  dimmed: 'fill-fg-subtle/60',
 };
+
+const HALO = '[filter:drop-shadow(0_0_6px_color-mix(in_srgb,var(--color-accent)_55%,transparent))]';
 
 function AgentNode(props: {
   agent: AgentDto;
   node: GraphNode;
   isWorking: boolean;
+  isActive: boolean;
   isDimmed: boolean;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
 }) {
-  const { agent, node, isWorking, isDimmed, onHover, onSelect } = props;
+  const { agent, node, isWorking, isActive, isDimmed, onHover, onSelect } = props;
+  const isHighlighted = isActive || isWorking;
   return (
     <g
       role="link"
       tabIndex={0}
       aria-label={`${agent.name}, ${agent.role}`}
       transform={`translate(${node.x} ${node.y})`}
-      className={`cursor-pointer outline-none transition-opacity ${isDimmed ? 'opacity-40' : ''}`}
+      className={`cursor-pointer outline-none motion-safe:transition-opacity ${isDimmed ? 'opacity-40' : ''}`}
       onMouseEnter={() => onHover(agent.id)}
       onMouseLeave={() => onHover(null)}
       onFocus={() => onHover(agent.id)}
@@ -78,34 +85,40 @@ function AgentNode(props: {
       onClick={() => onSelect(agent.id)}
       onKeyDown={(event) => event.key === 'Enter' && onSelect(agent.id)}
     >
-      {isWorking && (
-        <rect
-          x={-4}
-          y={-4}
-          width={W + 8}
-          height={H + 8}
-          rx={14}
-          className="animate-pulse fill-none stroke-sky-400"
-          strokeWidth={2}
-        />
-      )}
       <rect
         width={W}
         height={H}
-        rx={10}
-        className="fill-zinc-900 stroke-zinc-700 hover:stroke-indigo-400"
-        strokeWidth={1.5}
+        rx={8}
+        strokeWidth={1}
+        className={`fill-surface ${isHighlighted ? `stroke-accent ${HALO}` : 'stroke-line-strong'} ${isWorking ? 'motion-safe:animate-pulse' : ''}`}
       />
-      <text x={12} y={22} className="fill-zinc-100 text-[13px] font-semibold">
-        {clip(agent.name, 22)}
+      <rect
+        x={12}
+        y={(H - AVATAR) / 2}
+        width={AVATAR}
+        height={AVATAR}
+        rx={4}
+        className="fill-surface-raised stroke-line-strong"
+      />
+      <text
+        x={12 + AVATAR / 2}
+        y={H / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        className="fill-accent font-mono text-[13px] font-semibold"
+      >
+        {agentInitials(agent.name)}
       </text>
-      <text x={12} y={40} className="fill-zinc-400 text-[11px]">
-        {clip(agent.role, 28)}
+      <text x={TEXT_X} y={24} className="fill-fg text-[13px] font-semibold">
+        {clip(agent.name, 20)}
       </text>
-      <text x={12} y={57} className="fill-zinc-500 font-mono text-[10px]">
-        {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
-        {isWorking ? ' · trabajando' : ''}
+      <text x={TEXT_X} y={41} className="fill-fg-muted text-[11px]">
+        {clip(agent.role, 26)}
       </text>
+      <text x={TEXT_X} y={57} className="fill-fg-subtle font-mono text-[10px]">
+        {clip(`${agent.model} · ${EFFORT_LABELS[agent.effort].toLowerCase()}`, 26)}
+      </text>
+      {isWorking && <title>{`${agent.name}: trabajando`}</title>}
     </g>
   );
 }
@@ -168,6 +181,7 @@ export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: Age
                 agent={agent}
                 node={node}
                 isWorking={highlightedIds.has(node.id)}
+                isActive={hoveredId === node.id}
                 isDimmed={hoveredId !== null && hoveredId !== node.id && !neighbours.has(node.id)}
                 onHover={setHoveredId}
                 onSelect={onSelect}
@@ -176,7 +190,7 @@ export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: Age
           })}
         </svg>
       </div>
-      <figcaption className="text-center text-xs text-zinc-500">
+      <figcaption className="text-center text-xs text-fg-subtle">
         Las flechas indican «delega en»; las discontinuas cierran un ciclo. Haz clic en un agente para ver su
         ficha.
       </figcaption>

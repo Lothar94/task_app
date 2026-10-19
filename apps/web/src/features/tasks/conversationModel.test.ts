@@ -1,6 +1,12 @@
 import type { ConversationMessageDto, MessagePayload } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { buildTimeline, DELEGATE_TOOL, describeDelegation, hasDescription, shortToolName } from './conversationModel';
+import {
+  buildTimeline,
+  DELEGATE_TOOL,
+  describeDelegation,
+  hasDescription,
+  shortToolName,
+} from './conversationModel';
 
 const message = (seq: number, payload: MessagePayload): ConversationMessageDto => ({
   id: `m${seq}`,

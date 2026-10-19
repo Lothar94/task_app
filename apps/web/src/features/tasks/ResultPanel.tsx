@@ -1,35 +1,63 @@
 import type { TaskDto, TaskStatus } from '@fleet/shared';
-import { useState } from 'react';
+import { CircleAlert, CircleCheck, CircleSlash, LoaderCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Accordion } from '../../components/Accordion';
 import { Markdown } from '../../components/Markdown';
+import type { ChipTone } from '../../components/ui';
 
-const RESULT_STYLES: Partial<Record<TaskStatus, { label: string; className: string }>> = {
-  completed: { label: 'Resultado', className: 'border-emerald-900 bg-emerald-950/20' },
-  failed: { label: 'La tarea ha fallado', className: 'border-red-900 bg-red-950/30' },
-  cancelled: { label: 'Tarea cancelada', className: 'border-zinc-700 bg-zinc-900/60' },
+interface ResultStyle {
+  label: string;
+  tone: ChipTone;
+  icon: ReactNode;
+  iconClassName: string;
+}
+
+const RESULT_STYLES: Partial<Record<TaskStatus, ResultStyle>> = {
+  completed: {
+    label: 'Resultado de ejecución & entregables',
+    tone: 'success',
+    icon: <CircleCheck aria-hidden className="size-4 shrink-0" />,
+    iconClassName: 'text-success',
+  },
+  failed: {
+    label: 'La tarea ha fallado',
+    tone: 'danger',
+    icon: <CircleAlert aria-hidden className="size-4 shrink-0" />,
+    iconClassName: 'text-danger',
+  },
+  cancelled: {
+    label: 'Tarea cancelada',
+    tone: 'neutral',
+    icon: <CircleSlash aria-hidden className="size-4 shrink-0" />,
+    iconClassName: 'text-fg-subtle',
+  },
 };
-const IN_PROGRESS = { label: 'Resultado provisional', className: 'border-sky-900 bg-sky-950/20' };
+const IN_PROGRESS: ResultStyle = {
+  label: 'Resultado provisional',
+  tone: 'info',
+  icon: <LoaderCircle aria-hidden className="size-4 shrink-0" />,
+  iconClassName: 'text-info',
+};
 
 /**
  * Full-width, collapsible summary of what the agent delivered. It is remounted whenever the
  * summary changes (see the key in TaskView), so a newly generated result always shows up expanded.
  */
 export function ResultPanel({ task }: { task: TaskDto }) {
-  const [isOpen, setIsOpen] = useState(true);
-  const { label, className } = RESULT_STYLES[task.status] ?? IN_PROGRESS;
-
+  const { label, tone, icon, iconClassName } = RESULT_STYLES[task.status] ?? IN_PROGRESS;
   return (
-    <details
-      open={isOpen}
-      onToggle={(event) => setIsOpen(event.currentTarget.open)}
-      className={`min-w-0 rounded-lg border ${className}`}
+    <Accordion
+      defaultOpen
+      bar={tone}
+      bodyClassName="border-t border-line bg-canvas/40 px-5 py-4"
+      header={
+        <>
+          <span className={iconClassName}>{icon}</span>
+          <span className="text-sm font-semibold text-fg">{label}</span>
+        </>
+      }
     >
-      <summary className="flex cursor-pointer items-center justify-between gap-2 px-5 py-3">
-        <span className="text-sm font-semibold text-zinc-200">{label}</span>
-        <span className="text-xs text-zinc-500">{isOpen ? 'Ocultar' : 'Mostrar'}</span>
-      </summary>
-      <div className="border-t border-zinc-800/80 px-5 py-4">
-        <Markdown className="prose-base">{task.resultSummary ?? ''}</Markdown>
-      </div>
-    </details>
+      <Markdown className="prose-base">{task.resultSummary ?? ''}</Markdown>
+    </Accordion>
   );
 }

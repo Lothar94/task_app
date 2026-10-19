@@ -32,7 +32,7 @@ export interface GraphLayout {
 }
 
 export const DEFAULT_LAYOUT: LayoutOptions = {
-  nodeWidth: 184,
+  nodeWidth: 216,
   nodeHeight: 68,
   gapX: 32,
   gapY: 72,

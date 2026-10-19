@@ -1,8 +1,8 @@
 import { type TaskDto, isArchivedProject } from '@fleet/shared';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { Dialog } from '../../components/Dialog';
-import { Button, Card, ErrorMessage, Loading, PageHeader } from '../../components/ui';
+import { Button, ErrorMessage, Loading } from '../../components/ui';
 import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
@@ -10,8 +10,8 @@ import { ConversationView } from './ConversationView';
 import { TaskBrief } from './TaskBrief';
 import { ResultPanel } from './ResultPanel';
 import { TaskNumber, taskLabel } from './taskLabel';
+import { TaskInspector } from './TaskInspector';
 import { FollowUpForm } from './FollowUpForm';
-import { TaskTree } from './TaskTree';
 import { findNode, subtreeMetrics } from './taskTreeModel';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
 import { TaskEditForm } from './TaskEditForm';
@@ -30,6 +30,9 @@ import { ProposalNote } from './ProposalNote';
 import { isTaskActive, isTaskPlanned, TaskStatusBadge } from './TaskStatusBadge';
 import { useProject } from '../projects/projectQueries';
 
+const META_ITEM = 'flex items-baseline gap-1.5';
+const META_KEY = 'text-fg-subtle';
+
 function TaskMetricsSummary({ task }: { task: TaskDto }) {
   const tree = useTaskTree(task.projectId);
   const node = tree.data ? findNode(tree.data, task.id) : undefined;
@@ -37,10 +40,21 @@ function TaskMetricsSummary({ task }: { task: TaskDto }) {
   const total = subtreeMetrics(node);
   const delegated = node.children.length > 0 ? ` (${formatTokens(total.totalTokens)} con subtareas)` : '';
   return (
-    <span className="text-zinc-500" title={`Coste estimado ${formatCost(total.costUsd)}`}>
-      · {formatDuration(node.metrics.durationMs)} trabajando · {formatTokens(node.metrics.totalTokens)} tokens
-      {delegated} · {node.metrics.runs} ejecución{node.metrics.runs === 1 ? '' : 'es'}
-    </span>
+    <>
+      <span className={META_ITEM}>
+        <span className={META_KEY}>Duración:</span>
+        {formatDuration(node.metrics.durationMs)}
+      </span>
+      <span className={META_ITEM} title={`Coste estimado ${formatCost(total.costUsd)}`}>
+        <span className={META_KEY}>Tokens:</span>
+        {formatTokens(node.metrics.totalTokens)}
+        {delegated}
+      </span>
+      <span className={META_ITEM}>
+        <span className={META_KEY}>Ejecuciones:</span>
+        {node.metrics.runs}
+      </span>
+    </>
   );
 }
 
@@ -54,52 +68,41 @@ function TaskMeta({
   agentNames: Map<string, string>;
 }) {
   return (
-    <span className="flex flex-wrap items-center gap-2">
-      <TaskNumber number={task.number} />
-      <TaskStatusBadge status={task.status} />
-      <span>
-        Responsable:{' '}
-        <Link to={`/agents/${task.agentId}`} className="text-indigo-300 hover:underline">
-          {agentName}
-        </Link>
-      </span>
-      {task.startedAt && (
-        <span className="text-zinc-500">· inicio {new Date(task.startedAt).toLocaleString()}</span>
-      )}
-      <TaskMetricsSummary task={task} />
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-xs text-fg-muted">
+        <span className={META_ITEM}>
+          <span className={META_KEY}>Responsable:</span>
+          <Link to={`/agents/${task.agentId}`} className="text-accent hover:underline">
+            {agentName}
+          </Link>
+        </span>
+        {task.startedAt && (
+          <span className={META_ITEM}>
+            <span className={META_KEY}>Inicio:</span>
+            {new Date(task.startedAt).toLocaleString()}
+          </span>
+        )}
+        <TaskMetricsSummary task={task} />
+      </div>
       <ProposalNote task={task} agentNames={agentNames} detailed />
       <TaskLabels milestone={task.milestone} tags={task.tags} />
-    </span>
+    </div>
   );
 }
 
-function ConversationPanel({ task }: { task: TaskDto }) {
+function ConversationPanel({ task, agentName }: { task: TaskDto; agentName: string }) {
   const conversation = useConversation(task.id);
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <TaskBrief task={task} />
       {conversation.isPending ? (
         <Loading />
       ) : conversation.error ? (
         <ErrorMessage error={conversation.error} />
       ) : (
-        <ConversationView messages={conversation.data} projectId={task.projectId} />
+        <ConversationView messages={conversation.data} projectId={task.projectId} agentName={agentName} />
       )}
     </div>
-  );
-}
-
-function SubtasksPanel({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
-  const tree = useTaskTree(task.projectId);
-  const subtasks = tree.data ? (findNode(tree.data, task.id)?.children ?? []) : [];
-  return (
-    <Card title="Subtareas delegadas">
-      {subtasks.length === 0 ? (
-        <p className="text-sm text-zinc-500">Ninguna.</p>
-      ) : (
-        <TaskTree projectId={task.projectId} nodes={subtasks} agentNames={agentNames} compact />
-      )}
-    </Card>
   );
 }
 
@@ -138,7 +141,7 @@ function CancelTaskButton({ taskId }: { taskId: string }) {
 function ActionError({ error }: { error: unknown }) {
   if (!error) return null;
   return (
-    <span role="alert" className="self-center text-sm text-red-300">
+    <span role="alert" className="self-center text-sm text-danger">
       {error instanceof Error ? error.message : String(error)}
     </span>
   );
@@ -184,33 +187,76 @@ function EditTaskDialog({ task, onClose }: { task: TaskDto; onClose: () => void 
   );
 }
 
+function BreadcrumbSeparator() {
+  return <span aria-hidden>/</span>;
+}
+
 function ParentTaskLink({ projectId, parentTaskId }: { projectId: string; parentTaskId: string }) {
   const parent = useTask(parentTaskId);
   return (
-    <Link to={`/projects/${projectId}/tasks/${parentTaskId}`} className="hover:text-zinc-300">
-      · Delegada desde{' '}
-      {parent.data ? `${taskLabel(parent.data.number)}: ${parent.data.title}` : 'la tarea padre'}
-    </Link>
+    <>
+      <BreadcrumbSeparator />
+      <Link to={`/projects/${projectId}/tasks/${parentTaskId}`} className="hover:text-fg">
+        Delegada desde{' '}
+        {parent.data ? `${taskLabel(parent.data.number)}: ${parent.data.title}` : 'la tarea padre'}
+      </Link>
+    </>
   );
 }
 
-function Breadcrumbs({ task }: { task: TaskDto }) {
+function Breadcrumbs({ task, projectName }: { task: TaskDto; projectName: string }) {
   return (
-    <nav className="mb-3 flex gap-2 text-sm text-zinc-500">
-      <Link to={`/projects/${task.projectId}`} className="hover:text-zinc-300">
-        ← Proyecto
+    <nav aria-label="Ruta de navegación" className="label-mono-md mb-3 flex flex-wrap gap-2 text-fg-subtle">
+      <Link to="/projects" className="hover:text-fg">
+        ← Proyectos
+      </Link>
+      <BreadcrumbSeparator />
+      <Link to={`/projects/${task.projectId}`} className="hover:text-fg">
+        {projectName}
       </Link>
       {task.parentTaskId && <ParentTaskLink projectId={task.projectId} parentTaskId={task.parentTaskId} />}
+      <BreadcrumbSeparator />
+      <span aria-current="page" className="text-fg">
+        {taskLabel(task.number)}
+      </span>
     </nav>
+  );
+}
+
+function TaskHeader({
+  task,
+  agentNames,
+  actions,
+}: {
+  task: TaskDto;
+  agentNames: Map<string, string>;
+  actions: ReactNode;
+}) {
+  return (
+    <header className="mb-6 space-y-3">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+          <TaskNumber number={task.number} />
+          <h1 className="min-w-0 text-[1.5rem] leading-8 font-semibold tracking-tight [overflow-wrap:anywhere]">
+            {task.title}
+          </h1>
+          <TaskStatusBadge status={task.status} />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+      </div>
+      <TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />
+    </header>
   );
 }
 
 function TaskView({
   task,
+  projectName,
   agentNames,
   isReadOnly,
 }: {
   task: TaskDto;
+  projectName: string;
   agentNames: Map<string, string>;
   isReadOnly: boolean;
 }) {
@@ -219,12 +265,10 @@ function TaskView({
   const [isEditing, setIsEditing] = useState(false);
   return (
     <>
-      <Breadcrumbs task={task} />
-      <PageHeader
-        title={task.title}
-        subtitle={
-          <TaskMeta task={task} agentName={agentNames.get(task.agentId) ?? '?'} agentNames={agentNames} />
-        }
+      <Breadcrumbs task={task} projectName={projectName} />
+      <TaskHeader
+        task={task}
+        agentNames={agentNames}
         actions={
           <TaskActions
             task={task}
@@ -237,18 +281,14 @@ function TaskView({
         {task.resultSummary && <ResultPanel key={task.resultSummary} task={task} />}
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0 space-y-4">
-            <Card title="Conversación">
-              <ConversationPanel task={task} />
-            </Card>
+            <ConversationPanel task={task} agentName={agentNames.get(task.agentId) ?? '?'} />
             {!isReadOnly && !isActive && !isTaskPlanned(task.status) && (
-              <Card title="Continuar la conversación">
+              <div className="sticky bottom-0 z-10 -mx-1 bg-canvas px-1 pt-2 pb-3">
                 <FollowUpForm taskId={task.id} />
-              </Card>
+              </div>
             )}
           </div>
-          <aside className="min-w-0 xl:sticky xl:top-4">
-            <SubtasksPanel task={task} agentNames={agentNames} />
-          </aside>
+          <TaskInspector task={task} agentNames={agentNames} />
         </div>
       </div>
       {isRoot && (
@@ -274,6 +314,7 @@ export function TaskPage() {
   return (
     <TaskView
       task={task.data}
+      projectName={project.data.name}
       isReadOnly={isArchivedProject(project.data)}
       agentNames={new Map(agents.data.map((agent) => [agent.id, agent.name]))}
     />
