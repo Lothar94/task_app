@@ -85,14 +85,14 @@ function StatusCell({ telemetry }: { telemetry: ProjectTelemetry }) {
   if (counts.total === 0) return <p className="font-mono text-xs text-fg-subtle">Sin tareas</p>;
   return (
     <div className="space-y-1 font-mono text-xs">
-      <p className="flex max-w-[9rem] items-center justify-between text-fg-subtle">
+      <p className="flex max-w-[11rem] items-center justify-between gap-2 text-fg-subtle">
         <span>{plural(counts.total, 'tarea', 'tareas')}</span>
         {successRate !== null && <span className="text-success">{formatPercent(successRate)} éxito</span>}
       </p>
       <div
         role="img"
         aria-label={`${formatPercent(completedPercent / 100)} completadas`}
-        className="flex h-1.5 w-full max-w-[9rem] overflow-hidden bg-surface-hover"
+        className="flex h-1.5 w-full max-w-[11rem] overflow-hidden bg-surface-hover"
       >
         <span className="h-full bg-success" style={{ width: `${completedPercent}%` }} />
         <span className="h-full bg-warning" style={{ width: `${failedPercent}%` }} />

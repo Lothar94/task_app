@@ -53,6 +53,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
   const max = niceMax(Math.max(0, ...days.map((day) => day.totalTokens)));
   const ticks = [max, max / 2, 0];
   const peak = peakDay(days);
+  const gapClass = days.length > 14 ? 'gap-0.5' : 'gap-1 sm:gap-2';
   const labelEvery = Math.max(1, Math.ceil(days.length / 8));
 
   return (
@@ -77,7 +78,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
               style={{ top: `${(1 - tick / max) * 100}%` }}
             />
           ))}
-          <div className="absolute inset-0 flex items-end gap-1 px-1 sm:gap-2 sm:px-2">
+          <div className={`absolute inset-0 flex items-end ${gapClass} px-1 sm:px-2`}>
             {days.map((day) => (
               <div
                 key={day.date}
@@ -98,7 +99,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
           </div>
         </div>
       </div>
-      <div className="ml-[4rem] flex gap-1 px-1 pt-1 sm:gap-2 sm:px-2">
+      <div className={`ml-[4rem] flex ${gapClass} px-1 pt-1 sm:px-2`}>
         {days.map((day, index) => (
           <span
             key={day.date}

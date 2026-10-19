@@ -8,7 +8,7 @@ import { averageRunMs, cacheShare, errorRate } from './dashboardModel';
 /** Mono key/value row for the tile footer; rendered only when the value exists. */
 function Metric({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <p className="flex justify-between gap-2">
+    <p className="flex justify-between gap-2 whitespace-nowrap">
       <span>{label}</span>
       <span className="text-fg-muted">{value}</span>
     </p>
@@ -17,16 +17,16 @@ function Metric({ label, value }: { label: string; value: ReactNode }) {
 
 function SuccessBar({ rate }: { rate: number | null }) {
   return (
-    <div className="space-y-1.5">
-      <div
+    <>
+      <span
         role="img"
         aria-label={`Tasa de éxito ${formatPercent(rate)}`}
-        className="h-1.5 w-full bg-surface-hover"
+        className="mb-1.5 block h-1.5 w-full bg-surface-hover"
       >
-        <div className="h-full bg-[var(--status-good)]" style={{ width: `${(rate ?? 0) * 100}%` }} />
-      </div>
-      <p>completadas / (completadas + fallidas)</p>
-    </div>
+        <span className="block h-full bg-[var(--status-good)]" style={{ width: `${(rate ?? 0) * 100}%` }} />
+      </span>
+      completadas / (completadas + fallidas)
+    </>
   );
 }
 
@@ -76,7 +76,7 @@ export function Headline({ totals }: { totals: DashboardTotals }) {
         icon={<Clock />}
         value={formatDuration(totals.agentTimeMs)}
         detail={`${totals.runs} ejecuciones`}
-        footer={perRun !== null && <Metric label="Promedio/ejecución" value={formatDuration(perRun)} />}
+        footer={perRun !== null && <Metric label="Prom./ejecución" value={formatDuration(perRun)} />}
       />
     </div>
   );
