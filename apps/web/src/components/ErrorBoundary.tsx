@@ -20,9 +20,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBound
   override render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div role="alert" className="space-y-3 rounded-lg border border-red-900 bg-red-950/40 p-6">
-        <h2 className="font-semibold text-red-300">Algo ha fallado al mostrar esta vista</h2>
-        <pre className="font-mono text-xs whitespace-pre-wrap text-red-200/80">
+      <div role="alert" className="space-y-3 rounded-lg border border-danger-line bg-danger-soft p-6">
+        <h2 className="font-semibold text-danger">Algo ha fallado al mostrar esta vista</h2>
+        <pre className="font-mono text-xs whitespace-pre-wrap text-danger/80">
           {this.state.error.message}
         </pre>
         <Button variant="secondary" onClick={() => this.setState({ error: null })}>

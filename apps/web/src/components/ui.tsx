@@ -246,7 +246,7 @@ export function SegmentedControl<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex gap-1 border-b border-line">
+    <div role="radiogroup" aria-label={label} className="inline-flex items-center rounded border border-line bg-surface p-0.5">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -256,11 +256,11 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
-            className={`-mb-px flex items-center gap-1.5 border-b px-3 py-1.5 text-sm transition-colors ${FOCUS_RING} ${selected ? 'border-accent font-medium text-accent' : 'border-transparent text-fg-subtle hover:text-fg'}`}
+            className={`flex items-center gap-1.5 rounded-sm px-3 py-1 font-mono text-xs transition-colors ${FOCUS_RING} ${selected ? 'bg-surface-hover font-medium text-accent' : 'text-fg-subtle hover:text-fg'}`}
           >
             {option.label}
             {option.count !== undefined && (
-              <span className="rounded bg-surface-raised px-1 font-mono text-[0.6875rem] text-fg-muted">
+              <span className={`rounded px-1 font-mono text-[0.625rem] ${selected ? 'bg-accent/20 text-accent' : 'text-fg-subtle'}`}>
                 {option.count}
               </span>
             )}
