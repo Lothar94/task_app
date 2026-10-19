@@ -13,6 +13,8 @@ const TEXT_X = 12 + AVATAR + 10;
 interface AgentGraphProps {
   agents: AgentDto[];
   highlightedIds?: Set<string>;
+  /** When defined the nodes behave as toggle buttons and the selected one gets a halo. */
+  selectedId?: string | null;
   onSelect: (agentId: string) => void;
 }
 
@@ -66,14 +68,18 @@ function AgentNode(props: {
   isWorking: boolean;
   isActive: boolean;
   isDimmed: boolean;
+  selectable: boolean;
+  isSelected: boolean;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
 }) {
-  const { agent, node, isWorking, isActive, isDimmed, onHover, onSelect } = props;
-  const isHighlighted = isActive || isWorking;
+  const { agent, node, isWorking, isActive, isDimmed, selectable, isSelected, onHover, onSelect } = props;
+  const isHighlighted = isActive || isWorking || isSelected;
   return (
     <g
-      role="link"
+      data-agent-id={agent.id}
+      role={selectable ? 'button' : 'link'}
+      aria-pressed={selectable ? isSelected : undefined}
       tabIndex={0}
       aria-label={`${agent.name}, ${agent.role}`}
       transform={`translate(${node.x} ${node.y})`}
@@ -83,7 +89,11 @@ function AgentNode(props: {
       onFocus={() => onHover(agent.id)}
       onBlur={() => onHover(null)}
       onClick={() => onSelect(agent.id)}
-      onKeyDown={(event) => event.key === 'Enter' && onSelect(agent.id)}
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        onSelect(agent.id);
+      }}
     >
       <rect
         width={W}
@@ -145,7 +155,7 @@ function ArrowMarkers() {
 }
 
 /** Diagram of the fleet: each arrow means "delegates to". */
-export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: AgentGraphProps) {
+export function AgentGraph({ agents, highlightedIds = new Set(), selectedId, onSelect }: AgentGraphProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const layout = useMemo(() => layoutAgentGraph(agents), [agents]);
   const nodesById = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
@@ -159,7 +169,11 @@ export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: Age
     !hoveredId ? 'idle' : touchesHovered(edge) ? 'active' : 'dimmed';
 
   return (
-    <figure className="space-y-2">
+    <figure className="space-y-4">
+      <figcaption className="font-mono text-xs text-fg-subtle">
+        Las flechas indican «delega en»; las discontinuas cierran un ciclo. Haz clic en un agente para ver su
+        ficha.
+      </figcaption>
       <div className="overflow-x-auto">
         <svg
           viewBox={`0 0 ${layout.width + BACK_EDGE_BULGE} ${layout.height}`}
@@ -182,6 +196,8 @@ export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: Age
                 node={node}
                 isWorking={highlightedIds.has(node.id)}
                 isActive={hoveredId === node.id}
+                selectable={selectedId !== undefined}
+                isSelected={selectedId === node.id}
                 isDimmed={hoveredId !== null && hoveredId !== node.id && !neighbours.has(node.id)}
                 onHover={setHoveredId}
                 onSelect={onSelect}
@@ -190,10 +206,6 @@ export function AgentGraph({ agents, highlightedIds = new Set(), onSelect }: Age
           })}
         </svg>
       </div>
-      <figcaption className="text-center text-xs text-fg-subtle">
-        Las flechas indican «delega en»; las discontinuas cierran un ciclo. Haz clic en un agente para ver su
-        ficha.
-      </figcaption>
     </figure>
   );
 }
