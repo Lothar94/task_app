@@ -1,22 +1,38 @@
 import type { TaskDto, TaskNodeDto } from '@fleet/shared';
-import { CornerDownRight, PanelRight } from 'lucide-react';
+import { CornerDownRight, PanelRight, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
+import { Accordion } from '../../components/Accordion';
+import { IconButton } from '../../components/ui';
 import { formatDuration, formatTokens } from '../../lib/format';
 import { TaskStatusBadge } from './TaskStatusBadge';
 import { taskLabel } from './taskLabel';
+import { SCROLL_PANEL, anchorDomId } from './taskPanelStyles';
 import { useTaskTree } from './taskQueries';
 import { findNode } from './taskTreeModel';
 
-function InspectorSection({ title, meta, children }: { title: string; meta?: string; children: ReactNode }) {
+function InspectorSection({
+  title,
+  meta,
+  anchor,
+  children,
+}: {
+  title: string;
+  meta?: string;
+  anchor?: string;
+  children: ReactNode;
+}) {
   return (
-    <section className="min-w-0 rounded-lg border border-line bg-surface p-3">
-      <header className="label-mono mb-3 flex items-center justify-between gap-2 text-fg-muted">
-        <h3>{title}</h3>
-        {meta && <span className="text-fg-subtle">{meta}</span>}
-      </header>
-      {children}
-    </section>
+    <div id={anchor && anchorDomId(anchor)}>
+      <Accordion
+        defaultOpen
+        header={<h3 className="label-mono text-fg-muted">{title}</h3>}
+        trailing={meta && <span className="label-mono text-fg-subtle">{meta}</span>}
+        bodyClassName="border-t border-line p-3"
+      >
+        {children}
+      </Accordion>
+    </div>
   );
 }
 
@@ -77,39 +93,61 @@ function HierarchyNode({
   );
 }
 
-/** Right rail of the task page: delegated subtasks and the agent hierarchy. */
-export function TaskInspector({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
+/** Right rail of the task page: delegated subtasks and the agent hierarchy, scrolling on their own. */
+export function TaskInspector({
+  task,
+  agentNames,
+  onClose,
+}: {
+  task: TaskDto;
+  agentNames: Map<string, string>;
+  /** Only set when the inspector is shown as a drawer. */
+  onClose?: () => void;
+}) {
   const tree = useTaskTree(task.projectId);
   const node = tree.data ? findNode(tree.data, task.id) : undefined;
   const subtasks = node?.children ?? [];
   const done = subtasks.filter((subtask) => subtask.status === 'completed').length;
   return (
-    <aside aria-label="Inspector de tarea" className="min-w-0 space-y-3 xl:sticky xl:top-4">
-      <h2 className="label-mono-md flex items-center gap-2 text-fg-muted">
-        <PanelRight aria-hidden className="size-4" />
-        Inspector de tarea
-      </h2>
-      <InspectorSection
-        title="Subtareas delegadas"
-        meta={subtasks.length > 0 ? `${done}/${subtasks.length} listas` : undefined}
-      >
-        {subtasks.length === 0 ? (
-          <p className="text-sm text-fg-subtle">Ninguna.</p>
-        ) : (
-          <ul className="space-y-2">
-            {subtasks.map((subtask) => (
-              <SubtaskCard key={subtask.id} node={subtask} agentNames={agentNames} />
-            ))}
-          </ul>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex shrink-0 items-center gap-2 border-b border-line px-4 py-2.5">
+        <PanelRight aria-hidden className="size-4 text-fg-muted" />
+        <h2 className="label-mono-md mr-auto text-fg-muted">Inspector de tarea</h2>
+        {onClose && (
+          <IconButton label="Cerrar inspector" onClick={onClose}>
+            <X aria-hidden className="size-4" />
+          </IconButton>
         )}
-      </InspectorSection>
-      {node && subtasks.length > 0 && (
-        <InspectorSection title="Jerarquía">
-          <ul>
-            <HierarchyNode node={node} agentNames={agentNames} depth={0} />
-          </ul>
+      </div>
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Contenido del inspector"
+        className={`min-h-0 flex-1 space-y-3 p-4 ${SCROLL_PANEL}`}
+      >
+        <InspectorSection
+          title="Subtareas delegadas"
+          anchor="subtasks"
+          meta={subtasks.length > 0 ? `${done}/${subtasks.length} listas` : undefined}
+        >
+          {subtasks.length === 0 ? (
+            <p className="text-sm text-fg-subtle">Ninguna.</p>
+          ) : (
+            <ul className="space-y-2">
+              {subtasks.map((subtask) => (
+                <SubtaskCard key={subtask.id} node={subtask} agentNames={agentNames} />
+              ))}
+            </ul>
+          )}
         </InspectorSection>
-      )}
-    </aside>
+        {node && subtasks.length > 0 && (
+          <InspectorSection title="Jerarquía">
+            <ul>
+              <HierarchyNode node={node} agentNames={agentNames} depth={0} />
+            </ul>
+          </InspectorSection>
+        )}
+      </div>
+    </div>
   );
 }

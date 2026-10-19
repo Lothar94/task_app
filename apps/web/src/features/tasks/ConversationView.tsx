@@ -1,6 +1,6 @@
 import type { ConversationMessageDto } from '@fleet/shared';
-import { Bot, ChevronRight, User } from 'lucide-react';
-import { type ReactNode, useEffect, useRef } from 'react';
+import { Bot, ChevronRight, Cpu, User } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Accordion } from '../../components/Accordion';
 import { Markdown } from '../../components/Markdown';
@@ -68,7 +68,12 @@ function MessageBubble({ item, time, agentName }: { item: MessageItem; time: str
         <ChatRow avatar={<User />}>
           <div className="rounded-lg border border-line-strong bg-surface-raised p-4">
             <div className="mb-2 flex items-baseline justify-between gap-2">
-              <p className="label-mono text-accent">Encargo</p>
+              <p className="flex flex-wrap items-center gap-2">
+                <span className="label-mono text-accent">Instrucción de proyecto // ENCARGO</span>
+                <span className="rounded-sm border border-line bg-canvas px-1.5 py-0.5 font-mono text-xs text-fg-muted">
+                  project_manager
+                </span>
+              </p>
               {time && <time className="font-mono text-xs text-fg-subtle">{time}</time>}
             </div>
             <Markdown>{payload.text}</Markdown>
@@ -84,7 +89,8 @@ function MessageBubble({ item, time, agentName }: { item: MessageItem; time: str
       );
     case 'system':
       return (
-        <p className="rounded-sm border border-line bg-surface px-3 py-1.5 font-mono text-xs text-fg-subtle">
+        <p className="flex items-center gap-2 border border-line bg-surface px-3 py-1.5 font-mono text-xs text-fg-subtle [overflow-wrap:anywhere]">
+          <Cpu aria-hidden className="size-3.5 shrink-0" />
           {payload.text}
         </p>
       );
@@ -137,10 +143,22 @@ function DelegationLink({ item, projectId }: { item: ToolItem; projectId: string
   );
 }
 
-function ToolStep({ item, projectId }: { item: ToolItem; projectId: string }) {
+function ToolStep({
+  item,
+  projectId,
+  open,
+  onToggle,
+}: {
+  item: ToolItem;
+  projectId: string;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+}) {
   const isDelegation = describeDelegation(item.call, item.result) !== null;
   return (
     <Accordion
+      open={open}
+      onToggle={onToggle}
       bar={toolTone(item)}
       pulseBar={!item.result}
       header={<ToolHeader item={item} />}
@@ -175,15 +193,15 @@ export function ConversationView({
   messages,
   projectId,
   agentName,
+  openTools,
+  onToolToggle,
 }: {
   messages: ConversationMessageDto[];
   projectId: string;
   agentName: string;
+  openTools: ReadonlySet<string>;
+  onToolToggle: (toolId: string, open: boolean) => void;
 }) {
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [messages.length]);
   const createdAt = new Map(messages.map((message) => [message.id, message.createdAt]));
 
   return (
@@ -193,7 +211,13 @@ export function ConversationView({
       )}
       {buildTimeline(messages).map((item) =>
         item.type === 'tool' ? (
-          <ToolStep key={item.id} item={item} projectId={projectId} />
+          <ToolStep
+            key={item.id}
+            item={item}
+            projectId={projectId}
+            open={openTools.has(item.id)}
+            onToggle={(open) => onToolToggle(item.id, open)}
+          />
         ) : (
           <MessageBubble
             key={item.id}
@@ -203,7 +227,6 @@ export function ConversationView({
           />
         ),
       )}
-      <div ref={endRef} />
     </div>
   );
 }

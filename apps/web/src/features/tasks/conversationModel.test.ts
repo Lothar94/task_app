@@ -2,6 +2,7 @@ import type { ConversationMessageDto, MessagePayload } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
 import {
   buildTimeline,
+  toolStepIds,
   DELEGATE_TOOL,
   describeDelegation,
   hasDescription,
@@ -110,5 +111,17 @@ describe('hasDescription', () => {
     expect(hasDescription('')).toBe(false);
     expect(hasDescription(' \n\t ')).toBe(false);
     expect(hasDescription('Do it')).toBe(true);
+  });
+});
+
+describe('toolStepIds', () => {
+  it('lists only tool steps, in order', () => {
+    const timeline = buildTimeline([
+      { id: 'm1', createdAt: '', payload: { kind: 'assistant_text', text: 'hola' } },
+      { id: 't1', createdAt: '', payload: { kind: 'tool_use', toolUseId: 'a', toolName: 'Bash', input: {} } },
+      { id: 't2', createdAt: '', payload: { kind: 'tool_use', toolUseId: 'b', toolName: 'Read', input: {} } },
+    ] as never);
+
+    expect(toolStepIds(timeline)).toEqual(['t1', 't2']);
   });
 });
