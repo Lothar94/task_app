@@ -14,7 +14,7 @@ describe('dashboard model', () => {
       cacheReadTokens: 50,
     });
     expect(segments.map((s) => s.percent)).toEqual([10, 10, 30, 50]);
-    expect(segments.map((s) => s.color)).toEqual(['#8083ff', '#ffb95f', '#4edea3', '#ca8100']);
+    expect(segments.map((s) => s.color)).toEqual(['var(--usage-input)', 'var(--usage-output)', 'var(--usage-cache-write)', 'var(--usage-cache-read)']);
   });
 
   it('omits token kinds without usage and always adds up to 100%', () => {
