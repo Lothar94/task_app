@@ -21,10 +21,10 @@ export function OutcomeBar({ totals }: { totals: DashboardTotals }) {
       ) : (
         <div data-chart className="relative" onMouseLeave={hide}>
           <div className="flex h-3 gap-[2px]">
-            {OUTCOMES.filter((outcome) => totals[outcome.key] > 0).map((outcome, index, visible) => (
+            {OUTCOMES.filter((outcome) => totals[outcome.key] > 0).map((outcome) => (
               <span
                 key={outcome.key}
-                className={`h-full min-w-[4px] ${index === 0 ? 'rounded-l-[2px]' : ''} ${index === visible.length - 1 ? 'rounded-r-[2px]' : ''}`}
+                className="h-full min-w-[4px]"
                 style={{ flexGrow: totals[outcome.key], background: outcome.color }}
                 onMouseMove={(event) =>
                   show(
