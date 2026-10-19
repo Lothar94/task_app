@@ -7,32 +7,20 @@ import { IconButton } from '../../components/ui';
 import { formatDuration, formatTokens } from '../../lib/format';
 import { TaskStatusBadge } from './TaskStatusBadge';
 import { taskLabel } from './taskLabel';
-import { SCROLL_PANEL, anchorDomId } from './taskPanelStyles';
+import { SCROLL_PANEL } from './taskPanelStyles';
 import { useTaskTree } from './taskQueries';
 import { findNode } from './taskTreeModel';
 
-function InspectorSection({
-  title,
-  meta,
-  anchor,
-  children,
-}: {
-  title: string;
-  meta?: string;
-  anchor?: string;
-  children: ReactNode;
-}) {
+function InspectorSection({ title, meta, children }: { title: string; meta?: string; children: ReactNode }) {
   return (
-    <div id={anchor && anchorDomId(anchor)}>
-      <Accordion
-        defaultOpen
-        header={<h3 className="label-mono text-fg-muted">{title}</h3>}
-        trailing={meta && <span className="label-mono text-fg-subtle">{meta}</span>}
-        bodyClassName="border-t border-line p-3"
-      >
-        {children}
-      </Accordion>
-    </div>
+    <Accordion
+      defaultOpen
+      header={<h3 className="label-mono text-fg-muted">{title}</h3>}
+      trailing={meta && <span className="label-mono text-fg-subtle">{meta}</span>}
+      bodyClassName="border-t border-line p-3"
+    >
+      {children}
+    </Accordion>
   );
 }
 
@@ -127,7 +115,6 @@ export function TaskInspector({
       >
         <InspectorSection
           title="Subtareas delegadas"
-          anchor="subtasks"
           meta={subtasks.length > 0 ? `${done}/${subtasks.length} listas` : undefined}
         >
           {subtasks.length === 0 ? (
