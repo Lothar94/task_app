@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Fleet // Proyectos</title>
+<!-- Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#3e2400",
+            "surface-container-low": "#1a1b22",
+            "surface-container": "#1e1f26",
+            "on-error-container": "#ffdad6",
+            "on-background": "#e3e1ec",
+            "outline-variant": "#464554",
+            "surface-bright": "#383941",
+            "inverse-on-surface": "#2f3038",
+            "on-secondary-fixed": "#002113",
+            "primary-fixed": "#e1e0ff",
+            "surface": "#12131a",
+            "on-primary": "#1000a9",
+            "tertiary-fixed": "#ffddb8",
+            "on-tertiary-fixed": "#2a1700",
+            "surface-dim": "#12131a",
+            "tertiary-container": "#ca8100",
+            "outline": "#908fa0",
+            "surface-tint": "#c0c1ff",
+            "tertiary": "#ffb95f",
+            "inverse-primary": "#494bd6",
+            "surface-container-highest": "#33343c",
+            "secondary-fixed-dim": "#4edea3",
+            "on-primary-container": "#0d0096",
+            "background": "#12131a",
+            "on-surface": "#e3e1ec",
+            "tertiary-fixed-dim": "#ffb95f",
+            "on-secondary-fixed-variant": "#005236",
+            "error-container": "#93000a",
+            "secondary-container": "#00a572",
+            "on-surface-variant": "#c7c4d7",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-error": "#690005",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#07006c",
+            "inverse-surface": "#e3e1ec",
+            "on-secondary-container": "#00311f",
+            "secondary-fixed": "#6ffbbe",
+            "surface-variant": "#33343c",
+            "secondary": "#4edea3",
+            "on-secondary": "#003824",
+            "surface-container-high": "#292931",
+            "on-primary-fixed-variant": "#2f2ebe",
+            "on-tertiary": "#472a00",
+            "surface-container-lowest": "#0d0e15",
+            "primary": "#c0c1ff",
+            "primary-fixed-dim": "#c0c1ff",
+            "primary-container": "#8083ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-compact": "0.5rem",
+            "gutter": "1rem",
+            "margin": "1.5rem",
+            "space-md": "0.75rem",
+            "space-xs": "0.25rem",
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem"
+          },
+          "fontFamily": {
+            "label-mono-md": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "body-md": ["Geist"],
+            "headline-md": ["Geist"],
+            "label-mono-sm": ["JetBrains Mono"],
+            "headline-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "body-sm": ["Geist"],
+            "label-mono-xs": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "label-mono-md": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
+            "body-lg": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "fontWeight": "400" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
+            "label-mono-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
+            "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "600" }],
+            "headline-sm": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "600" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }],
+            "label-mono-xs": ["0.6875rem", { "lineHeight": "0.875rem", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Obsidian Terminal Micro-scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d0e15;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #292931;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #464554;
+    }
+
+    .pulse-dot {
+      box-shadow: 0 0 0 0 rgba(78, 222, 163, 0.7);
+      animation: pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+    @keyframes pulse {
+      to {
+        box-shadow: 0 0 0 6px rgba(78, 222, 163, 0);
+      }
+    }
+
+    .active-card-glow {
+      box-shadow: inset 0 0 0 1px rgba(192, 193, 255, 0.25), 0 0 20px -8px rgba(128, 131, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary font-body-md overflow-x-hidden">
+<!-- ================= TOP APP BAR ================= -->
+<header class="flex justify-between items-center w-full px-4 border-b border-outline-variant/20 sticky top-0 z-50 bg-surface-container-lowest docked full-width top-0 h-[52px]">
+<!-- Left Section: Brand & Workspace Switcher -->
+<div class="flex items-center gap-3">
+<!-- Brand Logo / Glyph -->
+<a class="flex items-center gap-2 group" href="#">
+<span class="w-3.5 h-3.5 rotate-45 bg-primary rounded-[1px] inline-block shadow-[0_0_8px_rgba(192,193,255,0.4)] group-hover:scale-105 transition-transform"></span>
+<span class="text-headline-sm font-headline-sm font-semibold tracking-tight text-on-surface">Agent Fleet</span>
+</a>
+<!-- Divider -->
+<span class="text-outline-variant/40 font-mono text-xs">/</span>
+<!-- Workspace Selector Dropdown Trigger -->
+<button class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 text-on-surface transition-colors duration-150">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-label-mono-sm text-label-mono-sm font-medium">Lothar's lab</span>
+<span class="material-symbols-outlined text-[16px] text-outline">unfold_more</span>
+</button>
+<!-- Main Navigation Links -->
+<nav class="hidden md:flex items-center gap-1 ml-3 border-l border-outline-variant/30 pl-4 h-[52px]">
+<!-- Proyectos (ACTIVE according to page context) -->
+<a class="border-b border-primary text-primary font-medium py-3.5 px-3 font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 transition-colors" href="#proyectos">
+<span class="material-symbols-outlined text-[15px]" data-icon="folder_open">folder_open</span>
+<span>Proyectos</span>
+<span class="ml-1 text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary font-mono font-bold">4</span>
+</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 hover:bg-surface-container" href="#tareas">
+<span class="material-symbols-outlined text-[15px]" data-icon="check_circle">check_circle</span>
+<span>Tareas</span>
+</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 hover:bg-surface-container" href="#agentes">
+<span class="material-symbols-outlined text-[15px]" data-icon="smart_toy">smart_toy</span>
+<span>Agentes</span>
+</a>
+<a class="text-outline hover:text-on-surface py-3.5 px-3 transition-colors font-label-mono-sm text-label-mono-sm flex items-center gap-1.5 hover:bg-surface-container" href="#dashboard">
+<span class="material-symbols-outlined text-[15px]" data-icon="speed">speed</span>
+<span>Dashboard</span>
+</a>
+</nav>
+</div>
+<!-- Center/Right Search Bar & Trailing Ops Actions -->
+<div class="flex items-center gap-3">
+<!-- Quick Command Bar -->
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]" data-icon="search">search</span>
+<input class="bg-surface-container-low border border-outline-variant/30 rounded text-body-sm font-body-sm pl-8 pr-12 py-1 text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64 h-8" placeholder="Buscar repositorio, commit o subgrafo..." type="text"/>
+<kbd class="absolute right-2 top-1/2 -translate-y-1/2 font-label-mono-xs text-label-mono-xs text-outline px-1 rounded bg-surface-container border border-outline-variant/40">⌘K</kbd>
+</div>
+<!-- Quick Status Strip -->
+<div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant/20 text-outline">
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary font-medium">Swarm: Activo</span>
+<span class="text-outline-variant">|</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface">5 Nodes</span>
+</div>
+<!-- Trailing Action Icons -->
+<div class="flex items-center gap-1 text-outline">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container hover:text-on-surface transition-colors" title="Consola Terminal">
+<span class="material-symbols-outlined text-[18px]" data-icon="terminal">terminal</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container hover:text-on-surface transition-colors" title="Ajustes de Flota">
+<span class="material-symbols-outlined text-[18px]" data-icon="tune">tune</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container hover:text-on-surface relative transition-colors" title="Alertas de Enjambre">
+<span class="material-symbols-outlined text-[18px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-error rounded-full"></span>
+</button>
+</div>
+<!-- Divider -->
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<!-- User Context & Org Switcher -->
+<div class="flex items-center gap-2 pl-1">
+<a class="hidden sm:inline-block font-label-mono-sm text-label-mono-sm text-outline hover:text-on-surface transition-colors" href="#organizaciones">
+          Organizaciones
+        </a>
+<div class="w-7 h-7 rounded border border-outline-variant/40 bg-surface-container-high flex items-center justify-center overflow-hidden" title="Lead Agent Operator Profile Avatar">
+<span class="font-label-mono-xs text-label-mono-xs font-semibold text-primary">LP</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= MAIN CONTAINER ================= -->
+<main class="max-w-[1580px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+<!-- BREADCRUMB & CONTEXT HEADER -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/20 pb-5">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-mono-xs text-label-mono-xs text-outline tracking-wider">CLUSTER / LOTHAR-LAB</span>
+<span class="text-outline-variant text-xs">/</span>
+<span class="font-label-mono-xs text-label-mono-xs text-primary font-medium">REPOSITORIOS Y WORKFLOWS</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg tracking-tight text-on-surface flex items-center gap-3">
+          Proyectos
+          <span class="font-label-mono-xs text-label-mono-xs px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant/30 text-on-surface-variant font-normal">
+            4 Conectados
+          </span>
+</h1>
+<p class="text-body-sm font-body-sm text-outline mt-1 max-w-2xl">
+          Cada proyecto tiene una carpeta de trabajo y un equipo autónomo de agentes orquestados en tiempo real.
+        </p>
+</div>
+<!-- Header Quick Actions -->
+<div class="flex items-center gap-2.5">
+<button class="flex items-center gap-2 bg-primary text-on-primary px-3.5 py-1.5 rounded font-label-mono-sm text-label-mono-sm font-medium hover:bg-primary-fixed-dim transition-all shadow-sm active:scale-95" onclick="toggleNewProjectDrawer()">
+<span class="material-symbols-outlined text-[17px]" data-icon="add">add</span>
+<span>Nuevo proyecto</span>
+<kbd class="ml-1 bg-black/20 text-white px-1 py-0.5 rounded text-[10px] font-mono">N</kbd>
+</button>
+<button class="flex items-center gap-1.5 bg-surface-container border border-outline-variant/30 hover:border-outline text-on-surface px-3 py-1.5 rounded font-label-mono-sm text-label-mono-sm transition-colors">
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="refresh">refresh</span>
+<span>Sincronizar repos</span>
+</button>
+</div>
+</div>
+<!-- QUICK TELEMETRY METRIC CHIPS -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<!-- Metric 1: Proyectos Activos -->
+<div class="bg-surface-container-lowest border border-outline-variant/25 rounded p-3 flex flex-col justify-between hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-mono-xs text-label-mono-xs">PROYECTOS ACTIVOS</span>
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="check_circle">check_circle</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface">4</span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary">+1 esta semana</span>
+</div>
+</div>
+<!-- Metric 2: Tareas en curso -->
+<div class="bg-surface-container-lowest border border-outline-variant/25 rounded p-3 flex flex-col justify-between hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-mono-xs text-label-mono-xs">TAREAS EN CURSO</span>
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="sync">sync</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-semibold text-primary">2</span>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">51 totales (49 completadas)</span>
+</div>
+</div>
+<!-- Metric 3: Agentes en Swarm -->
+<div class="bg-surface-container-lowest border border-outline-variant/25 rounded p-3 flex flex-col justify-between hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-mono-xs text-label-mono-xs">AGENTES EN SWARM</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="lan">lan</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface">5</span>
+<span class="font-label-mono-xs text-label-mono-xs text-tertiary font-medium">Conde, Acosa, Lara, Vega...</span>
+</div>
+</div>
+<!-- Metric 4: Inversión en Tokens -->
+<div class="bg-surface-container-lowest border border-outline-variant/25 rounded p-3 flex flex-col justify-between hover:border-outline-variant/50 transition-colors">
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-mono-xs text-label-mono-xs">CONSUMO DE TOKENS</span>
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="data_usage">data_usage</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface">81.6 M</span>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">~$58.42 USD</span>
+</div>
+</div>
+</section>
+<!-- FILTER & VIEW CONTROLS -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+<!-- Status Tabs Switcher -->
+<div class="inline-flex p-0.5 rounded bg-surface-container border border-outline-variant/20 self-start">
+<button class="px-3 py-1 rounded bg-surface-container-high text-primary font-label-mono-sm text-label-mono-sm font-medium flex items-center gap-1.5 transition-colors">
+<span>Activos</span>
+<span class="text-[10px] font-mono px-1 rounded bg-primary/20 text-primary">4</span>
+</button>
+<button class="px-3 py-1 rounded text-outline hover:text-on-surface font-label-mono-sm text-label-mono-sm transition-colors flex items-center gap-1.5">
+<span>Archivados</span>
+<span class="text-[10px] font-mono text-outline/60">0</span>
+</button>
+<button class="px-3 py-1 rounded text-outline hover:text-on-surface font-label-mono-sm text-label-mono-sm transition-colors flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>Con alertas</span>
+<span class="text-[10px] font-mono px-1 rounded bg-tertiary/20 text-tertiary font-medium">1</span>
+</button>
+</div>
+<!-- Granular Filters -->
+<div class="flex items-center gap-2">
+<div class="relative">
+<input class="bg-surface-container-low border border-outline-variant/30 rounded text-label-mono-sm font-label-mono-sm pl-7 pr-3 py-1 text-on-surface placeholder:text-outline/60 focus:outline-none focus:border-primary w-52 h-7" placeholder="Filtrar por nombre o path..." type="text"/>
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[14px]" data-icon="filter_list">filter_list</span>
+</div>
+<button class="px-2 py-1 bg-surface-container-low border border-outline-variant/30 rounded font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface flex items-center gap-1">
+<span>ORDENAR: RECIENTE</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- ================= HIGH DENSITY PROJECTS TABLE / BENTO GRID ================= -->
+<div class="border border-outline-variant/25 rounded bg-surface-container-lowest overflow-hidden">
+<!-- Table Header Bar -->
+<div class="grid grid-cols-12 px-4 py-2.5 bg-surface-container-low/70 border-b border-outline-variant/20 font-label-mono-xs text-label-mono-xs text-outline tracking-wider select-none">
+<div class="col-span-12 sm:col-span-5 flex items-center gap-2">
+<span>PROYECTO &amp; WORKSPACE LOCAL</span>
+</div>
+<div class="hidden sm:block sm:col-span-2">
+<span>EQUIPO DE AGENTES</span>
+</div>
+<div class="hidden sm:block sm:col-span-2">
+<span>ESTADO / TELEMETRÍA</span>
+</div>
+<div class="hidden sm:block sm:col-span-2">
+<span>CONSUMO &amp; CARGA</span>
+</div>
+<div class="hidden sm:block sm:col-span-1 text-right">
+<span>ACCIONES</span>
+</div>
+</div>
+<!-- Row 1: Task app (En Ejecución / Proyecto Destacado) -->
+<div class="group border-b border-outline-variant/15 hover:bg-surface-container/30 transition-colors duration-150 p-4 sm:p-0">
+<div class="grid grid-cols-1 sm:grid-cols-12 sm:items-center px-0 sm:px-4 py-3.5 gap-3 sm:gap-0">
+<!-- Name & Repo Info -->
+<div class="col-span-1 sm:col-span-5 pr-2">
+<div class="flex items-start gap-2.5">
+<span class="w-2.5 h-2.5 mt-1 rounded-full bg-secondary pulse-dot shrink-0" title="Ejecutando swarm en tiempo real"></span>
+<div>
+<div class="flex items-center gap-2">
+<a class="text-headline-sm font-headline-sm font-semibold text-on-surface hover:text-primary transition-colors" href="#task-app-detail">
+                    Task app
+                  </a>
+<span class="px-1.5 py-0.2 rounded font-label-mono-xs text-label-mono-xs bg-secondary/15 text-secondary border border-secondary/25 font-medium">
+                    En curso
+                  </span>
+<span class="px-1.5 py-0.2 rounded font-label-mono-xs text-label-mono-xs bg-surface-container text-outline border border-outline-variant/30">
+                    main*
+                  </span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5 line-clamp-1">
+                  Es la aplicación de este mismo proyecto. Esta aplicación te permite gestionar una flota de agentes para trabajar en distintos proyectos.
+                </p>
+<div class="flex items-center gap-2 mt-1.5 text-outline">
+<span class="material-symbols-outlined text-[13px]" data-icon="folder">folder</span>
+<code class="font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface transition-colors cursor-pointer" onclick="copyPath('/home/lpalma/repos/task_app')">
+                    /home/lpalma/repos/task_app
+                  </code>
+</div>
+</div>
+</div>
+</div>
+<!-- Team of Agents -->
+<div class="col-span-1 sm:col-span-2">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono-sm text-label-mono-sm font-medium text-on-surface">4 agentes</span>
+<span class="text-outline text-xs">·</span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary">1 activo</span>
+</div>
+<!-- Agent Badges Stack -->
+<div class="flex items-center gap-1 flex-wrap">
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 font-label-mono-xs text-label-mono-xs text-on-surface" title="Conde (CTO / Opus)">Conde</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 font-label-mono-xs text-label-mono-xs text-on-surface" title="Acosa (Frontend / Sonnet)">Acosa</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 font-label-mono-xs text-label-mono-xs text-on-surface" title="Lara (Backend / Sonnet)">Lara</span>
+<span class="px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 font-label-mono-xs text-label-mono-xs text-primary font-medium" title="Vega (QA - Trabajando ahora)">Vega*</span>
+</div>
+</div>
+</div>
+<!-- Tasks & Telemetry -->
+<div class="col-span-1 sm:col-span-2">
+<div class="space-y-1">
+<div class="flex items-center justify-between text-outline text-xs pr-4">
+<span class="font-label-mono-xs text-label-mono-xs">51 tareas</span>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary">96% éxito</span>
+</div>
+<!-- Progress mini bar -->
+<div class="w-full max-w-[140px] h-1.5 bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 96%"></div>
+<div class="bg-primary h-full animate-pulse" style="width: 4%"></div>
+</div>
+<div class="flex items-center gap-2 font-label-mono-xs text-label-mono-xs text-outline">
+<span class="text-secondary font-medium">49 comp.</span>
+<span>·</span>
+<span class="text-primary font-medium">2 en curso</span>
+</div>
+</div>
+</div>
+<!-- Consumption & Last Run -->
+<div class="col-span-1 sm:col-span-2">
+<div class="font-label-mono-xs text-label-mono-xs space-y-0.5">
+<div class="text-on-surface font-medium">35,3 M tokens</div>
+<div class="text-outline">4 h 18 min acumulados</div>
+<div class="text-outline/70">hace 9 segundos</div>
+</div>
+</div>
+<!-- Quick Row Actions -->
+<div class="col-span-1 sm:col-span-1 flex items-center justify-end gap-1">
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-primary font-label-mono-xs text-label-mono-xs flex items-center gap-1 transition-colors" onclick="expandProjectWorkspace('Task app')" title="Abrir panel de control de tareas">
+<span>Abrir</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container text-outline hover:text-on-surface" title="Opciones">
+<span class="material-symbols-outlined text-[16px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Inline Sub-stream Preview for Active Swarm -->
+<div class="mx-0 sm:mx-4 mb-3 p-2.5 rounded bg-surface-container-low border border-outline-variant/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-xs">
+<div class="flex items-center gap-2 overflow-hidden text-ellipsis">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="psychology">psychology</span>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">Subtarea activa:</span>
+<span class="font-label-mono-xs text-label-mono-xs text-primary font-medium">#51 QA: título y descripción de la tarea en la conversación</span>
+<span class="text-outline-variant">→</span>
+<span class="font-label-mono-xs text-label-mono-xs text-on-surface">Agente <strong class="text-secondary">Vega</strong> ejecutando Jest spec</span>
+</div>
+<div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+<span class="font-label-mono-xs text-label-mono-xs text-outline font-mono">9s transcurridos</span>
+<a class="font-label-mono-xs text-label-mono-xs text-primary hover:underline flex items-center gap-0.5" href="#ver-traza">
+<span>Ver traza en vivo</span>
+<span class="material-symbols-outlined text-[12px]" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Row 2: Onboarding Data Processor -->
+<div class="group border-b border-outline-variant/15 hover:bg-surface-container/30 transition-colors duration-150 p-4 sm:p-0">
+<div class="grid grid-cols-1 sm:grid-cols-12 sm:items-center px-0 sm:px-4 py-3.5 gap-3 sm:gap-0">
+<div class="col-span-1 sm:col-span-5 pr-2">
+<div class="flex items-start gap-2.5">
+<span class="w-2.5 h-2.5 mt-1 rounded-full bg-outline-variant/50 shrink-0"></span>
+<div>
+<div class="flex items-center gap-2">
+<a class="text-headline-sm font-headline-sm font-semibold text-on-surface hover:text-primary transition-colors" href="#">
+                    Onboarding Data Processor
+                  </a>
+<span class="px-1.5 py-0.2 rounded font-label-mono-xs text-label-mono-xs bg-surface-container text-outline border border-outline-variant/30">
+                    Inactivo
+                  </span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5 line-clamp-1">
+                  Proceso encargado del procesamiento de datos de embarcado, consumidores, plantas de generación, transformadores, líneas, nodos...
+                </p>
+<div class="flex items-center gap-2 mt-1.5 text-outline">
+<span class="material-symbols-outlined text-[13px]" data-icon="folder">folder</span>
+<code class="font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface cursor-pointer" onclick="copyPath('/home/lpalma/repos/gridfy/onboarding-data-processor')">
+                    /home/lpalma/repos/gridfy/onboarding-data-processor
+                  </code>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="font-label-mono-sm text-label-mono-sm font-medium text-on-surface">5 agentes</span>
+<div class="flex items-center gap-1 text-outline">
+<span class="font-label-mono-xs text-label-mono-xs px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Data Ingestion Fleet</span>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="space-y-1">
+<div class="font-label-mono-xs text-label-mono-xs text-on-surface">14 tareas completadas</div>
+<div class="w-full max-w-[140px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">0 pendientes</span>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="font-label-mono-xs text-label-mono-xs space-y-0.5">
+<div class="text-on-surface">12,4 M tokens</div>
+<div class="text-outline">1 h 42 min acumulados</div>
+<div class="text-outline/70">hace 3 horas</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-1 flex items-center justify-end gap-1">
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-outline hover:text-on-surface font-label-mono-xs text-label-mono-xs transition-colors">
+              Inspeccionar
+            </button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container text-outline hover:text-on-surface">
+<span class="material-symbols-outlined text-[16px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Row 3: Planning Models Processor -->
+<div class="group border-b border-outline-variant/15 hover:bg-surface-container/30 transition-colors duration-150 p-4 sm:p-0">
+<div class="grid grid-cols-1 sm:grid-cols-12 sm:items-center px-0 sm:px-4 py-3.5 gap-3 sm:gap-0">
+<div class="col-span-1 sm:col-span-5 pr-2">
+<div class="flex items-start gap-2.5">
+<span class="w-2.5 h-2.5 mt-1 rounded-full bg-outline-variant/50 shrink-0"></span>
+<div>
+<div class="flex items-center gap-2">
+<a class="text-headline-sm font-headline-sm font-semibold text-on-surface hover:text-primary transition-colors" href="#">
+                    Planning Models Processor
+                  </a>
+<span class="px-1.5 py-0.2 rounded font-label-mono-xs text-label-mono-xs bg-surface-container text-outline border border-outline-variant/30">
+                    En reposo
+                  </span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5 line-clamp-1">
+                  Servicio que sirve para generar los modelos de red de una distribuidora y refinarlos.
+                </p>
+<div class="flex items-center gap-2 mt-1.5 text-outline">
+<span class="material-symbols-outlined text-[13px]" data-icon="folder">folder</span>
+<code class="font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface cursor-pointer" onclick="copyPath('/home/lpalma/repos/gridfy/planning-model-processor')">
+                    /home/lpalma/repos/gridfy/planning-model-processor
+                  </code>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="font-label-mono-sm text-label-mono-sm font-medium text-on-surface">5 agentes</span>
+<div class="flex items-center gap-1 text-outline">
+<span class="font-label-mono-xs text-label-mono-xs px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Refiner Swarm</span>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="space-y-1">
+<div class="font-label-mono-xs text-label-mono-xs text-on-surface">38 tareas</div>
+<div class="w-full max-w-[140px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary font-medium">38 completadas</span>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="font-label-mono-xs text-label-mono-xs space-y-0.5">
+<div class="text-on-surface">28,1 M tokens</div>
+<div class="text-outline">3 h 50 min acumulados</div>
+<div class="text-outline/70">hace 1 día</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-1 flex items-center justify-end gap-1">
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-outline hover:text-on-surface font-label-mono-xs text-label-mono-xs transition-colors">
+              Inspeccionar
+            </button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container text-outline hover:text-on-surface">
+<span class="material-symbols-outlined text-[16px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Row 4: Planning Scenarios Builder (Con Alerta / Atención Requerida) -->
+<div class="group hover:bg-surface-container/30 transition-colors duration-150 p-4 sm:p-0 bg-error-container/5">
+<div class="grid grid-cols-1 sm:grid-cols-12 sm:items-center px-0 sm:px-4 py-3.5 gap-3 sm:gap-0">
+<div class="col-span-1 sm:col-span-5 pr-2">
+<div class="flex items-start gap-2.5">
+<span class="w-2.5 h-2.5 mt-1 rounded-full bg-tertiary shrink-0" title="Requiere intervención humana"></span>
+<div>
+<div class="flex items-center gap-2">
+<a class="text-headline-sm font-headline-sm font-semibold text-on-surface hover:text-primary transition-colors" href="#">
+                    Planning Scenarios Builder
+                  </a>
+<span class="px-1.5 py-0.2 rounded font-label-mono-xs text-label-mono-xs bg-tertiary/15 text-tertiary border border-tertiary/30 font-medium">
+                    Atención
+                  </span>
+</div>
+<p class="text-body-sm font-body-sm text-outline mt-0.5 line-clamp-1">
+                  Se trata de un constructor de escenarios de modelos de red de baja tensión. Este servicio es un proceso en python que, dado un modelo de red de baja tensión deberá obtener las métric...
+                </p>
+<div class="flex items-center gap-2 mt-1.5 text-outline">
+<span class="material-symbols-outlined text-[13px]" data-icon="folder">folder</span>
+<code class="font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface cursor-pointer" onclick="copyPath('/home/lpalma/repos/gridfy/planning-scenarios-builder')">
+                    /home/lpalma/repos/gridfy/planning-scenarios-builder
+                  </code>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="font-label-mono-sm text-label-mono-sm font-medium text-on-surface">4 agentes</span>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="font-label-mono-xs text-label-mono-xs px-1.5 py-0.5 rounded bg-tertiary/10 border border-tertiary/25">Límite de tokens</span>
+</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="space-y-1">
+<div class="font-label-mono-xs text-label-mono-xs text-tertiary">2 tareas con fallo de sesión</div>
+<div class="w-full max-w-[140px] h-1.5 bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 70%"></div>
+<div class="bg-tertiary h-full" style="width: 30%"></div>
+</div>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">7 completadas · 2 fallidas</span>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<div class="font-label-mono-xs text-label-mono-xs space-y-0.5">
+<div class="text-on-surface">5,8 M tokens</div>
+<div class="text-outline">48 min acumulados</div>
+<div class="text-tertiary font-medium">Reanudación pendiente</div>
+</div>
+</div>
+<div class="col-span-1 sm:col-span-1 flex items-center justify-end gap-1">
+<button class="px-2 py-1 rounded bg-tertiary-container/30 hover:bg-tertiary-container/50 border border-tertiary/40 text-tertiary font-label-mono-xs text-label-mono-xs transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]" data-icon="play_arrow">play_arrow</span>
+<span>Reanudar</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container text-outline hover:text-on-surface">
+<span class="material-symbols-outlined text-[16px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= DETAILED INSPECTION RAIL (BENTO PREVIEW: TASK APP) ================= -->
+<section class="mt-8 pt-4 border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary" data-icon="terminal">terminal</span>
+<h2 class="text-headline-md font-headline-md font-semibold text-on-surface">
+            Inspección Activa: Task app
+          </h2>
+<span class="font-label-mono-xs text-label-mono-xs text-secondary px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20">
+            Nodo Maestro: Conde
+          </span>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-on-surface font-label-mono-xs text-label-mono-xs px-2.5 py-1 rounded bg-surface-container border border-outline-variant/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="fork_right">fork_right</span>
+<span>Fork Session</span>
+</button>
+<button class="text-outline hover:text-on-surface font-label-mono-xs text-label-mono-xs px-2.5 py-1 rounded bg-surface-container border border-outline-variant/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="tune">tune</span>
+<span>Runtime Config</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid for Task App Deep Dive -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<!-- Column A: Active Tasks Stream (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest border border-outline-variant/25 rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="list_alt">list_alt</span>
+                Pila de Ejecución Reciente
+              </span>
+<span class="font-label-mono-xs text-label-mono-xs text-outline">Agrupado por: Número</span>
+</div>
+<!-- Task Tree Items -->
+<div class="mt-3 space-y-2">
+<!-- Task Item 48 (Active / Waiting) -->
+<div class="border border-outline-variant/30 rounded bg-surface-container-low/60 p-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[16px] cursor-pointer" data-icon="expand_more">expand_more</span>
+<span class="font-label-mono-xs text-label-mono-xs px-1 rounded bg-surface-container border border-outline-variant/40 text-outline">Tarea 48</span>
+<span class="text-body-sm font-body-sm font-medium text-on-surface">Mostrar el título y a descripción de la tarea</span>
+</div>
+<span class="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs bg-tertiary/15 text-tertiary border border-tertiary/30">
+                    Esperando subtareas
+                  </span>
+</div>
+<div class="flex items-center justify-between text-outline mt-2 pl-6 font-label-mono-xs text-label-mono-xs">
+<span>Conde · 3 subtareas</span>
+<span class="text-primary">2 min 34 s en curso · 219,7 mil tokens</span>
+</div>
+<!-- Subtasks Indentation -->
+<div class="mt-2.5 ml-6 pl-3 border-l-2 border-outline-variant/30 space-y-2 text-xs">
+<div class="flex items-center justify-between py-1 border-b border-outline-variant/10">
+<span class="text-on-surface">Tarea 49: Mostrar título y descripción en la conversación</span>
+<span class="text-secondary font-mono">Completada (34s)</span>
+</div>
+<div class="flex items-center justify-between py-1 border-b border-outline-variant/10">
+<span class="text-on-surface">Tarea 50: Correcciones revisión: brief de tarea</span>
+<span class="text-secondary font-mono">Completada (28s)</span>
+</div>
+<div class="flex items-center justify-between py-1 bg-surface-container/50 px-2 rounded">
+<span class="text-primary font-medium flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary pulse-dot"></span>
+                      Tarea 51: QA: título y descripción de la tarea
+                    </span>
+<span class="text-secondary font-mono font-medium">Trabajando (9s)</span>
+</div>
+</div>
+</div>
+<!-- Task Item 44 (Completed) -->
+<div class="border border-outline-variant/15 rounded bg-surface-container-low/30 p-2.5 flex items-center justify-between hover:border-outline-variant/30 transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-mono-xs text-label-mono-xs px-1 rounded bg-surface-container border border-outline-variant/40 text-outline">Tarea 44</span>
+<span class="text-body-sm font-body-sm text-on-surface">Un agente debe poder crear tareas de alto nivel también</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-mono-xs text-label-mono-xs text-outline">1,8 M tokens</span>
+<span class="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs bg-secondary/10 text-secondary border border-secondary/20">
+                    Completada
+                  </span>
+</div>
+</div>
+<!-- Task Item 40 (Completed) -->
+<div class="border border-outline-variant/15 rounded bg-surface-container-low/30 p-2.5 flex items-center justify-between hover:border-outline-variant/30 transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-mono-xs text-label-mono-xs px-1 rounded bg-surface-container border border-outline-variant/40 text-outline">Tarea 40</span>
+<span class="text-body-sm font-body-sm text-on-surface">Revisar la UX de la aplicación</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-mono-xs text-label-mono-xs text-outline">3,2 M tokens</span>
+<span class="px-2 py-0.5 rounded font-label-mono-xs text-label-mono-xs bg-secondary/10 text-secondary border border-secondary/20">
+                    Completada
+                  </span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-outline font-label-mono-xs text-label-mono-xs">
+<span>Mostrando las 3 tareas más recientes de 51</span>
+<a class="text-primary hover:underline flex items-center gap-1" href="#ver-todas">
+<span>Abrir vista completa de tareas</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Column B: Agent Swarm Architecture & Delegation Hierarchy (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-lowest border border-outline-variant/25 rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<span class="font-label-mono-sm text-label-mono-sm text-on-surface font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="account_tree">account_tree</span>
+                Topología del Enjambre (4 agentes)
+              </span>
+<button class="font-label-mono-xs text-label-mono-xs text-outline hover:text-on-surface px-2 py-0.5 rounded bg-surface-container border border-outline-variant/30">
+                Editar Roles
+              </button>
+</div>
+<!-- Visual Agent Delegation Tree -->
+<div class="mt-4 flex flex-col items-center">
+<!-- Root Node: Conde -->
+<div class="w-48 p-2 rounded bg-surface-container-high border-2 border-primary active-card-glow text-center">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm font-headline-sm font-semibold text-primary">Conde</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span>
+</div>
+<div class="font-body-sm text-body-sm text-outline text-left">Chief Technology Officer</div>
+<div class="flex items-center justify-between mt-1 text-[10px] font-mono text-outline/80">
+<span class="px-1 rounded bg-black/30">opus</span>
+<span>alta prioridad</span>
+<span class="text-secondary font-medium">trabajando</span>
+</div>
+</div>
+<!-- Connecting Line SVG -->
+<svg class="w-full h-8 stroke-outline-variant/40" fill="none" viewbox="0 0 300 32">
+<path d="M 150 0 L 150 16 M 50 32 L 50 16 L 250 16 L 250 32 M 150 16 L 150 32" stroke-dasharray="2,2"></path>
+</svg>
+<!-- Leaf Nodes Grid: Acosa, Lara, Vega -->
+<div class="grid grid-cols-3 gap-2 w-full">
+<!-- Acosa -->
+<div class="p-2 rounded bg-surface-container border border-outline-variant/30 text-left">
+<div class="font-headline-sm font-headline-sm font-medium text-on-surface">Acosa</div>
+<div class="font-label-mono-xs text-label-mono-xs text-outline truncate">Frontend</div>
+<div class="mt-1 flex items-center justify-between text-[9px] font-mono text-outline">
+<span>sonnet</span>
+<span class="text-outline/70">media</span>
+</div>
+</div>
+<!-- Lara -->
+<div class="p-2 rounded bg-surface-container border border-outline-variant/30 text-left">
+<div class="font-headline-sm font-headline-sm font-medium text-on-surface">Lara</div>
+<div class="font-label-mono-xs text-label-mono-xs text-outline truncate">Backend</div>
+<div class="mt-1 flex items-center justify-between text-[9px] font-mono text-outline">
+<span>sonnet</span>
+<span class="text-outline/70">media</span>
+</div>
+</div>
+<!-- Vega (Active) -->
+<div class="p-2 rounded bg-surface-container-high border border-primary text-left shadow-[0_0_12px_rgba(192,193,255,0.15)]">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm font-headline-sm font-semibold text-primary">Vega</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</div>
+<div class="font-label-mono-xs text-label-mono-xs text-outline truncate">QA Engineer</div>
+<div class="mt-1 flex items-center justify-between text-[9px] font-mono text-secondary">
+<span>sonnet</span>
+<span class="font-medium">trabajando</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Delegation legend -->
+<p class="font-label-mono-xs text-label-mono-xs text-outline/60 text-center mt-3">
+              Las flechas indican «delega en»; las líneas discontinuas cierran el ciclo de verificación.
+            </p>
+</div>
+<!-- Bottom Summary of Roles -->
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-outline font-label-mono-xs text-label-mono-xs">
+<span>Tokens por minuto: ~8.4k</span>
+<span class="text-secondary font-medium">Salud del cluster: 99.8%</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ================= SLIDE-OVER DRAWER: CREAR NUEVO PROYECTO ================= -->
+<div class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0" id="new-project-drawer">
+<!-- Backdrop overlay -->
+<div class="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity" id="drawer-backdrop" onclick="toggleNewProjectDrawer()"></div>
+<!-- Drawer Content Panel -->
+<div class="absolute right-0 top-0 h-full w-full max-w-lg bg-surface border-l border-outline-variant/30 p-6 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out" id="drawer-panel">
+<div>
+<!-- Drawer Header -->
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div>
+<div class="font-label-mono-xs text-label-mono-xs text-primary font-medium tracking-wider">CREAR PROYECTO DE AGENTES</div>
+<h3 class="text-headline-md font-headline-md font-semibold text-on-surface">Vincular nuevo repositorio</h3>
+</div>
+<button class="w-8 h-8 rounded hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface" onclick="toggleNewProjectDrawer()">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Form Fields -->
+<form class="space-y-4 mt-6" onsubmit="event.preventDefault(); toggleNewProjectDrawer();">
+<!-- Project Name -->
+<div>
+<label class="block font-label-mono-xs text-label-mono-xs text-outline mb-1.5 uppercase tracking-wider">
+              Nombre del Proyecto
+            </label>
+<input class="w-full bg-surface-container-low border border-outline-variant/40 rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="p. ej. Billing Engine Worker" type="text"/>
+</div>
+<!-- Working Directory Path -->
+<div>
+<label class="block font-label-mono-xs text-label-mono-xs text-outline mb-1.5 uppercase tracking-wider">
+              Ruta del Repositorio Local (Carpeta de Trabajo)
+            </label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]" data-icon="folder_open">folder_open</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/40 rounded pl-8 pr-3 py-2 text-label-mono-sm font-label-mono-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="/home/lpalma/repos/..." type="text"/>
+</div>
+<span class="font-label-mono-xs text-label-mono-xs text-outline/70 mt-1 block">
+              El demonio local de Agent Fleet indexará ramas, submódulos y diffs de Git.
+            </span>
+</div>
+<!-- Description -->
+<div>
+<label class="block font-label-mono-xs text-label-mono-xs text-outline mb-1.5 uppercase tracking-wider">
+              Descripción y Objetivos de la Flota
+            </label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/40 rounded px-3 py-2 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" placeholder="Indica qué labor automatizan los agentes en este repositorio..." rows="3"></textarea>
+</div>
+<!-- Swarm Template Selection -->
+<div>
+<label class="block font-label-mono-xs text-label-mono-xs text-outline mb-1.5 uppercase tracking-wider">
+              Plantilla de Equipo de Agentes
+            </label>
+<div class="grid grid-cols-2 gap-2">
+<label class="flex items-center gap-2 p-2.5 rounded bg-surface-container border border-primary/60 cursor-pointer">
+<input checked="" class="text-primary focus:ring-0 bg-surface-container-lowest border-outline-variant" name="swarm_preset" type="radio"/>
+<div>
+<div class="font-label-mono-xs text-label-mono-xs font-semibold text-on-surface">Full Stack Trio</div>
+<div class="text-[10px] text-outline">CTO + Frontend + QA</div>
+</div>
+</label>
+<label class="flex items-center gap-2 p-2.5 rounded bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant/60 cursor-pointer">
+<input class="text-primary focus:ring-0 bg-surface-container-lowest border-outline-variant" name="swarm_preset" type="radio"/>
+<div>
+<div class="font-label-mono-xs text-label-mono-xs font-semibold text-on-surface">Data Refiner</div>
+<div class="text-[10px] text-outline">Ingest + Math + Test</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Context Token Reserve -->
+<div class="p-3 rounded bg-surface-container-low border border-outline-variant/20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="shield">shield</span>
+<div>
+<div class="font-label-mono-xs text-label-mono-xs text-on-surface font-medium">Límite de seguridad por sesión</div>
+<div class="text-[10px] text-outline">Evita bucles infinitos de tool calls</div>
+</div>
+</div>
+<span class="font-label-mono-xs text-label-mono-xs text-primary font-bold">10M tokens</span>
+</div>
+</form>
+</div>
+<!-- Drawer Actions Footer -->
+<div class="border-t border-outline-variant/20 pt-4 flex items-center justify-end gap-3">
+<button class="px-4 py-2 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-mono-sm text-label-mono-sm transition-colors" onclick="toggleNewProjectDrawer()" type="button">
+          Cancelar
+        </button>
+<button class="px-4 py-2 rounded bg-primary text-on-primary hover:bg-primary-fixed-dim font-label-mono-sm text-label-mono-sm font-semibold transition-colors flex items-center gap-1.5" onclick="toggleNewProjectDrawer()" type="button">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+<span>Crear e Inicializar</span>
+</button>
+</div>
+</div>
+</div>
+<!-- ================= INLINE INTERACTIONS JAVASCRIPT ================= -->
+<script>
+    // Drawer Toggle Logic
+    let drawerOpen = false;
+    function toggleNewProjectDrawer() {
+      const drawer = document.getElementById('new-project-drawer');
+      const panel = document.getElementById('drawer-panel');
+      drawerOpen = !drawerOpen;
+
+      if (drawerOpen) {
+        drawer.classList.remove('pointer-events-none', 'opacity-0');
+        drawer.classList.add('opacity-100');
+        panel.classList.remove('translate-x-full');
+        panel.classList.add('translate-x-0');
+      } else {
+        drawer.classList.add('opacity-0');
+        panel.classList.remove('translate-x-0');
+        panel.classList.add('translate-x-full');
+        setTimeout(() => {
+          drawer.classList.add('pointer-events-none');
+        }, 300);
+      }
+    }
+
+    // Keyboard shortcut 'N' to open New Project
+    window.addEventListener('keydown', (e) => {
+      if ((e.key === 'n' || e.key === 'N') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        toggleNewProjectDrawer();
+      }
+    });
+
+    // Copy repo path helper
+    function copyPath(text) {
+      navigator.clipboard.writeText(text);
+      // Optional minimal toast notification
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-4 right-4 bg-surface-container-highest border border-outline-variant/50 text-on-surface px-3 py-1.5 rounded font-label-mono-xs text-label-mono-xs shadow-lg z-50 flex items-center gap-2';
+      toast.innerHTML = `<span class="material-symbols-outlined text-[14px] text-secondary">check</span> Ruta copiada al portapapeles`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    function expandProjectWorkspace(name) {
+      const el = document.querySelector('section.mt-8');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+</body></html>
