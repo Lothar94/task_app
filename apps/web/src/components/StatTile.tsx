@@ -1,30 +1,46 @@
 import type { ReactNode } from 'react';
 
+type StatTileTone = 'default' | 'good' | 'critical' | 'active' | 'warning';
+
 interface StatTileProps {
   label: string;
   value: ReactNode;
+  unit?: string;
   detail?: ReactNode;
-  tone?: 'default' | 'good' | 'critical' | 'active';
+  icon?: ReactNode;
+  footer?: ReactNode;
+  tone?: StatTileTone;
 }
 
-const TONE_MARKERS: Record<NonNullable<StatTileProps['tone']>, string> = {
+const TONE_BARS: Record<StatTileTone, string> = {
   default: '',
-  good: 'before:bg-[var(--status-good)]',
-  critical: 'before:bg-[var(--status-critical)]',
-  active: 'before:bg-[var(--series-1)]',
+  good: 'bg-[var(--status-good)]',
+  critical: 'bg-[var(--status-critical)]',
+  active: 'bg-info',
+  warning: 'bg-warning',
 };
 
-/** A single headline number; a small coloured bar marks status tiles (always with its label). */
-export function StatTile({ label, value, detail, tone = 'default' }: StatTileProps) {
-  const marker =
-    tone === 'default'
-      ? ''
-      : `relative pl-5 before:absolute before:top-4 before:bottom-4 before:left-0 before:w-1 before:rounded-full ${TONE_MARKERS[tone]}`;
+/** A single headline number; a coloured left bar marks status tiles (always with its label). */
+export function StatTile({ label, value, unit, detail, icon, footer, tone = 'default' }: StatTileProps) {
   return (
-    <div className={`min-w-0 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 ${marker}`}>
-      <p className="text-xs font-medium tracking-wide text-zinc-400 uppercase">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-zinc-100">{value}</p>
-      {detail && <p className="mt-1 text-xs text-zinc-500">{detail}</p>}
+    <div className="relative flex min-w-0 flex-col justify-between overflow-hidden rounded-lg border border-line bg-surface p-3.5">
+      {tone !== 'default' && <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${TONE_BARS[tone]}`} />}
+      <div className="flex items-center justify-between gap-2">
+        <p className="label-mono text-fg-subtle">{label}</p>
+        {icon && (
+          <span aria-hidden className="text-fg-subtle [&>svg]:size-4">
+            {icon}
+          </span>
+        )}
+      </div>
+      <p className="mt-2 text-[1.75rem] leading-9 font-semibold text-fg">
+        {value}
+        {unit && <span className="ml-1 font-mono text-sm font-normal text-fg-subtle">{unit}</span>}
+      </p>
+      {detail && <p className="mt-1 font-mono text-xs text-fg-subtle">{detail}</p>}
+      {footer && (
+        <div className="mt-2 border-t border-line pt-1.5 font-mono text-[0.6875rem] text-fg-subtle">{footer}</div>
+      )}
     </div>
   );
 }
