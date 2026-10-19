@@ -1,5 +1,6 @@
 import type { AgentDto } from '@fleet/shared';
-import { Link, useNavigate } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import {
   Badge,
   Button,
@@ -20,6 +21,10 @@ import { ImportButton } from './ImportButton';
 import { EFFORT_LABELS } from './agentLabels';
 import { AgentAvatar } from './AgentAvatar';
 import { AgentGraph } from './diagram/AgentGraph';
+import { AgentSheet } from './AgentSheet';
+import { agentTrackRecord } from './agentSheetModel';
+import { FleetTiles } from './FleetTiles';
+import { useDashboard } from '../dashboard/dashboardQueries';
 
 const VIEWS = ['list', 'diagram'] as const;
 const VIEW_OPTIONS = [
@@ -122,10 +127,46 @@ function AgentList({ agents, selection }: { agents: AgentDto[]; selection?: Sele
   );
 }
 
+function AgentDiagramView({ agents }: { agents: AgentDto[] }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const container = useRef<HTMLDivElement>(null);
+  const sheet = useRef<HTMLElement>(null);
+  const dashboard = useDashboard({ projectId: null, days: null });
+  const selected = agents.find((agent) => agent.id === selectedId);
+
+  useEffect(() => {
+    if (selectedId) sheet.current?.focus();
+  }, [selectedId]);
+
+  const close = () => {
+    const id = selectedId;
+    setSelectedId(null);
+    if (id) container.current?.querySelector<SVGElement>(`[data-agent-id="${id}"]`)?.focus();
+  };
+
+  return (
+    <div
+      ref={container}
+      className={selected ? 'space-y-6 lg:pr-[24rem]' : 'space-y-6'}
+      onKeyDown={(event) => event.key === 'Escape' && selected && close()}
+    >
+      <AgentGraph agents={agents} selectedId={selectedId} onSelect={setSelectedId} />
+      {selected && (
+        <AgentSheet
+          ref={sheet}
+          agent={selected}
+          record={dashboard.data && agentTrackRecord(dashboard.data.byAgent, selected.id)}
+          onClose={close}
+        />
+      )}
+      <FleetTiles />
+    </div>
+  );
+}
+
 export function AgentsPage() {
   const agents = useAgents();
-  const navigate = useNavigate();
-  const [view, setView] = useStoredChoice('fleet.agents.view', VIEWS, 'list');
+  const [view, setView] = useStoredChoice('fleet.agents.view', VIEWS, 'diagram');
   const exporting = useAgentExportSelection(view === 'list');
   const { selected } = exporting;
   if (agents.isPending) return <Loading />;
@@ -175,7 +216,7 @@ export function AgentsPage() {
           Aún no hay agentes. Crea uno o ejecuta `make seed` para cargar un equipo de ejemplo.
         </EmptyState>
       ) : view === 'diagram' ? (
-        <AgentGraph agents={agents.data} onSelect={(id) => navigate(`/agents/${id}`)} />
+        <AgentDiagramView agents={agents.data} />
       ) : (
         <AgentList
           agents={agents.data}
