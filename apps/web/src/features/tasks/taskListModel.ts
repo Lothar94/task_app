@@ -95,7 +95,8 @@ function spellings(values: string[]): Map<string, string> {
 
 const distinct = (values: string[]) => [...spellings(values).values()].sort(compareText);
 
-const milestonesOf = (nodes: TaskNodeDto[]) => nodes.flatMap((node) => (node.milestone ? [node.milestone] : []));
+const milestonesOf = (nodes: TaskNodeDto[]) =>
+  nodes.flatMap((node) => (node.milestone ? [node.milestone] : []));
 const tagsOf = (nodes: TaskNodeDto[]) => nodes.flatMap((node) => node.tags);
 
 export const existingMilestones = (roots: TaskNodeDto[]) => distinct(milestonesOf(roots));
@@ -109,7 +110,10 @@ export const awaitsConfirmation = (task: Proposable) =>
   task.proposedByAgentId !== null && task.status === 'draft';
 
 /** "Propuesta por <agente>", or null when the project manager created the task. */
-export const proposalLabel = (task: Pick<TaskNodeDto, 'proposedByAgentId'>, agentNames: Map<string, string>) =>
+export const proposalLabel = (
+  task: Pick<TaskNodeDto, 'proposedByAgentId'>,
+  agentNames: Map<string, string>,
+) =>
   task.proposedByAgentId === null
     ? null
     : `Propuesta por ${agentNames.get(task.proposedByAgentId) ?? 'un agente'}`;

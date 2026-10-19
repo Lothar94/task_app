@@ -45,12 +45,12 @@ export function LabelFields({
         <TextInput value={tagsText} onChange={(e) => onTagsChange(e.target.value)} autoComplete="off" />
       </Field>
       {tags.length > 0 && (
-        <div aria-live="polite" className="flex items-center gap-2 text-xs text-zinc-500">
+        <div aria-live="polite" className="flex items-center gap-2 text-xs text-fg-subtle">
           Vista previa: <TaskLabels milestone={null} tags={tags} />
         </div>
       )}
       {unused.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1 text-xs text-zinc-500">
+        <div className="flex flex-wrap items-center gap-1 text-xs text-fg-subtle">
           <span>Tags existentes:</span>
           {unused.map((tag) => (
             <button
@@ -58,7 +58,7 @@ export function LabelFields({
               type="button"
               aria-label={`Añadir tag ${tag}`}
               onClick={() => onTagsChange(addTag(tagsText, tag))}
-              className="rounded border border-zinc-700 px-1.5 py-0.5 text-zinc-300 hover:border-indigo-400"
+              className="rounded border border-line-strong px-1.5 py-0.5 text-fg-muted hover:border-accent"
             >
               +{tag}
             </button>

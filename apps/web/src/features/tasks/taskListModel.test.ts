@@ -184,7 +184,14 @@ describe('agent proposals (QA)', () => {
     task(1, { status: 'draft', proposedByAgentId: 'a1', ...extra });
 
   it('stops awaiting confirmation for every status other than draft', () => {
-    for (const status of ['queued', 'running', 'waiting_subtasks', 'completed', 'failed', 'cancelled'] as const) {
+    for (const status of [
+      'queued',
+      'running',
+      'waiting_subtasks',
+      'completed',
+      'failed',
+      'cancelled',
+    ] as const) {
       expect(awaitsConfirmation(proposal({ status })), status).toBe(false);
     }
   });
