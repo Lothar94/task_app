@@ -1,5 +1,5 @@
 import type { TaskDto } from '@fleet/shared';
-import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { ConversationPanel } from './ConversationPanel';
 import { ResultPanel } from './ResultPanel';
@@ -8,12 +8,20 @@ import { TaskInspector } from './TaskInspector';
 import { InspectorToggles, SidebarToggle } from './TaskPanelToggles';
 import { TaskSidebar } from './TaskSidebar';
 import { isTaskActive, isTaskPlanned } from './TaskStatusBadge';
+import { useInspectorDrawer } from './useInspectorDrawer';
 import { useMastheadHeight } from './useMastheadHeight';
 import { prefersReducedMotion } from './stickToBottom';
 import { SCROLL_PANEL, anchorDomId } from './taskPanelStyles';
 
 const PANEL_CHOICES = ['shown', 'hidden'] as const;
 const WIDE_QUERY = '(min-width: 1280px)';
+
+/** Drawer below 1280px (only while open); a fixed-width rail above it unless the user hid it. */
+function inspectorLayout(isDrawerOpen: boolean, isRailShown: boolean) {
+  const drawer = isDrawerOpen ? 'fixed right-0 bottom-0 z-40 flex w-[min(22rem,100vw)]' : 'hidden';
+  const rail = isRailShown ? 'xl:static xl:z-auto xl:flex xl:w-[340px] xl:shrink-0' : 'xl:hidden';
+  return `${drawer} ${rail}`;
+}
 
 function scrollToAnchor(id: AnchorId) {
   document
@@ -42,39 +50,22 @@ export function TaskWorkspace({
   const [sidebar, setSidebar] = useStoredChoice('fleet.task.sidebar', PANEL_CHOICES, 'shown');
   const [inspector, setInspector] = useStoredChoice('fleet.task.inspector', PANEL_CHOICES, 'shown');
   const [isExpanded, setExpanded] = useState(false);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const drawer = useInspectorDrawer();
   const [active, setActive] = useState<AnchorId>('overview');
   const mastheadHeight = useMastheadHeight();
-  const drawerOpener = useRef<HTMLSpanElement>(null);
-  const inspectorPanel = useRef<HTMLElement>(null);
   const isSidebarShown = sidebar === 'shown';
   const isInspectorShown = inspector === 'shown';
-
-  useEffect(() => {
-    if (isDrawerOpen) inspectorPanel.current?.focus();
-  }, [isDrawerOpen]);
-
-  const closeDrawer = () => {
-    setDrawerOpen(false);
-    drawerOpener.current?.querySelector('button')?.focus();
-  };
-
-  const handleDrawerKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && isDrawerOpen) closeDrawer();
-  };
 
   const goTo = (id: AnchorId) => {
     setActive(id);
     if (id === 'subtasks') {
       if (window.matchMedia(WIDE_QUERY).matches) setInspector('shown');
-      else setDrawerOpen(true);
+      else drawer.open();
     } else setExpanded(false);
     requestAnimationFrame(() => scrollToAnchor(id));
   };
 
   const canFollowUp = !isReadOnly && !isTaskActive(task.status) && !isTaskPlanned(task.status);
-  const asideLayout = isDrawerOpen ? 'fixed right-0 bottom-0 z-40 flex w-[min(22rem,100vw)]' : 'hidden';
-  const asideWide = isInspectorShown ? 'xl:static xl:z-auto xl:flex xl:w-[340px] xl:shrink-0' : 'xl:hidden';
 
   return (
     <div
@@ -123,26 +114,30 @@ export function TaskWorkspace({
             <InspectorToggles
               isShown={isInspectorShown}
               onToggle={() => setInspector(isInspectorShown ? 'hidden' : 'shown')}
-              isDrawerOpen={isDrawerOpen}
-              onOpenDrawer={() => setDrawerOpen(true)}
-              drawerOpenerRef={drawerOpener}
+              isDrawerOpen={drawer.isOpen}
+              onOpenDrawer={drawer.open}
+              drawerOpenerRef={drawer.openerRef}
             />
           }
         />
       </section>
 
-      {isDrawerOpen && (
-        <div aria-hidden onClick={closeDrawer} className="fixed inset-0 z-30 bg-canvas/70 xl:hidden" />
+      {drawer.isOpen && (
+        <div aria-hidden onClick={drawer.close} className="fixed inset-0 z-30 bg-canvas/70 xl:hidden" />
       )}
       <aside
-        ref={inspectorPanel}
+        ref={drawer.panelRef}
         tabIndex={-1}
         aria-label="Inspector de tarea"
-        onKeyDown={handleDrawerKeyDown}
-        style={isDrawerOpen ? { top: mastheadHeight } : undefined}
-        className={`${asideLayout} ${asideWide} flex-col border-l border-line bg-canvas outline-none`}
+        onKeyDown={drawer.onKeyDown}
+        style={drawer.isOpen ? { top: mastheadHeight } : undefined}
+        className={`${inspectorLayout(drawer.isOpen, isInspectorShown)} flex-col border-l border-line bg-canvas outline-none`}
       >
-        <TaskInspector task={task} agentNames={agentNames} onClose={isDrawerOpen ? closeDrawer : undefined} />
+        <TaskInspector
+          task={task}
+          agentNames={agentNames}
+          onClose={drawer.isOpen ? drawer.close : undefined}
+        />
       </aside>
     </div>
   );
