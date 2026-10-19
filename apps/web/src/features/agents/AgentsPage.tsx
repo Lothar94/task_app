@@ -1,6 +1,7 @@
 import type { AgentDto } from '@fleet/shared';
 import { Link, useNavigate } from 'react-router';
 import {
+  Badge,
   Button,
   EmptyState,
   ErrorMessage,
@@ -17,6 +18,7 @@ import { useAgentExportSelection } from './useAgentExportSelection';
 import { ExportToolbar } from './ExportToolbar';
 import { ImportButton } from './ImportButton';
 import { EFFORT_LABELS } from './agentLabels';
+import { AgentAvatar } from './AgentAvatar';
 import { AgentGraph } from './diagram/AgentGraph';
 
 const VIEWS = ['list', 'diagram'] as const;
@@ -24,6 +26,8 @@ const VIEW_OPTIONS = [
   { value: 'list' as const, label: 'Lista' },
   { value: 'diagram' as const, label: 'Diagrama' },
 ];
+
+const agentCountLabel = (count: number) => `${count} ${count === 1 ? 'agente' : 'agentes'}`;
 
 function ExportStarters({
   onStart,
@@ -50,14 +54,15 @@ function AgentRowBody({ agent, teammates }: { agent: AgentDto; teammates: Map<st
   const collaborators = agent.collaboratorIds.map((id) => teammates.get(id)).filter(Boolean);
   return (
     <>
+      <AgentAvatar name={agent.name} />
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold">{agent.name}</p>
-        <p className="truncate text-sm text-zinc-400">{agent.role}</p>
+        <p className="truncate text-sm text-fg-muted">{agent.role}</p>
       </div>
-      <p className="hidden min-w-0 max-w-[35%] flex-1 truncate text-xs text-zinc-500 md:block">
+      <p className="hidden min-w-0 max-w-[35%] flex-1 truncate text-xs text-fg-subtle md:block">
         {collaborators.length > 0 ? `Delega en: ${collaborators.join(', ')}` : 'Sin colaboradores'}
       </p>
-      <span className="rounded bg-zinc-800 px-2 py-0.5 font-mono text-xs whitespace-nowrap text-zinc-300">
+      <span className="rounded border border-line-strong bg-surface-raised px-2 py-0.5 font-mono text-xs whitespace-nowrap text-fg-muted">
         {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
       </span>
     </>
@@ -92,7 +97,7 @@ function AgentRow({
   return (
     <li>
       <label
-        className={`${ROW_CLASS} cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-indigo-400 ${checked ? 'bg-indigo-500/10' : ''}`}
+        className={`${ROW_CLASS} cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-accent ${checked ? 'bg-accent/10' : ''}`}
       >
         <input
           type="checkbox"
@@ -130,6 +135,7 @@ export function AgentsPage() {
     <>
       <PageHeader
         title="Agentes"
+        badge={<Badge>{agentCountLabel(agents.data.length)}</Badge>}
         subtitle="Tu flota: identidad, instrucciones y con quién puede colaborar cada uno."
         actions={
           <>

@@ -39,7 +39,7 @@ function Preview({
         {file.agents.map((agent, index) => (
           <li key={`${agent.name}-${index}`}>
             {agent.name}
-            {conflicts.includes(agent.name) && <span className="text-amber-400"> (ya existe)</span>}
+            {conflicts.includes(agent.name) && <span className="text-warning"> (ya existe)</span>}
           </li>
         ))}
       </ul>

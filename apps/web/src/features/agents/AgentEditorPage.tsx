@@ -1,5 +1,5 @@
 import type { AgentDto } from '@fleet/shared';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { ErrorMessage, Loading, PageHeader } from '../../components/ui';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { AgentForm } from './AgentForm';
@@ -25,7 +25,12 @@ function AgentEditor({ agentId, agents }: { agentId: string | undefined; agents:
 
   return (
     <>
-      <PageHeader title={agent ? `Editar ${agent.name}` : 'Nuevo agente'} />
+      <PageHeader
+        breadcrumb={
+          <Link to={agent ? `/agents/${agent.id}` : '/agents'}>← {agent ? agent.name : 'Agentes'}</Link>
+        }
+        title={agent ? `Editar ${agent.name}` : 'Nuevo agente'}
+      />
       <AgentForm
         initialValues={agent ? toFormValues(agent) : EMPTY_AGENT_FORM}
         isNew={!agent}

@@ -19,13 +19,13 @@ interface SkillsFieldProps {
 
 function SkillChip({ name, onRemove }: { name: string; onRemove: () => void }) {
   return (
-    <li className="flex items-center gap-1 rounded bg-zinc-800 px-2 py-0.5 text-xs">
+    <li className="flex items-center gap-1 rounded bg-surface-raised border border-line px-2 py-0.5 text-xs">
       <code>{name}</code>
       <button
         type="button"
         aria-label={`Quitar skill ${name}`}
         onClick={onRemove}
-        className="rounded px-1 text-zinc-400 hover:text-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-400"
+        className="rounded px-1 text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
       >
         ×
       </button>
@@ -42,7 +42,7 @@ function SkillGroupList({
   const groupNames = new Set(group.skills.map((skill) => skill.name));
   return (
     <fieldset className="mt-2">
-      <legend className="mb-1 text-xs font-medium text-zinc-300">{group.label}</legend>
+      <legend className="mb-1 text-xs font-medium text-fg-muted">{group.label}</legend>
       <CheckboxList
         options={group.skills.map(({ name, description }) => ({ id: name, name, description }))}
         selected={skills.filter((name) => groupNames.has(name))}
@@ -56,10 +56,10 @@ function SkillGroupList({
 
 function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
   const { data, isLoading, isError } = useSkills();
-  if (isLoading) return <p className="text-sm text-zinc-500">Cargando skills instaladas…</p>;
+  if (isLoading) return <p className="text-sm text-fg-subtle">Cargando skills instaladas…</p>;
   if (isError) {
     return (
-      <p role="alert" className="text-sm text-red-300">
+      <p role="alert" className="text-sm text-danger">
         No se pudo cargar el catálogo de skills. Aún puedes añadirlas por nombre.
       </p>
     );
@@ -67,7 +67,7 @@ function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
   const catalog = data ?? [];
   if (catalog.length === 0) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-fg-subtle">
         No hay skills instaladas. Instálalas en ~/.claude/skills o en el .claude/skills del proyecto.
       </p>
     );
@@ -86,9 +86,9 @@ function SkillCatalog({ skills, onChange }: SkillsFieldProps) {
           onChange={onChange}
         />
       ))}
-      {limitReached && <p className="mt-2 text-xs text-amber-300">{SKILL_LIMIT_MESSAGE}</p>}
+      {limitReached && <p className="mt-2 text-xs text-warning">{SKILL_LIMIT_MESSAGE}</p>}
       {outsideCatalog.length > 0 && (
-        <ul className="mt-2 space-y-1 text-xs text-zinc-500">
+        <ul className="mt-2 space-y-1 text-xs text-fg-subtle">
           {outsideCatalog.map((name) => (
             <li key={name}>
               <code>{name}</code>: {missingSkillNote(name)}
@@ -120,7 +120,7 @@ function CustomSkillInput({ skills, onChange }: SkillsFieldProps) {
 
   return (
     <div className="mt-3">
-      <label htmlFor={id} className="text-xs text-zinc-400">
+      <label htmlFor={id} className="text-xs text-fg-muted">
         Añadir por nombre (skill del proyecto, de Claude Code o de un plugin)
       </label>
       <div className="mt-1 flex gap-2">
@@ -138,7 +138,7 @@ function CustomSkillInput({ skills, onChange }: SkillsFieldProps) {
         </Button>
       </div>
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1 text-xs text-red-300">
+        <p id={`${id}-error`} role="alert" className="mt-1 text-xs text-danger">
           {error}
         </p>
       )}
@@ -149,8 +149,8 @@ function CustomSkillInput({ skills, onChange }: SkillsFieldProps) {
 export function SkillsField({ skills, onChange }: SkillsFieldProps) {
   return (
     <fieldset>
-      <legend className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">Skills</legend>
-      <p className="mt-1 mb-2 text-xs text-zinc-500">
+      <legend className="text-xs font-semibold tracking-wide text-fg-muted uppercase">Skills</legend>
+      <p className="mt-1 mb-2 text-xs text-fg-subtle">
         Se le indicará al agente que use estas skills. Si lo dejas vacío, el agente no tendrá skills (máximo{' '}
         {MAX_AGENT_SKILLS}).
       </p>
