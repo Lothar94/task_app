@@ -11,7 +11,7 @@ export function AgentAvatar({ name }: { name: string }) {
   return (
     <span
       aria-hidden
-      className="grid size-9 shrink-0 place-items-center rounded border border-line-strong bg-surface-raised font-mono text-sm font-semibold text-accent"
+      className="grid size-9 shrink-0 place-items-center rounded-sm border border-line-strong bg-surface-raised font-mono text-sm font-semibold text-accent"
     >
       {agentInitials(name)}
     </span>

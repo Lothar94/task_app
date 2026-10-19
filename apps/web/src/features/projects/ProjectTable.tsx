@@ -71,7 +71,7 @@ function ProjectRow({ project, agents }: { project: ProjectDto; agents: AgentDto
         <Link
           to={href}
           aria-label={`Abrir ${project.name}`}
-          className={`inline-flex items-center gap-1.5 rounded border border-line-strong px-2.5 py-1 font-mono text-xs text-fg hover:border-fg-subtle hover:bg-fg/5 ${FOCUS_RING}`}
+          className={`inline-flex items-center gap-1.5 rounded-sm border border-line-strong px-2.5 py-1 font-mono text-xs text-fg hover:border-fg-subtle hover:bg-fg/5 ${FOCUS_RING}`}
         >
           Abrir
           <ArrowRight aria-hidden className="size-3.5" />

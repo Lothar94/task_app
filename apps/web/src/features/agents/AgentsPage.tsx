@@ -62,7 +62,7 @@ function AgentRowBody({ agent, teammates }: { agent: AgentDto; teammates: Map<st
       <p className="hidden min-w-0 max-w-[35%] flex-1 truncate text-xs text-fg-subtle md:block">
         {collaborators.length > 0 ? `Delega en: ${collaborators.join(', ')}` : 'Sin colaboradores'}
       </p>
-      <span className="rounded border border-line-strong bg-surface-raised px-2 py-0.5 font-mono text-xs whitespace-nowrap text-fg-muted">
+      <span className="rounded-sm border border-line-strong bg-surface-raised px-2 py-0.5 font-mono text-xs whitespace-nowrap text-fg-muted">
         {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
       </span>
     </>

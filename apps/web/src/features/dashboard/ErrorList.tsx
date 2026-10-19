@@ -12,7 +12,7 @@ export function ErrorList({ errors }: { errors: RunErrorRow[] }) {
       {errors.map((error) => (
         <li
           key={error.runId}
-          className="rounded border border-line border-l-2 border-l-danger bg-surface-raised/40 p-3"
+          className="rounded-sm border border-line border-l-2 border-l-danger bg-surface-raised/40 p-3"
         >
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <CircleX aria-hidden className="size-4 text-danger" />
@@ -29,7 +29,7 @@ export function ErrorList({ errors }: { errors: RunErrorRow[] }) {
               </time>
             </span>
           </div>
-          <p className="mt-2 line-clamp-3 rounded border border-line bg-canvas p-2 font-mono text-xs whitespace-pre-wrap text-danger [overflow-wrap:anywhere]">
+          <p className="mt-2 line-clamp-3 rounded-sm border border-line bg-canvas p-2 font-mono text-xs whitespace-pre-wrap text-danger [overflow-wrap:anywhere]">
             {error.error}
           </p>
         </li>

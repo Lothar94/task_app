@@ -18,7 +18,7 @@ export function OrganizationSelect() {
   };
 
   return (
-    <div className="relative flex items-center rounded border border-line-strong bg-surface focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
+    <div className="relative flex items-center rounded-sm border border-line-strong bg-surface focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
       <span aria-hidden className="pointer-events-none absolute left-2 size-1.5 rounded-full bg-success" />
       <select
         aria-label="Organización"

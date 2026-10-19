@@ -19,13 +19,13 @@ interface SkillsFieldProps {
 
 function SkillChip({ name, onRemove }: { name: string; onRemove: () => void }) {
   return (
-    <li className="flex items-center gap-1 rounded bg-surface-raised border border-line px-2 py-0.5 text-xs">
+    <li className="flex items-center gap-1 rounded-sm bg-surface-raised border border-line px-2 py-0.5 text-xs">
       <code>{name}</code>
       <button
         type="button"
         aria-label={`Quitar skill ${name}`}
         onClick={onRemove}
-        className="rounded px-1 text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+        className="rounded-sm px-1 text-fg-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
       >
         ×
       </button>

@@ -24,7 +24,7 @@ function Avatar({ children }: { children: ReactNode }) {
   return (
     <span
       aria-hidden
-      className="grid size-8 shrink-0 place-items-center rounded border border-line-strong bg-surface-raised text-fg-muted [&>svg]:size-4"
+      className="grid size-8 shrink-0 place-items-center rounded-sm border border-line-strong bg-surface-raised text-fg-muted [&>svg]:size-4"
     >
       {children}
     </span>
@@ -37,7 +37,7 @@ function MessageHeader({ name, time, tag }: { name: string; time: string; tag?: 
       <span className="font-semibold text-fg">{name}</span>
       {time && <time className="font-mono text-xs text-fg-subtle">{time}</time>}
       {tag && (
-        <span className="label-mono rounded border border-line bg-surface-raised px-1.5 py-0.5 text-fg-muted">
+        <span className="label-mono rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 text-fg-muted">
           {tag}
         </span>
       )}
@@ -84,7 +84,7 @@ function MessageBubble({ item, time, agentName }: { item: MessageItem; time: str
       );
     case 'system':
       return (
-        <p className="rounded border border-line bg-surface px-3 py-1.5 font-mono text-xs text-fg-subtle">
+        <p className="rounded-sm border border-line bg-surface px-3 py-1.5 font-mono text-xs text-fg-subtle">
           {payload.text}
         </p>
       );

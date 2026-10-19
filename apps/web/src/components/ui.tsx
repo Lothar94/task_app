@@ -12,7 +12,7 @@ export const FOCUS_RING =
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
-const BUTTON_BASE = `inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`;
+const BUTTON_BASE = `inline-flex items-center justify-center gap-1.5 rounded-sm px-3.5 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`;
 
 const BUTTON_STYLES: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:bg-accent-hover focus-visible:outline-fg',
@@ -56,7 +56,7 @@ export function IconButton({
       type="button"
       aria-label={label}
       title={label}
-      className={`inline-flex size-6 shrink-0 items-center justify-center rounded text-fg-subtle transition-colors hover:bg-surface-hover hover:text-fg disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${className}`}
+      className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-fg-subtle transition-colors hover:bg-surface-hover hover:text-fg disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${className}`}
       {...props}
     >
       {children}
@@ -65,7 +65,7 @@ export function IconButton({
 }
 
 const CONTROL =
-  'w-full rounded border border-line-strong bg-surface px-3 py-2 text-sm text-fg outline-none placeholder:text-fg-subtle focus:border-accent focus-visible:ring-1 focus-visible:ring-accent';
+  'w-full rounded-sm border border-line-strong bg-surface px-3 py-2 text-sm text-fg outline-none placeholder:text-fg-subtle focus:border-accent focus-visible:ring-1 focus-visible:ring-accent';
 
 export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -169,7 +169,7 @@ export const ROW_CLASS =
 
 export function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="label-mono-md rounded border border-line bg-surface-raised px-1.5 py-0.5 whitespace-nowrap text-fg-muted normal-case">
+    <span className="label-mono-md rounded-sm border border-line bg-surface-raised px-1.5 py-0.5 whitespace-nowrap text-fg-muted normal-case">
       {children}
     </span>
   );
@@ -200,7 +200,7 @@ export function StatusChip({
   const { box, dot } = CHIP_TONES[tone];
   return (
     <span
-      className={`inline-flex h-5 items-center gap-1.5 rounded border px-1.5 font-mono text-[0.6875rem] leading-none font-medium whitespace-nowrap ${dashed ? 'border-dashed' : ''} ${box}`}
+      className={`inline-flex h-5 items-center gap-1.5 rounded-sm border px-1.5 font-mono text-[0.6875rem] leading-none font-medium whitespace-nowrap ${dashed ? 'border-dashed' : ''} ${box}`}
     >
       {pulse && <span aria-hidden className={`size-1 rounded-full motion-safe:animate-pulse ${dot}`} />}
       {children}
@@ -221,7 +221,7 @@ export function ErrorMessage({ error }: { error: unknown }) {
   const message = error instanceof Error ? error.message : String(error);
   const details = (error as { details?: string[] }).details ?? [];
   return (
-    <div role="alert" className="rounded border border-danger-line bg-danger-soft p-3 text-sm text-danger">
+    <div role="alert" className="rounded-sm border border-danger-line bg-danger-soft p-3 text-sm text-danger">
       {message}
       {details.length > 0 && (
         <ul className="mt-1 list-disc pl-5">
@@ -246,7 +246,7 @@ export function SegmentedControl<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex items-center rounded border border-line bg-surface p-0.5">
+    <div role="radiogroup" aria-label={label} className="inline-flex items-center rounded-sm border border-line bg-surface p-0.5">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -260,7 +260,7 @@ export function SegmentedControl<T extends string>({
           >
             {option.label}
             {option.count !== undefined && (
-              <span className={`rounded px-1 font-mono text-[0.625rem] ${selected ? 'bg-accent/20 text-accent' : 'text-fg-subtle'}`}>
+              <span className={`rounded-sm px-1 font-mono text-[0.625rem] ${selected ? 'bg-accent/20 text-accent' : 'text-fg-subtle'}`}>
                 {option.count}
               </span>
             )}
@@ -295,7 +295,7 @@ export function CheckboxList<T extends { id: string; name: string }>({
     <ul className="grid gap-2 sm:grid-cols-2">
       {options.map((option) => (
         <li key={option.id}>
-          <label className="flex cursor-pointer items-start gap-2 rounded border border-line p-2 hover:border-line-strong has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50">
+          <label className="flex cursor-pointer items-start gap-2 rounded-sm border border-line p-2 hover:border-line-strong has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50">
             <input
               type="checkbox"
               className="mt-1 accent-accent"
