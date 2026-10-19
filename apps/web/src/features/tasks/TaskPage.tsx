@@ -72,11 +72,11 @@ function TaskMeta({
   );
 }
 
-function ConversationPanel({ taskId, projectId }: { taskId: string; projectId: string }) {
-  const conversation = useConversation(taskId);
+function ConversationPanel({ task }: { task: TaskDto }) {
+  const conversation = useConversation(task.id);
   if (conversation.isPending) return <Loading />;
   if (conversation.error) return <ErrorMessage error={conversation.error} />;
-  return <ConversationView messages={conversation.data} projectId={projectId} />;
+  return <ConversationView messages={conversation.data} projectId={task.projectId} task={task} />;
 }
 
 function SubtasksPanel({ task, agentNames }: { task: TaskDto; agentNames: Map<string, string> }) {
@@ -226,7 +226,7 @@ function TaskView({
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0 space-y-4">
             <Card title="Conversación">
-              <ConversationPanel taskId={task.id} projectId={task.projectId} />
+              <ConversationPanel task={task} />
             </Card>
             {!isReadOnly && !isActive && !isTaskPlanned(task.status) && (
               <Card title="Continuar la conversación">
