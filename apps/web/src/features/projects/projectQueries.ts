@@ -44,3 +44,26 @@ export function useSetProjectArchived(projectId: string) {
     },
   });
 }
+
+export function useProjectsTelemetry() {
+  const { id: organizationId } = useCurrentOrganization();
+  return useQuery({
+    queryKey: queryKeys.projectsTelemetry(organizationId),
+    queryFn: () => projectsApi.telemetry(organizationId),
+  });
+}
+
+/** Re-queues the recoverable failed tasks of a project; callers must confirm with the user first. */
+export function useResumeProject() {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  return useMutation({
+    mutationFn: (projectId: string) => projectsApi.resume(projectId),
+    onSuccess: (_result, projectId) =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.projectsTelemetry(organizationId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.projects(organizationId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.taskTree(projectId) }),
+      ]),
+  });
+}

@@ -15,6 +15,8 @@ import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
+import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
+import { ResumeProject } from '../application/projects/ResumeProject.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
 import { GetProject, ListProjects } from '../application/projects/QueryProjects.js';
@@ -231,6 +233,8 @@ export function createContainer(options: ContainerOptions) {
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
+      getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
+      resumeProject: new ResumeProject(projects, tasks, recorder, queue),
       getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
       ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),

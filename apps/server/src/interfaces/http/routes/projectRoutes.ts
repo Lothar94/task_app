@@ -4,6 +4,8 @@ import type { GetProject, ListProjects } from '../../../application/projects/Que
 import type { ArchiveProject } from '../../../application/projects/ArchiveProject.js';
 import type { UnarchiveProject } from '../../../application/projects/UnarchiveProject.js';
 import type { SetProjectMembers } from '../../../application/projects/SetProjectMembers.js';
+import type { GetProjectsTelemetry } from '../../../application/projects/GetProjectsTelemetry.js';
+import type { ResumeProject } from '../../../application/projects/ResumeProject.js';
 import { toProjectDto } from '../../../application/shared/dtos.js';
 import { createProjectSchema, idParams, membersSchema } from '../schemas.js';
 
@@ -14,12 +16,19 @@ export interface ProjectUseCases {
   setProjectMembers: SetProjectMembers;
   archiveProject: ArchiveProject;
   unarchiveProject: UnarchiveProject;
+  getProjectsTelemetry: GetProjectsTelemetry;
+  resumeProject: ResumeProject;
 }
 
 export function registerProjectRoutes(app: FastifyInstance, useCases: ProjectUseCases): void {
   app.get('/api/organizations/:id/projects', (request) => {
     const { id } = idParams.parse(request.params);
     return useCases.listProjects.execute(id).map(toProjectDto);
+  });
+
+  app.get('/api/organizations/:id/projects/telemetry', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.getProjectsTelemetry.execute(id);
   });
 
   app.get('/api/projects/:id', (request) => {
@@ -48,5 +57,10 @@ export function registerProjectRoutes(app: FastifyInstance, useCases: ProjectUse
   app.post('/api/projects/:id/unarchive', (request) => {
     const { id } = idParams.parse(request.params);
     return toProjectDto(useCases.unarchiveProject.execute(id));
+  });
+
+  app.post('/api/projects/:id/resume', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.resumeProject.execute(id);
   });
 }

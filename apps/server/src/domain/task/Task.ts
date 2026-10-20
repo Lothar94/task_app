@@ -212,6 +212,20 @@ export class Task {
     this.state = { ...this.state, status: 'queued', queuePosition: requirePositiveInteger(position) };
   }
 
+  /** Puts a failed top-level task back at the end of the queue so it runs again. */
+  requeue(position: number): void {
+    if (this.state.status !== 'failed' || this.state.parentTaskId !== null) {
+      throw new ConflictError(`Only failed top-level tasks can be re-queued: "${this.state.id}"`);
+    }
+    this.state = {
+      ...this.state,
+      status: 'queued',
+      queuePosition: requirePositiveInteger(position),
+      resultSummary: null,
+      finishedAt: null,
+    };
+  }
+
   dequeue(): void {
     this.requireQueued();
     this.state = { ...this.state, status: 'draft', queuePosition: null };

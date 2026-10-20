@@ -6,6 +6,7 @@ import {
   countTasks,
   findNode,
   subtreeMetrics,
+  treeTotals,
 } from './taskTreeModel';
 
 const metrics = (tokens: number, durationMs: number): TaskMetricsDto => ({
@@ -77,5 +78,15 @@ describe('task tree model', () => {
 
   it('counts tasks by status, subtasks included', () => {
     expect(countTasks(tree)).toEqual({ total: 5, active: 2, planned: 0, queued: 0, completed: 2, failed: 1 });
+  });
+});
+
+describe('treeTotals', () => {
+  it('sums tokens, cost and working time through subtasks', () => {
+    const tree = [
+      node('a1', 'completed', [node('a1', 'completed', [], 20)], 10),
+      node('a1', 'completed', [], 5),
+    ];
+    expect(treeTotals(tree)).toEqual({ tokens: 35, costUsd: 0, workingMs: 350 });
   });
 });

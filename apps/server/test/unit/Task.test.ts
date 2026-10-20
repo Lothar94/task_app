@@ -56,6 +56,42 @@ describe('Task', () => {
     expect(task.resultSummary).toBeNull();
   });
 
+  describe('requeue', () => {
+    const failedTask = (parentTaskId: string | null = null) => {
+      const task = Task.create(
+        't',
+        { projectId: 'p', number: 1, parentTaskId, agentId: 'a', title: 'T', description: 'x' },
+        now,
+      );
+      task.start(now);
+      task.fail('usage limit reached', now);
+      return task;
+    };
+
+    it('moves a failed root task back to the queue and clears its failure', () => {
+      const task = failedTask();
+      task.requeue(3);
+      expect(task.toSnapshot()).toMatchObject({
+        status: 'queued',
+        queuePosition: 3,
+        resultSummary: null,
+        finishedAt: null,
+      });
+    });
+
+    it('rejects tasks that are not failed', () => {
+      const task = newTask();
+      expect(() => task.requeue(1)).toThrow(ConflictError);
+      task.start(now);
+      task.complete('done', now);
+      expect(() => task.requeue(1)).toThrow(ConflictError);
+    });
+
+    it('rejects failed subtasks', () => {
+      expect(() => failedTask('parent').requeue(1)).toThrow(ConflictError);
+    });
+  });
+
   it('requires a title and a description', () => {
     expect(() =>
       Task.create(
