@@ -30,6 +30,24 @@ export function subtreeMetrics(node: TaskNodeDto): TaskMetricsDto {
   return node.children.map(subtreeMetrics).reduce(addMetrics, node.metrics);
 }
 
+export interface TreeTotals {
+  tokens: number;
+  costUsd: number;
+  workingMs: number;
+}
+
+/** Tokens, estimated cost and agent working time of a whole task tree. */
+export function treeTotals(nodes: TaskNodeDto[]): TreeTotals {
+  return nodes.map(subtreeMetrics).reduce<TreeTotals>(
+    (sum, item) => ({
+      tokens: sum.tokens + item.totalTokens,
+      costUsd: sum.costUsd + item.costUsd,
+      workingMs: sum.workingMs + item.durationMs,
+    }),
+    { tokens: 0, costUsd: 0, workingMs: 0 },
+  );
+}
+
 export function countDescendants(node: TaskNodeDto): number {
   return node.children.reduce((count, child) => count + 1 + countDescendants(child), 0);
 }
