@@ -17,24 +17,38 @@ export function DiffViewer({ diff }: { diff: Pick<TaskGitDiffDto, 'patch' | 'tru
   return (
     <div className="space-y-3">
       {diff.truncated && (
-        <p role="status" className="rounded-sm border border-warning/40 bg-warning/10 p-2 text-sm text-warning">
+        <p
+          role="status"
+          className="rounded-sm border border-warning/40 bg-warning/10 p-2 text-sm text-warning"
+        >
           Diff truncado: se muestra solo el principio del cambio.
         </p>
       )}
       {files.length === 0 && <p className="text-sm text-fg-subtle">Sin cambios entre base y head.</p>}
       {files.map((file) => (
-        <section key={`${file.oldPath ?? ''}>${file.path}`} aria-label={file.path} className="rounded-md border border-line bg-canvas">
+        <section
+          key={`${file.oldPath ?? ''}>${file.path}`}
+          aria-label={file.path}
+          className="rounded-md border border-line bg-canvas"
+        >
           <h3 className="border-b border-line px-3 py-1.5 font-mono text-xs text-fg [overflow-wrap:anywhere]">
             {file.oldPath ? `${file.oldPath} → ${file.path}` : file.path}
           </h3>
           {file.isBinary && <p className="px-3 py-2 font-mono text-xs text-fg-subtle">Archivo binario</p>}
           {/* Focusable so keyboard users can scroll wide lines. */}
-          <pre tabIndex={0} aria-label={`Cambios de ${file.path}`} className="overflow-x-auto py-1 font-mono text-xs leading-5 focus-visible:outline-2 focus-visible:outline-accent">
+          <pre
+            tabIndex={0}
+            aria-label={`Cambios de ${file.path}`}
+            className="overflow-x-auto py-1 font-mono text-xs leading-5 focus-visible:outline-2 focus-visible:outline-accent"
+          >
             {file.hunks.map((hunk) => (
               <code key={hunk.header} className="block">
                 <span className="block px-3 text-info">{hunk.header}</span>
                 {hunk.lines.map((line, index) => (
-                  <span key={`${index}-${line.text}`} className={`block px-3 whitespace-pre ${LINE_STYLES[line.kind]}`}>
+                  <span
+                    key={`${index}-${line.text}`}
+                    className={`block px-3 whitespace-pre ${LINE_STYLES[line.kind]}`}
+                  >
                     {line.text}
                   </span>
                 ))}
@@ -48,7 +62,15 @@ export function DiffViewer({ diff }: { diff: Pick<TaskGitDiffDto, 'patch' | 'tru
 }
 
 /** Modal diff view; the patch is requested only while it is open. */
-export function GitDiffDialog({ taskId, open, onClose }: { taskId: string; open: boolean; onClose: () => void }) {
+export function GitDiffDialog({
+  taskId,
+  open,
+  onClose,
+}: {
+  taskId: string;
+  open: boolean;
+  onClose: () => void;
+}) {
   const { data, error } = useTaskGitDiff(taskId, open);
   return (
     <Dialog open={open} title="Cambios de la tarea" onClose={onClose}>

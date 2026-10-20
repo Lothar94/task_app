@@ -3,7 +3,13 @@ import { Check, Copy, FileDiff } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../../components/ui';
 import { GitDiffDialog } from './DiffView';
-import { buildPullRequestText, type CopyState, copyToClipboard, type GitContextOk, isGitOk } from './gitContextModel';
+import {
+  buildPullRequestText,
+  type CopyState,
+  copyToClipboard,
+  type GitContextOk,
+  isGitOk,
+} from './gitContextModel';
 import { useTaskExecution, useTaskGit } from './taskQueries';
 
 const COPY_FEEDBACK: Record<CopyState, string> = { idle: '', copied: 'Copiado', failed: 'No se pudo copiar' };
@@ -18,11 +24,19 @@ interface ResultActionsViewProps {
 export function ResultActionsView({ fileCount, copyState, onCopy, onOpenDiff }: ResultActionsViewProps) {
   return (
     <>
-      <span role="status" aria-live="polite" className={`font-mono text-xs ${copyState === 'failed' ? 'text-danger' : 'text-success'}`}>
+      <span
+        role="status"
+        aria-live="polite"
+        className={`font-mono text-xs ${copyState === 'failed' ? 'text-danger' : 'text-success'}`}
+      >
         {COPY_FEEDBACK[copyState]}
       </span>
       <Button variant="secondary" className="py-1 text-xs" onClick={onCopy}>
-        {copyState === 'copied' ? <Check aria-hidden className="size-3.5" /> : <Copy aria-hidden className="size-3.5" />}
+        {copyState === 'copied' ? (
+          <Check aria-hidden className="size-3.5" />
+        ) : (
+          <Copy aria-hidden className="size-3.5" />
+        )}
         Copiar PR
       </Button>
       <Button variant="secondary" className="py-1 text-xs" onClick={onOpenDiff}>
@@ -33,13 +47,26 @@ export function ResultActionsView({ fileCount, copyState, onCopy, onOpenDiff }: 
   );
 }
 
-function ResultActionsForGit({ task, git, execution }: { task: TaskDto; git: GitContextOk; execution?: TaskExecutionDto }) {
+function ResultActionsForGit({
+  task,
+  git,
+  execution,
+}: {
+  task: TaskDto;
+  git: GitContextOk;
+  execution?: TaskExecutionDto;
+}) {
   const [copyState, setCopyState] = useState<CopyState>('idle');
   const [isDiffOpen, setDiffOpen] = useState(false);
   const copy = async () => setCopyState(await copyToClipboard(buildPullRequestText(task, git, execution)));
   return (
     <>
-      <ResultActionsView fileCount={git.files.length} copyState={copyState} onCopy={copy} onOpenDiff={() => setDiffOpen(true)} />
+      <ResultActionsView
+        fileCount={git.files.length}
+        copyState={copyState}
+        onCopy={copy}
+        onOpenDiff={() => setDiffOpen(true)}
+      />
       <GitDiffDialog taskId={task.id} open={isDiffOpen} onClose={() => setDiffOpen(false)} />
     </>
   );

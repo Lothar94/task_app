@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
 import { Accordion } from '../../components/Accordion';
 
-export function InspectorSection({ title, meta, children }: { title: string; meta?: string; children: ReactNode }) {
+export function InspectorSection({
+  title,
+  meta,
+  children,
+}: {
+  title: string;
+  meta?: string;
+  children: ReactNode;
+}) {
   return (
     <Accordion
       defaultOpen

@@ -15,7 +15,17 @@ const execution = (patch: Partial<TaskExecutionDto> = {}): TaskExecutionDto => (
   time: { totalMs: 1000, llmMs: 500, toolMs: 300, ioMs: 200 },
   models: [{ model: 'opus', ...totals, costUsd: 1 }],
   primaryModel: 'opus',
-  runs: [{ number: 2, startedAt: '', finishedAt: '', durationMs: 1, outcome: 'failed', totalTokens: 1, costUsd: 0 }],
+  runs: [
+    {
+      number: 2,
+      startedAt: '',
+      finishedAt: '',
+      durationMs: 1,
+      outcome: 'failed',
+      totalTokens: 1,
+      costUsd: 0,
+    },
+  ],
   ...patch,
 });
 const html = (node: React.ReactNode) => renderToStaticMarkup(node);
@@ -36,7 +46,12 @@ describe('ExecutionMetricsBody', () => {
     const one = html(<ExecutionMetricsBody execution={execution()} />);
     const many = html(
       <ExecutionMetricsBody
-        execution={execution({ models: [{ model: 'a', ...totals, costUsd: 1 }, { model: 'b', ...totals, costUsd: 1 }] })}
+        execution={execution({
+          models: [
+            { model: 'a', ...totals, costUsd: 1 },
+            { model: 'b', ...totals, costUsd: 1 },
+          ],
+        })}
       />,
     );
 
@@ -68,7 +83,9 @@ describe('TaskMetricsView (header)', () => {
   });
 
   it('shows "en curso" while running', () => {
-    expect(html(<TaskMetricsView task={{ status: 'running' }} execution={execution()} />)).toContain('#2 en curso');
+    expect(html(<TaskMetricsView task={{ status: 'running' }} execution={execution()} />)).toContain(
+      '#2 en curso',
+    );
   });
 });
 

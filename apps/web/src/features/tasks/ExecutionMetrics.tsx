@@ -18,7 +18,11 @@ function TimeDistribution({ time }: { time: NonNullable<TaskExecutionDto['time']
   return (
     <div className="space-y-2">
       <h4 className="label-mono text-fg-subtle">Distribución de tiempo</h4>
-      <div role="img" aria-label={`Distribución de tiempo: ${summary}`} className="flex h-2 overflow-hidden rounded-sm bg-canvas">
+      <div
+        role="img"
+        aria-label={`Distribución de tiempo: ${summary}`}
+        className="flex h-2 overflow-hidden rounded-sm bg-canvas"
+      >
         {segments.map((s) => (
           <span key={s.key} className={SEGMENT_COLORS[s.key]} style={{ width: `${s.percent}%` }} />
         ))}
@@ -62,7 +66,11 @@ export function ExecutionMetricsBody({ execution }: { execution: TaskExecutionDt
         <StatTile
           label="Tokens totales"
           value={formatTokens(execution.own.totalTokens)}
-          detail={hasSubtreeTokens(execution) ? `${formatTokens(execution.subtree.totalTokens)} con árbol` : undefined}
+          detail={
+            hasSubtreeTokens(execution)
+              ? `${formatTokens(execution.subtree.totalTokens)} con árbol`
+              : undefined
+          }
         />
         <StatTile
           label="Coste estimado"
@@ -87,7 +95,13 @@ export function ExecutionMetricsSection({ taskId }: { taskId: string }) {
       title="Métricas de ejecución"
       meta={data && data.own.runs > 0 ? formatDuration(data.own.durationMs) : undefined}
     >
-      {error ? <ErrorMessage error={error} /> : data ? <ExecutionMetricsBody execution={data} /> : <Loading />}
+      {error ? (
+        <ErrorMessage error={error} />
+      ) : data ? (
+        <ExecutionMetricsBody execution={data} />
+      ) : (
+        <Loading />
+      )}
     </InspectorSection>
   );
 }

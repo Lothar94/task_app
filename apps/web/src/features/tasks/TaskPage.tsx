@@ -30,9 +30,17 @@ const META_ITEM = 'flex items-baseline gap-1.5';
 const META_KEY = 'text-fg-subtle';
 
 /** Duration, tokens and last run from the execution endpoint (the single source for run telemetry). */
-export function TaskMetricsView({ task, execution }: { task: Pick<TaskDto, 'status'>; execution: TaskExecutionDto }) {
+export function TaskMetricsView({
+  task,
+  execution,
+}: {
+  task: Pick<TaskDto, 'status'>;
+  execution: TaskExecutionDto;
+}) {
   if (execution.own.runs === 0) return null;
-  const delegated = hasSubtreeTokens(execution) ? ` (${formatTokens(execution.subtree.totalTokens)} con subtareas)` : '';
+  const delegated = hasSubtreeTokens(execution)
+    ? ` (${formatTokens(execution.subtree.totalTokens)} con subtareas)`
+    : '';
   return (
     <>
       <span className={META_ITEM}>

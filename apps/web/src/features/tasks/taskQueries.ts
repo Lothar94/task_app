@@ -22,7 +22,8 @@ export const useTaskGit = (taskId: string) =>
   useQuery({
     queryKey: queryKeys.git(taskId),
     queryFn: () => tasksApi.git(taskId),
-    refetchInterval: (query) => (query.state.data?.status === 'ok' && query.state.data.live ? GIT_POLL_MS : false),
+    refetchInterval: (query) =>
+      query.state.data?.status === 'ok' && query.state.data.live ? GIT_POLL_MS : false,
   });
 
 /** The unified patch is only fetched once the diff view is opened (`enabled`). */

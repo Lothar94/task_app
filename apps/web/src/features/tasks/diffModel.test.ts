@@ -55,7 +55,9 @@ describe('parseUnifiedDiff', () => {
   });
 
   it('uses the old path for deleted files', () => {
-    const [file] = parseUnifiedDiff('diff --git a/gone.ts b/gone.ts\ndeleted file mode 100644\n--- a/gone.ts\n+++ /dev/null\n@@ -1 +0,0 @@\n-x\n');
+    const [file] = parseUnifiedDiff(
+      'diff --git a/gone.ts b/gone.ts\ndeleted file mode 100644\n--- a/gone.ts\n+++ /dev/null\n@@ -1 +0,0 @@\n-x\n',
+    );
 
     expect(file?.path).toBe('gone.ts');
   });
