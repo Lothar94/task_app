@@ -1,8 +1,7 @@
 import type { TaskNodeDto } from '@fleet/shared';
 import { StatTile } from '../../components/StatTile';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
-import { countTasks } from '../tasks/taskTreeModel';
-import { treeTotals } from './projectTelemetryModel';
+import { countTasks, treeTotals } from '../tasks/taskTreeModel';
 
 export function ProjectStats({ nodes }: { nodes: TaskNodeDto[] }) {
   const counts = countTasks(nodes);

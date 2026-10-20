@@ -1,94 +1,64 @@
-import { useState } from 'react';
-import { Activity, Check, Coins, Plus, Users } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { Dialog } from '../../components/Dialog';
-import { StatTile } from '../../components/StatTile';
 import { Tabs, tabPanelProps } from '../../components/Tabs';
 import { Badge, Button, EmptyState, ErrorMessage, Loading, PageHeader } from '../../components/ui';
-import { formatCost, formatInteger, formatTokens } from '../../lib/format';
-import type { AgentDto, ProjectDto } from '@fleet/shared';
+import type { ProjectDto } from '@fleet/shared';
+import { useProjectsLiveTelemetry } from '../../hooks/useProjectsLiveTelemetry';
 import { useAgents } from '../agents/agentQueries';
 import { useCurrentOrganization } from '../organizations/OrganizationContext';
-import { type ProjectFilter, groupProjects, memberNames, summarizeProjects } from './projectListModel';
-import { portfolioTelemetry, type ProjectTelemetry } from './projectTelemetryModel';
-import { useCreateProject, useProjects } from './projectQueries';
+import {
+  type ProjectFilter,
+  type ProjectSort,
+  filterProjects,
+  groupProjects,
+  sortProjects,
+} from './projectListModel';
+import { useCreateProject, useProjects, useProjectsTelemetry } from './projectQueries';
 import { ProjectForm } from './ProjectForm';
+import { ProjectListControls } from './ProjectListControls';
 import { ProjectTable } from './ProjectTable';
-import { type ProjectTelemetryState, useProjectTelemetry } from './useProjectTelemetry';
-
-const MAX_SWARM_NAMES = 4;
+import { ProjectTiles } from './ProjectTiles';
+import { ResumeProjectDialog } from './ResumeProjectDialog';
 
 const EMPTY_MESSAGES: Record<ProjectFilter, string> = {
   active: 'No hay proyectos activos. Crea uno con «Nuevo proyecto».',
   archived: 'No hay proyectos archivados.',
+  alerts: 'Ningún proyecto tiene alertas pendientes.',
 };
-
-function ProjectTiles({
-  projects,
-  agents,
-  telemetry,
-}: {
-  projects: ProjectDto[];
-  agents: AgentDto[];
-  telemetry: Map<string, ProjectTelemetryState>;
-}) {
-  const summary = summarizeProjects(projects);
-  const activeTelemetry = projects.map((project) => telemetry.get(project.id));
-  const settled = activeTelemetry.every((state) => state && !state.isPending);
-  const portfolio = portfolioTelemetry(
-    activeTelemetry.flatMap((state) => state?.telemetry ?? []) as ProjectTelemetry[],
-  );
-  const swarmNames = [...new Set(projects.flatMap((project) => memberNames(project, agents)))];
-  return (
-    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <StatTile label="Proyectos activos" value={summary.activeProjects} icon={<Check />} tone="good" />
-      <StatTile
-        label="Tareas en curso"
-        value={settled ? formatInteger(portfolio.activeTasks) : '…'}
-        detail={
-          settled &&
-          `${formatInteger(portfolio.totalTasks)} totales (${formatInteger(portfolio.completedTasks)} completadas)`
-        }
-        icon={<Activity />}
-      />
-      <StatTile
-        label="Agentes en el enjambre"
-        value={summary.teamAgents}
-        detail={
-          swarmNames.length > 0 &&
-          `${swarmNames.slice(0, MAX_SWARM_NAMES).join(', ')}${swarmNames.length > MAX_SWARM_NAMES ? '…' : ''}`
-        }
-        icon={<Users />}
-      />
-      <StatTile
-        label="Consumo de tokens"
-        value={settled ? formatTokens(portfolio.tokens) : '…'}
-        detail={settled && `~${formatCost(portfolio.costUsd)} USD`}
-        icon={<Coins />}
-      />
-    </div>
-  );
-}
 
 export function ProjectsPage() {
   const projects = useProjects();
   const agents = useAgents();
+  const telemetryQuery = useProjectsTelemetry();
   const createProject = useCreateProject();
   const navigate = useNavigate();
   const organization = useCurrentOrganization();
   const [isCreating, setIsCreating] = useState(false);
+  const [resuming, setResuming] = useState<ProjectDto | null>(null);
   const [filter, setFilter] = useState<ProjectFilter>('active');
-  const telemetry = useProjectTelemetry(projects.data ?? []);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<ProjectSort>('recent');
+  const projectIds = useMemo(() => projects.data?.map((project) => project.id) ?? [], [projects.data]);
+  const telemetry = useMemo(
+    () => new Map(telemetryQuery.data?.projects.map((item) => [item.projectId, item])),
+    [telemetryQuery.data],
+  );
+  useProjectsLiveTelemetry(organization.id, projectIds);
 
   if (projects.isPending || agents.isPending) return <Loading />;
   if (projects.error || agents.error) return <ErrorMessage error={projects.error ?? agents.error} />;
 
-  const groups = groupProjects(projects.data);
-  const visible = groups[filter];
+  const groups = groupProjects(projects.data, telemetry);
+  const visible = sortProjects(filterProjects(groups[filter], query), sort, telemetry);
   const options = [
     { value: 'active' as const, label: 'Activos', count: groups.active.length },
     { value: 'archived' as const, label: 'Archivados', count: groups.archived.length },
+    { value: 'alerts' as const, label: 'Con alertas', count: groups.alerts.length },
   ];
+  const emptyMessage =
+    groups[filter].length === 0 ? EMPTY_MESSAGES[filter] : `Ningún proyecto coincide con «${query.trim()}».`;
 
   return (
     <>
@@ -104,8 +74,12 @@ export function ProjectsPage() {
           </Button>
         }
       />
-      <ProjectTiles projects={groups.active} agents={agents.data} telemetry={telemetry} />
-      <div className="mb-4">
+      <ProjectTiles
+        summary={telemetryQuery.data?.summary}
+        activeProjects={groups.active.length}
+        agents={agents.data}
+      />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Tabs
           label="Filtrar proyectos"
           idPrefix="projects"
@@ -113,14 +87,37 @@ export function ProjectsPage() {
           value={filter}
           onChange={setFilter}
         />
+        <ProjectListControls query={query} onQueryChange={setQuery} sort={sort} onSortChange={setSort} />
       </div>
+      {telemetryQuery.error && (
+        <div className="mb-4">
+          <ErrorMessage
+            error={new Error(`No se pudo cargar la telemetría: ${telemetryQuery.error.message}`)}
+          />
+        </div>
+      )}
       <div {...tabPanelProps('projects', filter)}>
         {visible.length === 0 ? (
-          <EmptyState>{EMPTY_MESSAGES[filter]}</EmptyState>
+          <EmptyState>{emptyMessage}</EmptyState>
         ) : (
-          <ProjectTable projects={visible} agents={agents.data} telemetry={telemetry} />
+          <ProjectTable
+            projects={visible}
+            agents={agents.data}
+            telemetry={telemetry}
+            loading={telemetryQuery.isPending}
+            onResume={setResuming}
+          />
         )}
       </div>
+      {resuming && (
+        <ResumeProjectDialog
+          key={resuming.id}
+          projectId={resuming.id}
+          projectName={resuming.name}
+          alerts={telemetry.get(resuming.id)?.alerts ?? []}
+          onClose={() => setResuming(null)}
+        />
+      )}
       <Dialog open={isCreating} title="Nuevo proyecto" onClose={() => setIsCreating(false)}>
         <ProjectForm
           agents={agents.data}
