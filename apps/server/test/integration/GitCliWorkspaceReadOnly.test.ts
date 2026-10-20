@@ -38,7 +38,7 @@ afterAll(() => rmSync(root, { recursive: true, force: true }));
 function snapshot() {
   const index = join(repo, '.git', 'index');
   return {
-    status: git('status', '--porcelain'),
+    status: git('--no-optional-locks', 'status', '--porcelain'),
     head: git('rev-parse', 'HEAD'),
     refs: git('for-each-ref'),
     indexBytes: readFileSync(index).toString('hex'),
