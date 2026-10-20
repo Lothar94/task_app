@@ -15,6 +15,10 @@ interface AgentGraphProps {
   highlightedIds?: Set<string>;
   /** When defined the nodes behave as toggle buttons and the selected one gets a halo. */
   selectedId?: string | null;
+  /** Shows a "trabajando"/"idle" status line in each node, driven by `highlightedIds`. */
+  showStatus?: boolean;
+  /** Marks this node with an "orquestador" tag. */
+  orchestratorId?: string | null;
   onSelect: (agentId: string) => void;
 }
 
@@ -60,6 +64,38 @@ const MARKER_FILLS: Record<EdgeState, string> = {
   dimmed: 'fill-fg-subtle/60',
 };
 
+function nodeLabel(
+  agent: AgentDto,
+  flags: { showStatus: boolean; isWorking: boolean; isOrchestrator: boolean },
+) {
+  const parts = [agent.name, agent.role];
+  if (flags.isOrchestrator) parts.push('orquestador');
+  if (flags.showStatus) parts.push(flags.isWorking ? 'trabajando' : 'idle');
+  return parts.join(', ');
+}
+
+function modelLine(agent: AgentDto, showStatus: boolean, isWorking: boolean) {
+  if (showStatus) return `${isWorking ? '●' : '○'} ${isWorking ? 'trabajando' : 'idle'} · ${agent.model}`;
+  return `${agent.model} · ${EFFORT_LABELS[agent.effort].toLowerCase()}`;
+}
+
+function OrchestratorTag() {
+  return (
+    <g transform={`translate(${W - 84} -9)`}>
+      <rect width={84} height={16} className="fill-accent" />
+      <text
+        x={42}
+        y={8}
+        textAnchor="middle"
+        dominantBaseline="central"
+        className="fill-surface font-mono text-[10px] font-semibold"
+      >
+        orquestador
+      </text>
+    </g>
+  );
+}
+
 const HALO = '[filter:drop-shadow(0_0_6px_color-mix(in_srgb,var(--color-accent)_55%,transparent))]';
 
 function AgentNode(props: {
@@ -70,10 +106,13 @@ function AgentNode(props: {
   isDimmed: boolean;
   selectable: boolean;
   isSelected: boolean;
+  showStatus: boolean;
+  isOrchestrator: boolean;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
 }) {
   const { agent, node, isWorking, isActive, isDimmed, selectable, isSelected, onHover, onSelect } = props;
+  const { showStatus, isOrchestrator } = props;
   const isHighlighted = isActive || isWorking || isSelected;
   return (
     <g
@@ -81,7 +120,7 @@ function AgentNode(props: {
       role={selectable ? 'button' : 'link'}
       aria-pressed={selectable ? isSelected : undefined}
       tabIndex={0}
-      aria-label={`${agent.name}, ${agent.role}`}
+      aria-label={nodeLabel(agent, props)}
       transform={`translate(${node.x} ${node.y})`}
       className={`cursor-pointer outline-none motion-safe:transition-opacity ${isDimmed ? 'opacity-40' : ''}`}
       onMouseEnter={() => onHover(agent.id)}
@@ -126,8 +165,9 @@ function AgentNode(props: {
         {clip(agent.role, 26)}
       </text>
       <text x={TEXT_X} y={57} className="fill-fg-subtle font-mono text-[10px]">
-        {clip(`${agent.model} · ${EFFORT_LABELS[agent.effort].toLowerCase()}`, 26)}
+        {clip(modelLine(agent, showStatus, isWorking), 26)}
       </text>
+      {isOrchestrator && <OrchestratorTag />}
       {isWorking && <title>{`${agent.name}: trabajando`}</title>}
     </g>
   );
@@ -155,7 +195,14 @@ function ArrowMarkers() {
 }
 
 /** Diagram of the fleet: each arrow means "delegates to". */
-export function AgentGraph({ agents, highlightedIds = new Set(), selectedId, onSelect }: AgentGraphProps) {
+export function AgentGraph({
+  agents,
+  highlightedIds = new Set(),
+  selectedId,
+  showStatus = false,
+  orchestratorId = null,
+  onSelect,
+}: AgentGraphProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const layout = useMemo(() => layoutAgentGraph(agents), [agents]);
   const nodesById = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
@@ -171,8 +218,8 @@ export function AgentGraph({ agents, highlightedIds = new Set(), selectedId, onS
   return (
     <figure className="space-y-4">
       <figcaption className="font-mono text-xs text-fg-subtle">
-        Las flechas indican «delega en»; las discontinuas cierran un ciclo. Haz clic en un agente para ver su
-        ficha.
+        Las flechas indican «delega en»; las discontinuas cierran un ciclo, como el de verificación. Haz clic
+        en un agente para ver su ficha.
       </figcaption>
       <div className="overflow-x-auto">
         <svg
@@ -198,6 +245,8 @@ export function AgentGraph({ agents, highlightedIds = new Set(), selectedId, onS
                 isActive={hoveredId === node.id}
                 selectable={selectedId !== undefined}
                 isSelected={selectedId === node.id}
+                showStatus={showStatus}
+                isOrchestrator={orchestratorId === node.id}
                 isDimmed={hoveredId !== null && hoveredId !== node.id && !neighbours.has(node.id)}
                 onHover={setHoveredId}
                 onSelect={onSelect}

@@ -39,7 +39,12 @@ const telemetry = (patch: Partial<ProjectTelemetryDto> = {}): ProjectTelemetryDt
 const renderTable = (
   projects: ProjectDto[],
   data: ProjectTelemetryDto | undefined,
-  options: { loading?: boolean; onResume?: () => void } = {},
+  options: {
+    loading?: boolean;
+    onResume?: () => void;
+    inspectedId?: string | null;
+    onInspect?: (project: ProjectDto) => void;
+  } = {},
 ) =>
   render(
     <MemoryRouter>
@@ -48,6 +53,8 @@ const renderTable = (
         agents={agents}
         telemetry={new Map(data ? [[data.projectId, data]] : [])}
         loading={options.loading}
+        inspectedId={options.inspectedId ?? null}
+        onInspect={options.onInspect ?? (() => undefined)}
         onResume={options.onResume ?? (() => undefined)}
       />
     </MemoryRouter>,
