@@ -82,6 +82,7 @@ export class SdkMessageMapper {
   private usage(message: Extract<SDKMessage, { type: 'result' }>): RunUsage {
     return {
       numTurns: message.num_turns,
+      apiDurationMs: message.duration_api_ms ?? null,
       models: Object.entries(message.modelUsage ?? {}).map(([model, usage]) => ({
         model: usage.canonicalModel ?? model,
         inputTokens: usage.inputTokens,

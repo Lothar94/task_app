@@ -3,6 +3,8 @@ import { toMessageDto, toTaskDto } from '../../../application/shared/dtos.js';
 import type { AssignTask } from '../../../application/tasks/AssignTask.js';
 import type { CancelTask } from '../../../application/tasks/CancelTask.js';
 import type { GetTask, GetTaskConversation, GetTaskTree } from '../../../application/tasks/QueryTasks.js';
+import type { GetTaskExecution } from '../../../application/metrics/GetTaskExecution.js';
+import type { GetTaskGitContext, GetTaskGitDiff } from '../../../application/tasks/QueryTaskGit.js';
 import type { SendFollowUp } from '../../../application/tasks/SendFollowUp.js';
 import type { DequeueTask } from '../../../application/tasks/DequeueTask.js';
 import type { EnqueueTask } from '../../../application/tasks/EnqueueTask.js';
@@ -29,9 +31,31 @@ export interface TaskUseCases {
   getTask: GetTask;
   getTaskTree: GetTaskTree;
   getTaskConversation: GetTaskConversation;
+  getTaskExecution: GetTaskExecution;
+  getTaskGitContext: GetTaskGitContext;
+  getTaskGitDiff: GetTaskGitDiff;
+}
+
+function registerTaskTelemetryRoutes(app: FastifyInstance, useCases: TaskUseCases): void {
+  app.get('/api/tasks/:id/execution', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.getTaskExecution.execute(id);
+  });
+
+  app.get('/api/tasks/:id/git', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.getTaskGitContext.execute(id);
+  });
+
+  app.get('/api/tasks/:id/git/diff', (request) => {
+    const { id } = idParams.parse(request.params);
+    return useCases.getTaskGitDiff.execute(id);
+  });
 }
 
 export function registerTaskRoutes(app: FastifyInstance, useCases: TaskUseCases): void {
+  registerTaskTelemetryRoutes(app, useCases);
+
   app.get('/api/projects/:id/tasks', (request) => {
     const { id } = idParams.parse(request.params);
     return useCases.getTaskTree.execute(id);

@@ -1,3 +1,4 @@
+import type { MessagePayload } from '@fleet/shared';
 import type { Agent } from '../../domain/agent/Agent.js';
 import type { Project } from '../../domain/project/Project.js';
 import type { Task } from '../../domain/task/Task.js';
@@ -8,10 +9,12 @@ import type { Clock } from '../ports/Clock.js';
 import type { ProjectRepository } from '../ports/ProjectRepository.js';
 import type { TaskRepository } from '../ports/TaskRepository.js';
 import { requireAgent, requireProject, requireTask } from '../shared/lookups.js';
+import { ToolTimeTracker } from '../metrics/toolTiming.js';
 import type { AgentBriefing } from './AgentBriefing.js';
 import type { DelegateSubtask } from './DelegateSubtask.js';
 import type { ProposeTask } from './ProposeTask.js';
 import type { SkillWorkspace } from '../ports/SkillWorkspace.js';
+import type { TaskGitTracker } from './TaskGitTracker.js';
 import type { RunningTasks } from './RunningTasks.js';
 import { TaskDelegationGateway } from './TaskDelegationGateway.js';
 import type { ExecutionOptions, TaskExecutor } from './TaskExecutor.js';
@@ -36,6 +39,7 @@ export interface RunTaskDependencies {
   skillWorkspace: SkillWorkspace;
   delegateSubtask: DelegateSubtask;
   proposeTask: ProposeTask;
+  gitTracker: TaskGitTracker;
   clock: Clock;
   ids: IdGenerator;
 }
@@ -57,13 +61,26 @@ export class RunTask implements TaskExecutor {
     recorder.recordMessage(task, { kind: 'user', text: prompt });
     const controller = running.register(task.id, options.parentSignal);
     const startedAt = clock.now();
+    const toolTime = new ToolTimeTracker();
 
     try {
-      const outcome = await this.runAgent(task, agent, project, prompt, isFollowUp, controller.signal).catch(
-        (error: unknown): RunOutcome => ({ resultText: describeError(error), isError: true, usage: null }),
-      );
+      await this.deps.gitTracker.captureBase(task.id, project.workspacePath);
+      const outcome = await this.runAgent(
+        task,
+        agent,
+        project,
+        prompt,
+        isFollowUp,
+        controller.signal,
+        toolTime,
+      ).catch((error: unknown): RunOutcome => ({
+        resultText: describeError(error),
+        isError: true,
+        usage: null,
+      }));
       this.conclude(task, outcome, controller.signal);
-      this.recordRun(task, startedAt, outcome);
+      this.recordRun(task, startedAt, outcome, toolTime);
+      await this.deps.gitTracker.captureHead(task.id, project.workspacePath);
     } finally {
       running.release(task.id);
       recorder.recordChange(task);
@@ -78,6 +95,7 @@ export class RunTask implements TaskExecutor {
     prompt: string,
     isFollowUp: boolean,
     signal: AbortSignal,
+    toolTime: ToolTimeTracker,
   ): Promise<RunOutcome> {
     const { runtime, briefing, delegateSubtask, proposeTask, agents, recorder } = this.deps;
     const collaborators = this.collaboratorsOf(agent, project);
@@ -110,10 +128,14 @@ export class RunTask implements TaskExecutor {
         signal,
       ),
     });
-    return this.consume(task, events);
+    return this.consume(task, events, toolTime);
   }
 
-  private async consume(task: Task, events: AsyncIterable<RuntimeEvent>): Promise<RunOutcome> {
+  private async consume(
+    task: Task,
+    events: AsyncIterable<RuntimeEvent>,
+    toolTime: ToolTimeTracker,
+  ): Promise<RunOutcome> {
     const { recorder } = this.deps;
     let outcome: RunOutcome = {
       resultText: 'The agent stopped without a result',
@@ -127,6 +149,7 @@ export class RunTask implements TaskExecutor {
           recorder.recordChange(task);
           break;
         case 'message':
+          this.trackToolTime(toolTime, event.payload);
           recorder.recordMessage(task, event.payload);
           break;
         case 'finished':
@@ -137,6 +160,12 @@ export class RunTask implements TaskExecutor {
     return outcome;
   }
 
+  private trackToolTime(toolTime: ToolTimeTracker, payload: MessagePayload): void {
+    const atMs = this.deps.clock.now().getTime();
+    if (payload.kind === 'tool_use') toolTime.start(payload.toolUseId, atMs);
+    else if (payload.kind === 'tool_result') toolTime.finish(payload.toolUseId, atMs);
+  }
+
   private conclude(task: Task, outcome: RunOutcome, signal: AbortSignal): void {
     const now = this.deps.clock.now();
     if (signal.aborted) task.cancel(now);
@@ -144,18 +173,19 @@ export class RunTask implements TaskExecutor {
     else task.complete(outcome.resultText, now);
   }
 
-  private recordRun(task: Task, startedAt: Date, outcome: RunOutcome): void {
+  private recordRun(task: Task, startedAt: Date, outcome: RunOutcome, toolTime: ToolTimeTracker): void {
     const status = task.status;
     if (status !== 'completed' && status !== 'failed' && status !== 'cancelled') return;
+    const finishedAt = this.deps.clock.now();
     this.deps.recorder.recordRun({
       id: this.deps.ids.next(),
       taskId: task.id,
       startedAt,
-      finishedAt: this.deps.clock.now(),
+      finishedAt,
       outcome: status,
       error: status === 'failed' ? task.resultSummary : null,
-      numTurns: outcome.usage?.numTurns ?? null,
-      models: outcome.usage?.models ?? [],
+      ...usageOf(outcome),
+      toolMs: toolTime.totalMs(finishedAt.getTime()),
     });
   }
 
@@ -179,6 +209,14 @@ export class RunTask implements TaskExecutor {
       )
       .map(({ name, role, description }) => ({ name, role, description }));
   }
+}
+
+function usageOf({ usage }: RunOutcome) {
+  return {
+    numTurns: usage?.numTurns ?? null,
+    models: usage?.models ?? [],
+    llmMs: usage?.apiDurationMs ?? null,
+  };
 }
 
 function describeError(error: unknown): string {

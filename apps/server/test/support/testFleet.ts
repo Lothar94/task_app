@@ -8,6 +8,7 @@ import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDa
 import type { AgentBrief, InstructionWriter } from '../../src/application/ports/InstructionWriter.js';
 import { createContainer } from '../../src/main/container.js';
 import { type AgentBehaviour, FakeAgentRuntime } from './FakeAgentRuntime.js';
+import { FakeGitWorkspace } from './FakeGitWorkspace.js';
 
 export class FakeInstructionWriter implements InstructionWriter {
   readonly briefs: AgentBrief[] = [];
@@ -72,16 +73,18 @@ export function createTestFleet(
   const runtime = new FakeAgentRuntime(behaviours);
   const instructionWriter = new FakeInstructionWriter();
   const skillSupport = fakeSkillSupport(catalogSkills);
+  const git = new FakeGitWorkspace();
   const container = createContainer({
     db: openDatabase(':memory:'),
     runtime,
     instructionWriter,
     ...skillSupport,
     logger: silentLogger,
+    git,
     maxDelegationDepth,
     reservedPorts,
   });
-  return { runtime, instructionWriter, skillWorkspace: skillSupport.skillWorkspace, ...container };
+  return { runtime, git, instructionWriter, skillWorkspace: skillSupport.skillWorkspace, ...container };
 }
 
 /** Creates a CTO that can delegate to the given teammates, all members of a fresh project. */
