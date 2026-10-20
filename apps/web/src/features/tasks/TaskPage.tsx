@@ -1,4 +1,4 @@
-import { type TaskDto, isArchivedProject } from '@fleet/shared';
+import { type TaskDto, type TaskExecutionDto, isArchivedProject } from '@fleet/shared';
 import { type ReactNode, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { Dialog } from '../../components/Dialog';
@@ -7,7 +7,7 @@ import { useFleetEvents } from '../../hooks/useFleetEvents';
 import { useAgents } from '../agents/agentQueries';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { TaskNumber, taskLabel } from './taskLabel';
-import { findNode, subtreeMetrics } from './taskTreeModel';
+import { hasSubtreeTokens, runLabel } from './executionModel';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
 import { TaskWorkspace } from './TaskWorkspace';
 import { TaskEditForm } from './TaskEditForm';
@@ -19,6 +19,7 @@ import {
   useEnqueueTask,
   useStartTask,
   useTask,
+  useTaskExecution,
   useTaskTree,
 } from './taskQueries';
 import { ProposalNote } from './ProposalNote';
@@ -28,29 +29,32 @@ import { useProject } from '../projects/projectQueries';
 const META_ITEM = 'flex items-baseline gap-1.5';
 const META_KEY = 'text-fg-subtle';
 
-function TaskMetricsSummary({ task }: { task: TaskDto }) {
-  const tree = useTaskTree(task.projectId);
-  const node = tree.data ? findNode(tree.data, task.id) : undefined;
-  if (!node || node.metrics.runs === 0) return null;
-  const total = subtreeMetrics(node);
-  const delegated = node.children.length > 0 ? ` (${formatTokens(total.totalTokens)} con subtareas)` : '';
+/** Duration, tokens and last run from the execution endpoint (the single source for run telemetry). */
+export function TaskMetricsView({ task, execution }: { task: Pick<TaskDto, 'status'>; execution: TaskExecutionDto }) {
+  if (execution.own.runs === 0) return null;
+  const delegated = hasSubtreeTokens(execution) ? ` (${formatTokens(execution.subtree.totalTokens)} con subtareas)` : '';
   return (
     <>
       <span className={META_ITEM}>
         <span className={META_KEY}>Duración:</span>
-        {formatDuration(node.metrics.durationMs)}
+        {formatDuration(execution.own.durationMs)}
       </span>
-      <span className={META_ITEM} title={`Coste estimado ${formatCost(total.costUsd)}`}>
+      <span className={META_ITEM} title={`Coste estimado ${formatCost(execution.subtree.costUsd)}`}>
         <span className={META_KEY}>Tokens:</span>
-        {formatTokens(node.metrics.totalTokens)}
+        {formatTokens(execution.own.totalTokens)}
         {delegated}
       </span>
       <span className={META_ITEM}>
-        <span className={META_KEY}>Ejecuciones:</span>
-        {node.metrics.runs}
+        <span className={META_KEY}>Ejecución:</span>
+        {runLabel(execution, task.status)}
       </span>
     </>
   );
+}
+
+function TaskMetricsSummary({ task }: { task: TaskDto }) {
+  const { data } = useTaskExecution(task.id);
+  return data ? <TaskMetricsView task={task} execution={data} /> : null;
 }
 
 function TaskMeta({

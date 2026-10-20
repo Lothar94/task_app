@@ -3,6 +3,8 @@ import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tansta
 import { queryKeys } from '../../api/queryKeys';
 import { tasksApi } from '../../api/tasksApi';
 
+const GIT_POLL_MS = 10_000;
+
 export const useTaskTree = (projectId: string) =>
   useQuery({ queryKey: queryKeys.taskTree(projectId), queryFn: () => tasksApi.tree(projectId) });
 
@@ -11,6 +13,21 @@ export const useTask = (id: string) =>
 
 export const useConversation = (taskId: string) =>
   useQuery({ queryKey: queryKeys.conversation(taskId), queryFn: () => tasksApi.conversation(taskId) });
+
+export const useTaskExecution = (taskId: string) =>
+  useQuery({ queryKey: queryKeys.execution(taskId), queryFn: () => tasksApi.execution(taskId) });
+
+/** Git context of a task; polled every 10 s while its head and files are live. */
+export const useTaskGit = (taskId: string) =>
+  useQuery({
+    queryKey: queryKeys.git(taskId),
+    queryFn: () => tasksApi.git(taskId),
+    refetchInterval: (query) => (query.state.data?.status === 'ok' && query.state.data.live ? GIT_POLL_MS : false),
+  });
+
+/** The unified patch is only fetched once the diff view is opened (`enabled`). */
+export const useTaskGitDiff = (taskId: string, enabled: boolean) =>
+  useQuery({ queryKey: queryKeys.gitDiff(taskId), queryFn: () => tasksApi.gitDiff(taskId), enabled });
 
 export function useAssignTask(projectId: string) {
   const queryClient = useQueryClient();
