@@ -2,6 +2,7 @@ import type { AgentDto, ProjectDto, TaskNodeDto } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
 import {
   findOrchestrator,
+  flattenDescendants,
   recentRoots,
   resolveInspected,
   taskElapsedMs,
@@ -33,7 +34,7 @@ describe('recentRoots', () => {
       task('new', { number: 4, createdAt: '2026-01-03T00:00:00.000Z' }),
     ];
     expect(recentRoots(tree, 3).map((t) => t.id)).toEqual(['new', 'tie-b', 'tie-a']);
-    expect(tree[0].id).toBe('old');
+    expect(tree[0]?.id).toBe('old');
   });
 });
 
@@ -96,5 +97,16 @@ describe('resolveInspected', () => {
     expect(resolveInspected(projects, 'p2')?.id).toBe('p2');
     expect(resolveInspected(projects, 'zz')?.id).toBe('p1');
     expect(resolveInspected([], null)).toBeNull();
+  });
+});
+
+describe('flattenDescendants', () => {
+  it('lists descendants in tree order with depth', () => {
+    const root = task('r', { children: [task('c1', { children: [task('g')] }), task('c2')] });
+    expect(flattenDescendants(root).map((f) => [f.task.id, f.depth])).toEqual([
+      ['c1', 1],
+      ['g', 2],
+      ['c2', 1],
+    ]);
   });
 });

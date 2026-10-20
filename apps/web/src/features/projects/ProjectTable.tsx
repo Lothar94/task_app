@@ -1,11 +1,12 @@
 import type { AgentDto, ProjectDto, ProjectTelemetryDto } from '@fleet/shared';
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowRight, Eye, RotateCcw } from 'lucide-react';
 import { Fragment } from 'react';
 import { Link } from 'react-router';
 import { useNow } from '../../hooks/useNow';
 import { Badge, Button, FOCUS_RING, StatusChip } from '../../components/ui';
 import { formatDate } from '../../lib/format';
 import { ActiveSubtaskRow } from './ActiveSubtaskRow';
+import { INSPECTION_PANEL_ID } from './inspectionModel';
 import { memberNames, type TelemetryByProject } from './projectListModel';
 import { CellSkeleton, LoadCell, STATUS_CHIP, StatusCell, plural } from './ProjectTelemetryCells';
 
@@ -96,11 +97,15 @@ function NameCell({ project, telemetry }: { project: ProjectDto; telemetry?: Pro
 function ActionsCell({
   project,
   canResume,
+  inspected,
   onResume,
+  onInspect,
 }: {
   project: ProjectDto;
   canResume: boolean;
+  inspected: boolean;
   onResume: (project: ProjectDto) => void;
+  onInspect: (project: ProjectDto) => void;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2 md:justify-end">
@@ -115,6 +120,17 @@ function ActionsCell({
           Reanudar
         </Button>
       )}
+      <Button
+        variant="secondary"
+        className={`!px-2.5 !py-1 font-mono text-xs ${inspected ? '!border-accent !text-accent' : ''}`}
+        aria-label={`Inspeccionar ${project.name}`}
+        aria-pressed={inspected}
+        aria-controls={INSPECTION_PANEL_ID}
+        onClick={() => onInspect(project)}
+      >
+        <Eye aria-hidden className="size-3.5" />
+        Inspeccionar
+      </Button>
       <Link
         to={`/projects/${project.id}`}
         aria-label={`Abrir ${project.name}`}
@@ -133,7 +149,9 @@ interface RowProps {
   telemetry?: ProjectTelemetryDto;
   loading: boolean;
   now: number;
+  inspected: boolean;
   onResume: (project: ProjectDto) => void;
+  onInspect: (project: ProjectDto) => void;
 }
 
 /** Archived projects keep their numbers but expose no live subtask nor resume action. */
@@ -142,7 +160,7 @@ function liveState(project: ProjectDto, telemetry?: ProjectTelemetryDto) {
   return { subtask: live?.activeSubtask ?? null, canResume: (live?.alerts.length ?? 0) > 0 };
 }
 
-function ProjectRow({ project, agents, telemetry, loading, now, onResume }: RowProps) {
+function ProjectRow({ project, agents, telemetry, loading, now, inspected, onResume, onInspect }: RowProps) {
   const { tint } = rowAppearance(project, telemetry);
   const { subtask, canResume } = liveState(project, telemetry);
   const skeleton = loading && !telemetry;
@@ -166,7 +184,13 @@ function ProjectRow({ project, agents, telemetry, loading, now, onResume }: RowP
           {telemetry && <LoadCell telemetry={telemetry} now={now} />}
         </td>
         <td className={`${CELL} md:text-right`}>
-          <ActionsCell project={project} canResume={canResume} onResume={onResume} />
+          <ActionsCell
+            project={project}
+            canResume={canResume}
+            inspected={inspected}
+            onResume={onResume}
+            onInspect={onInspect}
+          />
         </td>
       </tr>
       {subtask && <ActiveSubtaskRow projectId={project.id} subtask={subtask} now={now} tint={tint} />}
@@ -179,13 +203,17 @@ export function ProjectTable({
   agents,
   telemetry,
   loading = false,
+  inspectedId,
   onResume,
+  onInspect,
 }: {
   projects: ProjectDto[];
   agents: AgentDto[];
   telemetry: TelemetryByProject;
   loading?: boolean;
+  inspectedId: string | null;
   onResume: (project: ProjectDto) => void;
+  onInspect: (project: ProjectDto) => void;
 }) {
   const now = useNow(telemetry.size > 0);
   return (
@@ -219,7 +247,9 @@ export function ProjectTable({
               telemetry={telemetry.get(project.id)}
               loading={loading}
               now={now}
+              inspected={project.id === inspectedId}
               onResume={onResume}
+              onInspect={onInspect}
             />
           ))}
         </tbody>

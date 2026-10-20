@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { Dialog } from '../../components/Dialog';
 import { Tabs, tabPanelProps } from '../../components/Tabs';
 import { Badge, Button, EmptyState, ErrorMessage, Loading, PageHeader } from '../../components/ui';
@@ -17,10 +17,14 @@ import {
 } from './projectListModel';
 import { useCreateProject, useProjects, useProjectsTelemetry } from './projectQueries';
 import { ProjectForm } from './ProjectForm';
+import { ProjectInspection } from './ProjectInspection';
+import { resolveInspected } from './inspectionModel';
 import { ProjectListControls } from './ProjectListControls';
 import { ProjectTable } from './ProjectTable';
 import { ProjectTiles } from './ProjectTiles';
 import { ResumeProjectDialog } from './ResumeProjectDialog';
+
+const INSPECT_PARAM = 'inspect';
 
 const EMPTY_MESSAGES: Record<ProjectFilter, string> = {
   active: 'No hay proyectos activos. Crea uno con «Nuevo proyecto».',
@@ -35,6 +39,7 @@ export function ProjectsPage() {
   const createProject = useCreateProject();
   const navigate = useNavigate();
   const organization = useCurrentOrganization();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isCreating, setIsCreating] = useState(false);
   const [resuming, setResuming] = useState<ProjectDto | null>(null);
   const [filter, setFilter] = useState<ProjectFilter>('active');
@@ -57,6 +62,7 @@ export function ProjectsPage() {
     { value: 'archived' as const, label: 'Archivados', count: groups.archived.length },
     { value: 'alerts' as const, label: 'Con alertas', count: groups.alerts.length },
   ];
+  const inspected = resolveInspected(visible, searchParams.get(INSPECT_PARAM));
   const emptyMessage =
     groups[filter].length === 0 ? EMPTY_MESSAGES[filter] : `Ningún proyecto coincide con «${query.trim()}».`;
 
@@ -105,10 +111,13 @@ export function ProjectsPage() {
             agents={agents.data}
             telemetry={telemetry}
             loading={telemetryQuery.isPending}
+            inspectedId={inspected?.id ?? null}
+            onInspect={(project) => setSearchParams({ [INSPECT_PARAM]: project.id }, { replace: true })}
             onResume={setResuming}
           />
         )}
       </div>
+      {inspected && <ProjectInspection key={inspected.id} project={inspected} agents={agents.data} />}
       {resuming && (
         <ResumeProjectDialog
           key={resuming.id}

@@ -2,6 +2,7 @@ import type { AgentDto, ProjectDto, TaskNodeDto } from '@fleet/shared';
 import { isTaskActive } from '../tasks/TaskStatusBadge';
 import type { TreeTotals } from '../tasks/taskTreeModel';
 
+export const INSPECTION_PANEL_ID = 'project-inspection';
 export const RECENT_ROOTS_LIMIT = 3;
 const MS_PER_MINUTE = 60_000;
 
@@ -51,7 +52,7 @@ export function findOrchestrator(members: AgentDto[], tree: TaskNodeDto[]): Agen
   }
   const delegated = new Set(members.flatMap((member) => member.collaboratorIds));
   const heads = members.filter((member) => !delegated.has(member.id));
-  return [...heads].sort((a, b) => a.name.localeCompare(b.name))[0] ?? members[0];
+  return [...heads].sort((a, b) => a.name.localeCompare(b.name))[0] ?? members[0] ?? null;
 }
 
 export function topologyRows(
@@ -74,4 +75,17 @@ export function topologyRows(
 /** Average throughput over agent working time, or null without working time. */
 export function tokensPerMinute(totals: TreeTotals): number | null {
   return totals.workingMs > 0 ? totals.tokens / (totals.workingMs / MS_PER_MINUTE) : null;
+}
+
+export interface FlatTask {
+  task: TaskNodeDto;
+  /** 1 for direct children of the root. */
+  depth: number;
+}
+
+/** Every descendant of a task in tree order, with its depth below it. */
+export function flattenDescendants(root: TaskNodeDto): FlatTask[] {
+  const visit = (node: TaskNodeDto, depth: number): FlatTask[] =>
+    node.children.flatMap((child) => [{ task: child, depth }, ...visit(child, depth + 1)]);
+  return visit(root, 1);
 }
