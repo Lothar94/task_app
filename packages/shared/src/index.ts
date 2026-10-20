@@ -5,3 +5,4 @@ export * from './tasks.js';
 export * from './conversation.js';
 export * from './events.js';
 export * from './metrics.js';
+export * from './telemetry.js';
