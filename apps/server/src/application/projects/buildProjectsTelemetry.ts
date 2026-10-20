@@ -13,7 +13,7 @@ import type { Project } from '../../domain/project/Project.js';
 import type { Task } from '../../domain/task/Task.js';
 import type { TaskRun } from '../../domain/task/TaskRun.js';
 import { groupBy, summarizeRuns } from '../metrics/usageMath.js';
-import { classifyFailure } from './classifyFailure.js';
+import { classifyFailure, recoverableFailures } from './classifyFailure.js';
 
 const WEEK_MS = 7 * 86_400_000;
 
@@ -41,11 +41,9 @@ function countTasks(tasks: Task[]): ProjectTaskCounts {
 }
 
 function buildAlerts(tasks: Task[]): ProjectAlertDto[] {
-  const failedRoots = tasks
-    .filter((task) => task.status === 'failed' && task.parentTaskId === null)
-    .sort((a, b) => a.toSnapshot().createdAt.getTime() - b.toSnapshot().createdAt.getTime());
+  const recoverable = recoverableFailures(tasks);
   return PROJECT_ALERT_KINDS.flatMap((kind) => {
-    const taskIds = failedRoots
+    const taskIds = recoverable
       .filter((task) => classifyFailure(task.resultSummary) === kind)
       .map((task) => task.id);
     return taskIds.length > 0 ? [{ kind, taskIds }] : [];
@@ -78,7 +76,8 @@ function lastActivity(tasks: Task[], runs: TaskRun[]): string | null {
     }),
     ...runs.map((run) => run.finishedAt),
   ].flatMap((date) => (date ? [date.getTime()] : []));
-  return times.length > 0 ? new Date(Math.max(...times)).toISOString() : null;
+  if (times.length === 0) return null;
+  return new Date(times.reduce((latest, time) => Math.max(latest, time))).toISOString();
 }
 
 function statusOf(tasks: Task[], alerts: ProjectAlertDto[]): ProjectOperationalStatus {
