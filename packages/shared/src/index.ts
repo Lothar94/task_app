@@ -6,3 +6,4 @@ export * from './conversation.js';
 export * from './events.js';
 export * from './metrics.js';
 export * from './telemetry.js';
+export * from './projectTelemetry.js';
