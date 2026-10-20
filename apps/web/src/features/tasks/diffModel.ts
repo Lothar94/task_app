@@ -34,6 +34,28 @@ function lineKind(line: string): DiffLineKind {
   return 'context';
 }
 
+/** `--- a/x` / `+++ b/x` lines refine the paths; `/dev/null` (added/deleted file) is ignored. */
+function applyPathLine(file: DiffFile, line: string): void {
+  const path = line.slice(4);
+  if (path === '/dev/null') return;
+  if (line.startsWith('+++ ')) file.path = stripPrefix(path);
+  else if (file.oldPath !== null) file.oldPath = stripPrefix(path);
+}
+
+/** Applies one pre-hunk header line (mode, rename, ---/+++, binary marker) to its file. */
+function applyHeaderLine(file: DiffFile, line: string): void {
+  if (line.startsWith('Binary files ') || line.startsWith('GIT binary patch')) {
+    file.isBinary = true;
+  } else if (line.startsWith('+++ ') || line.startsWith('--- ')) {
+    applyPathLine(file, line);
+  } else if (line.startsWith('rename to ')) {
+    file.path = line.slice('rename to '.length);
+    file.meta.push(line);
+  } else if (line !== '' && !line.startsWith('index ')) {
+    file.meta.push(line);
+  }
+}
+
 /** Parses `git diff` output into files, hunks and typed lines; an empty patch gives no files. */
 export function parseUnifiedDiff(patch: string): DiffFile[] {
   const files: DiffFile[] = [];
@@ -45,27 +67,13 @@ export function parseUnifiedDiff(patch: string): DiffFile[] {
       file = { path, oldPath: oldPath === path ? null : oldPath, isBinary: false, meta: [], hunks: [] };
       files.push(file);
       hunk = undefined;
-    } else if (!file) {
-      continue;
-    } else if (line.startsWith('@@')) {
+    } else if (file && line.startsWith('@@')) {
       hunk = { header: line, lines: [] };
       file.hunks.push(hunk);
-    } else if (hunk) {
-      if (line === '') continue;
-      hunk.lines.push({ kind: lineKind(line), text: line });
-    } else if (line.startsWith('Binary files ') || line.startsWith('GIT binary patch')) {
-      file.isBinary = true;
-    } else if (line.startsWith('rename to ')) {
-      file.path = line.slice('rename to '.length);
-      file.meta.push(line);
-    } else if (line.startsWith('+++ ')) {
-      const target = line.slice(4);
-      if (target !== '/dev/null') file.path = stripPrefix(target);
-    } else if (line.startsWith('--- ')) {
-      const source = line.slice(4);
-      if (source !== '/dev/null' && file.oldPath !== null) file.oldPath = stripPrefix(source);
-    } else if (line !== '' && !line.startsWith('index ')) {
-      file.meta.push(line);
+    } else if (file && hunk) {
+      if (line !== '') hunk.lines.push({ kind: lineKind(line), text: line });
+    } else if (file) {
+      applyHeaderLine(file, line);
     }
   }
   return files;
