@@ -1,4 +1,4 @@
-import type { ConversationMessageDto, FleetEvent } from '@fleet/shared';
+import type { ConversationMessageDto, FleetEvent, TaskDto } from '@fleet/shared';
 import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { queryKeys } from '../api/queryKeys';
@@ -10,6 +10,19 @@ function appendMessage(queryClient: QueryClient, message: ConversationMessageDto
   });
 }
 
+/** A task's telemetry changes with its runs; its ancestors' subtree totals change with it. */
+function invalidateTelemetry(queryClient: QueryClient, task: TaskDto): void {
+  void queryClient.invalidateQueries({ queryKey: queryKeys.execution(task.id) });
+  void queryClient.invalidateQueries({ queryKey: queryKeys.git(task.id) });
+  const visited = new Set([task.id]);
+  let parentId = task.parentTaskId;
+  while (parentId && !visited.has(parentId)) {
+    visited.add(parentId);
+    void queryClient.invalidateQueries({ queryKey: queryKeys.execution(parentId) });
+    parentId = queryClient.getQueryData<TaskDto>(queryKeys.task(parentId))?.parentTaskId ?? null;
+  }
+}
+
 function applyEvent(queryClient: QueryClient, event: FleetEvent): void {
   if (event.type === 'task.message_appended') {
     appendMessage(queryClient, event.message);
@@ -17,6 +30,7 @@ function applyEvent(queryClient: QueryClient, event: FleetEvent): void {
   }
   queryClient.setQueryData(queryKeys.task(event.task.id), event.task);
   void queryClient.invalidateQueries({ queryKey: queryKeys.taskTree(event.projectId) });
+  if (event.type === 'task.updated') invalidateTelemetry(queryClient, event.task);
 }
 
 /** Keeps cached tasks and conversations of a project in sync with the server in real time. */
