@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Accordion } from '../../components/Accordion';
 import { Markdown } from '../../components/Markdown';
 import type { ChipTone } from '../../components/ui';
+import { ResultActions } from './ResultActions';
 
 interface ResultStyle {
   label: string;
@@ -49,6 +50,11 @@ export function ResultPanel({ task, defaultOpen = true }: { task: TaskDto; defau
     <Accordion
       defaultOpen={defaultOpen}
       bar={tone}
+      trailing={
+        <span className="flex flex-wrap items-center justify-end gap-2">
+          <ResultActions task={task} />
+        </span>
+      }
       bodyClassName="border-t border-line bg-canvas/40 px-5 py-4"
       header={
         <>

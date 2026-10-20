@@ -61,6 +61,8 @@ function run(
     outcome,
     error,
     numTurns: 2,
+    llmMs: null,
+    toolMs: null,
     models,
   };
 }

@@ -69,6 +69,8 @@ export interface AgentRunRequest {
 
 export interface RunUsage {
   numTurns: number;
+  /** Time spent waiting for the model API (SDK `duration_api_ms`); null when unknown. */
+  apiDurationMs: number | null;
   models: ModelTokenUsage[];
 }
 

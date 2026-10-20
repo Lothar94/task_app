@@ -29,6 +29,8 @@ export class RecoverInterruptedTasks {
           outcome: 'failed',
           error: INTERRUPTED_REASON,
           numTurns: null,
+          llmMs: null,
+          toolMs: null,
           models: [],
         });
       }

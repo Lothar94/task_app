@@ -200,3 +200,29 @@ describe('organizations migration', () => {
     expect(project?.toSnapshot().archivedAt).toBeNull();
   });
 });
+
+describe('task telemetry migrations', () => {
+  it('keeps legacy runs, leaving their timing unknown, and adds the git snapshot table', () => {
+    const db = openDatabase(
+      legacyDatabase(
+        9,
+        `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools,
+          permission_mode, max_turns, created_at, updated_at) VALUES ('a1', '${DEFAULT_ORGANIZATION_ID}', 'CTO',
+          'Lead', '', 'Lead', 'opus', 'high', '[]', 'dontAsk', 10, '2026-01-01', '2026-01-01');
+        INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at)
+          VALUES ('p1', '${DEFAULT_ORGANIZATION_ID}', 'P1', '', '/tmp/p1', '2026-01-01');
+        INSERT INTO tasks (id, number, project_id, agent_id, title, description, status, created_at)
+          VALUES ('t1', 1, 'p1', 'a1', 'T', 'd', 'completed', '2026-01-01');
+        INSERT INTO task_runs (id, task_id, started_at, finished_at, outcome, model_usage)
+          VALUES ('r1', 't1', '2026-01-01', '2026-01-02', 'completed', '[]');`,
+      ),
+    );
+
+    expect(db.prepare('SELECT llm_ms, tool_ms FROM task_runs').all()).toEqual([
+      { llm_ms: null, tool_ms: null },
+    ]);
+    db.prepare("INSERT INTO task_git_snapshots (task_id, base_sha) VALUES ('t1', 'abc')").run();
+    db.prepare("DELETE FROM tasks WHERE id = 't1'").run();
+    expect(db.prepare('SELECT COUNT(*) AS n FROM task_git_snapshots').get()).toEqual({ n: 0 });
+  });
+});

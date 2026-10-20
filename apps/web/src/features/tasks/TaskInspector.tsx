@@ -1,28 +1,16 @@
 import type { TaskDto, TaskNodeDto } from '@fleet/shared';
 import { CornerDownRight, PanelRight, X } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { Accordion } from '../../components/Accordion';
 import { IconButton } from '../../components/ui';
 import { formatDuration, formatTokens } from '../../lib/format';
+import { ExecutionMetricsSection } from './ExecutionMetrics';
+import { GitContextSection } from './GitContextSection';
+import { InspectorSection } from './InspectorSection';
 import { TaskStatusBadge } from './TaskStatusBadge';
 import { taskLabel } from './taskLabel';
 import { SCROLL_PANEL } from './taskPanelStyles';
 import { useTaskTree } from './taskQueries';
 import { findNode } from './taskTreeModel';
-
-function InspectorSection({ title, meta, children }: { title: string; meta?: string; children: ReactNode }) {
-  return (
-    <Accordion
-      defaultOpen
-      header={<h3 className="label-mono text-fg-muted">{title}</h3>}
-      trailing={meta && <span className="label-mono text-fg-subtle">{meta}</span>}
-      bodyClassName="border-t border-line p-3"
-    >
-      {children}
-    </Accordion>
-  );
-}
 
 function SubtaskCard({ node, agentNames }: { node: TaskNodeDto; agentNames: Map<string, string> }) {
   const hasRuns = node.metrics.runs > 0;
@@ -113,6 +101,8 @@ export function TaskInspector({
         aria-label="Contenido del inspector"
         className={`min-h-0 flex-1 space-y-3 p-4 ${SCROLL_PANEL}`}
       >
+        <ExecutionMetricsSection taskId={task.id} />
+        <GitContextSection taskId={task.id} />
         <InspectorSection
           title="Subtareas delegadas"
           meta={subtasks.length > 0 ? `${done}/${subtasks.length} listas` : undefined}
