@@ -9,6 +9,8 @@ export type AgentBehaviour = (request: AgentRunRequest) => Promise<string> | str
 /** Runs scripted behaviours keyed by agent name instead of calling Claude. */
 export class FakeAgentRuntime implements AgentRuntime {
   readonly requests: AgentRunRequest[] = [];
+  /** Agents (by name) that call one tool taking this many milliseconds before finishing. */
+  readonly toolDelaysMs: Record<string, number> = {};
 
   constructor(private readonly behaviours: Record<string, AgentBehaviour>) {}
 
@@ -17,6 +19,7 @@ export class FakeAgentRuntime implements AgentRuntime {
     const name = this.agentNameOf(request);
     yield { type: 'session_started', sessionId: `session-${name}-${this.requests.length}` };
     yield { type: 'message', payload: { kind: 'assistant_text', text: `${name} working` } };
+    yield* this.toolCall(name);
     const behaviour = this.behaviours[name] ?? (() => `${name} done`);
     const resultText = await behaviour(request);
     if (request.signal.aborted) throw new Error('aborted');
@@ -26,6 +29,7 @@ export class FakeAgentRuntime implements AgentRuntime {
       isError: false,
       usage: {
         numTurns: 3,
+        apiDurationMs: 1200,
         models: [
           {
             model: 'claude-sonnet',
@@ -38,6 +42,15 @@ export class FakeAgentRuntime implements AgentRuntime {
         ],
       },
     };
+  }
+
+  private async *toolCall(name: string): AsyncIterable<RuntimeEvent> {
+    const delayMs = this.toolDelaysMs[name];
+    if (delayMs === undefined) return;
+    const toolUseId = `tool-${name}`;
+    yield { type: 'message', payload: { kind: 'tool_use', toolUseId, toolName: 'Bash', input: {} } };
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    yield { type: 'message', payload: { kind: 'tool_result', toolUseId, content: 'ok', isError: false } };
   }
 
   private agentNameOf(request: AgentRunRequest): string {

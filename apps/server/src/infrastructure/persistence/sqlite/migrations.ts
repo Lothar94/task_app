@@ -148,6 +148,15 @@ const MIGRATIONS: readonly string[] = [
   `ALTER TABLE agents ADD COLUMN skills TEXT NOT NULL DEFAULT '[]';`,
   `ALTER TABLE projects ADD COLUMN archived_at TEXT;`,
   `ALTER TABLE tasks ADD COLUMN proposed_by_agent_id TEXT REFERENCES agents(id);`,
+  `ALTER TABLE task_runs ADD COLUMN llm_ms INTEGER;
+   ALTER TABLE task_runs ADD COLUMN tool_ms INTEGER;`,
+  `CREATE TABLE task_git_snapshots (
+    task_id TEXT PRIMARY KEY REFERENCES tasks(id) ON DELETE CASCADE,
+    base_sha TEXT NOT NULL,
+    base_branch TEXT,
+    head_sha TEXT,
+    head_branch TEXT
+  );`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */

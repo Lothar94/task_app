@@ -11,6 +11,8 @@ interface TaskRunRow {
   outcome: RunOutcome;
   error: string | null;
   num_turns: number | null;
+  llm_ms: number | null;
+  tool_ms: number | null;
   model_usage: string;
 }
 
@@ -20,8 +22,8 @@ export class SqliteTaskRunRepository implements TaskRunRepository {
   append(run: TaskRun): void {
     this.db
       .prepare(
-        `INSERT INTO task_runs (id, task_id, started_at, finished_at, outcome, error, num_turns, model_usage)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO task_runs (id, task_id, started_at, finished_at, outcome, error, num_turns, model_usage, llm_ms, tool_ms)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         run.id,
@@ -32,6 +34,8 @@ export class SqliteTaskRunRepository implements TaskRunRepository {
         run.error,
         run.numTurns,
         JSON.stringify(run.models),
+        run.llmMs,
+        run.toolMs,
       );
   }
 
@@ -42,6 +46,15 @@ export class SqliteTaskRunRepository implements TaskRunRepository {
          WHERE t.project_id = ? ORDER BY r.finished_at`,
       )
       .all(projectId) as TaskRunRow[];
+    return rows.map(toTaskRun);
+  }
+
+  findByTaskIds(taskIds: readonly string[]): TaskRun[] {
+    if (taskIds.length === 0) return [];
+    const placeholders = taskIds.map(() => '?').join(', ');
+    const rows = this.db
+      .prepare(`SELECT * FROM task_runs WHERE task_id IN (${placeholders}) ORDER BY started_at`)
+      .all(...taskIds) as TaskRunRow[];
     return rows.map(toTaskRun);
   }
 
@@ -61,6 +74,8 @@ function toTaskRun(row: TaskRunRow): TaskRun {
     outcome: row.outcome,
     error: row.error,
     numTurns: row.num_turns,
+    llmMs: row.llm_ms,
+    toolMs: row.tool_ms,
     models: JSON.parse(row.model_usage) as ModelTokenUsage[],
   };
 }

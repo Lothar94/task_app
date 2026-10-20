@@ -34,6 +34,13 @@ import { StartTask } from '../application/tasks/StartTask.js';
 import { TaskQueue } from '../application/tasks/TaskQueue.js';
 import { UpdateTask } from '../application/tasks/UpdateTask.js';
 import { RecoverInterruptedTasks } from '../application/tasks/RecoverInterruptedTasks.js';
+import { GetTaskExecution } from '../application/metrics/GetTaskExecution.js';
+import { GitScopeResolver } from '../application/tasks/GitScope.js';
+import { GetTaskGitContext, GetTaskGitDiff } from '../application/tasks/QueryTaskGit.js';
+import { TaskGitTracker } from '../application/tasks/TaskGitTracker.js';
+import type { GitWorkspace } from '../application/ports/GitWorkspace.js';
+import { SqliteTaskGitSnapshotRepository } from '../infrastructure/persistence/sqlite/SqliteTaskGitSnapshotRepository.js';
+import { GitCliWorkspace } from '../infrastructure/system/GitCliWorkspace.js';
 import { RunningTasks } from '../application/tasks/RunningTasks.js';
 import { RunTask } from '../application/tasks/RunTask.js';
 import { SendFollowUp } from '../application/tasks/SendFollowUp.js';
@@ -58,6 +65,8 @@ export interface ContainerOptions {
   skillCatalog: SkillCatalog;
   skillWorkspace: SkillWorkspace;
   logger: Logger;
+  /** Read-only git access to workspaces; defaults to the git CLI. */
+  git?: GitWorkspace;
   maxDelegationDepth: number;
   reservedPorts?: number[];
 }
@@ -69,11 +78,12 @@ interface Infrastructure {
   projects: SqliteProjectRepository;
   tasks: SqliteTaskRepository;
   recorder: TaskRecorder;
+  gitTracker: TaskGitTracker;
 }
 
 /** Wires the execution of tasks: running agents, delegation and cancellation. */
 function createTaskExecution(
-  { ids, clock, agents, projects, tasks, recorder }: Infrastructure,
+  { ids, clock, agents, projects, tasks, recorder, gitTracker }: Infrastructure,
   { runtime, skillWorkspace, logger, maxDelegationDepth, reservedPorts = [] }: ContainerOptions,
 ) {
   const running = new RunningTasks();
@@ -98,6 +108,7 @@ function createTaskExecution(
     skillWorkspace,
     delegateSubtask,
     proposeTask,
+    gitTracker,
     clock,
     ids,
   });
@@ -142,6 +153,25 @@ function createProjectMemberAndArchiveUseCases(
   };
 }
 
+/** Wires task telemetry: execution metrics plus the read-only git context (snapshots and queries). */
+function createTelemetrySupport(
+  { db, logger, git = new GitCliWorkspace() }: ContainerOptions,
+  tasks: SqliteTaskRepository,
+  projects: SqliteProjectRepository,
+  runs: SqliteTaskRunRepository,
+) {
+  const snapshots = new SqliteTaskGitSnapshotRepository(db);
+  const scopes = new GitScopeResolver(tasks, projects, snapshots, git);
+  return {
+    gitTracker: new TaskGitTracker(git, snapshots, logger),
+    telemetryUseCases: {
+      getTaskExecution: new GetTaskExecution(tasks, runs),
+      getTaskGitContext: new GetTaskGitContext(scopes, git),
+      getTaskGitDiff: new GetTaskGitDiff(scopes, git),
+    },
+  };
+}
+
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
   const { db, instructionWriter, skillCatalog } = options;
@@ -156,8 +186,9 @@ export function createContainer(options: ContainerOptions) {
   const conversations = new SqliteConversationRepository(db, ids, clock);
   const runs = new SqliteTaskRunRepository(db);
   const recorder = new TaskRecorder(tasks, conversations, events, runs);
+  const { gitTracker, telemetryUseCases } = createTelemetrySupport(options, tasks, projects, runs);
   const { running, launcher } = createTaskExecution(
-    { ids, clock, agents, projects, tasks, recorder },
+    { ids, clock, agents, projects, tasks, recorder, gitTracker },
     options,
   );
   const queue = new TaskQueue(tasks, recorder, launcher);
@@ -201,6 +232,7 @@ export function createContainer(options: ContainerOptions) {
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
       getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
+      ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),
     },
   };
