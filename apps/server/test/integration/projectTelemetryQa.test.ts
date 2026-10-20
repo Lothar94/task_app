@@ -13,8 +13,7 @@ describe('classifyFailure QA', () => {
     expect(classifyFailure('TypeError: x is undefined')).toBeNull();
     expect(classifyFailure(null)).toBeNull();
   });
-  // DEFECT QA-1: bare "budget" matches token_limit
-  it.fails('does not flag a generic "budget" mention as token limit', () => {
+  it('does not flag a generic "budget" mention as token limit', () => {
     expect(classifyFailure('Cannot parse budget.csv')).toBeNull();
   });
 });
