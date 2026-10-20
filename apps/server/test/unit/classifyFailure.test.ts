@@ -22,14 +22,22 @@ describe('classifyFailure', () => {
     'error_max_budget_usd',
     'Maximum context reached',
     'over budget',
+    'Budget exceeded',
+    'Budget limit reached',
+    'exceeded the maximum budget',
   ])('detects a token limit in "%s"', (reason) => {
     expect(classifyFailure(reason)).toBe('token_limit');
   });
 
-  it.each([null, undefined, '', 'Interrupted by a server restart', 'TypeError: x is undefined'])(
-    'ignores %j',
-    (reason) => {
-      expect(classifyFailure(reason)).toBeNull();
-    },
-  );
+  it.each([
+    null,
+    undefined,
+    '',
+    'Interrupted by a server restart',
+    'TypeError: x is undefined',
+    'Cannot parse budget.csv',
+    'Updated the budget report',
+  ])('ignores %j', (reason) => {
+    expect(classifyFailure(reason)).toBeNull();
+  });
 });
