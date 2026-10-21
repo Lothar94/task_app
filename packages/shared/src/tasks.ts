@@ -1,4 +1,5 @@
 import type { TaskMetricsDto } from './metrics.js';
+import type { AgentEffort, AgentModel, RunModelChoice } from './agents.js';
 
 export const TASK_STATUSES = [
   /** Defined by the project manager but not started: waits until it is started or queued. */
@@ -37,6 +38,11 @@ export interface TaskDto {
   tags: string[];
   /** 1-based position in the project queue while the task is queued; null otherwise. */
   queuePosition: number | null;
+  /**
+   * Model and effort chosen by the invoker for this task when its agent uses `auto` model selection;
+   * null when not chosen (the agent's own model/effort apply). Ignored for `fixed` agents.
+   */
+  modelChoice: RunModelChoice;
   createdAt: string;
   startedAt: string | null;
   finishedAt: string | null;
@@ -66,6 +72,9 @@ export interface AssignTaskInput {
   start?: TaskStartMode;
   milestone?: string | null;
   tags?: string[];
+  /** Only honoured when the agent uses `auto` model selection; omitted fields use the agent's. */
+  model?: AgentModel | null;
+  effort?: AgentEffort | null;
 }
 
 /**

@@ -1,3 +1,4 @@
+import { AGENT_MODELS, EFFORT_LEVELS, type RunModelChoice } from '@fleet/shared';
 import { ValidationError } from '../errors/DomainError.js';
 
 export function requireText(value: string, field: string, maxLength = 20_000): string {
@@ -14,4 +15,23 @@ export function requireIntegerInRange(value: number, field: string, min: number,
     throw new ValidationError(`${field} must be an integer between ${min} and ${max}`);
   }
   return value;
+}
+
+export function requireOneOf<T extends string>(value: unknown, field: string, allowed: readonly T[]): T {
+  if (typeof value !== 'string' || !allowed.includes(value as T)) {
+    throw new ValidationError(`${field} must be one of: ${allowed.join(', ')}`);
+  }
+  return value as T;
+}
+
+function optionalOneOf<T extends string>(value: unknown, field: string, allowed: readonly T[]): T | null {
+  return value === null || value === undefined ? null : requireOneOf(value, field, allowed);
+}
+
+/** Each field of an invoker's model choice must be unset or a known model/effort. */
+export function requireModelChoice(choice: { model?: unknown; effort?: unknown }): RunModelChoice {
+  return {
+    model: optionalOneOf(choice.model, 'model', AGENT_MODELS),
+    effort: optionalOneOf(choice.effort, 'effort', EFFORT_LEVELS),
+  };
 }

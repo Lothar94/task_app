@@ -1,6 +1,6 @@
-import { TASK_LIMITS, type TaskStatus } from '@fleet/shared';
+import { TASK_LIMITS, type RunModelChoice, type TaskStatus } from '@fleet/shared';
 import { ConflictError, ValidationError } from '../errors/DomainError.js';
-import { requireIntegerInRange, requireText } from '../shared/guards.js';
+import { requireIntegerInRange, requireModelChoice, requireText } from '../shared/guards.js';
 
 const requirePositiveInteger = (value: number) =>
   requireIntegerInRange(value, 'number', 1, Number.MAX_SAFE_INTEGER);
@@ -46,9 +46,12 @@ export interface NewTask {
   tags?: string[];
   /** Agent that proposed the task on its own; only top-level tasks can be proposed. */
   proposedByAgentId?: string | null;
+  /** Model/effort picked by the invoker for an `auto` agent; defaults to none. */
+  modelChoice?: RunModelChoice;
 }
 
-export interface TaskSnapshot extends Omit<NewTask, 'milestone' | 'tags' | 'proposedByAgentId'> {
+export interface TaskSnapshot extends Omit<NewTask, 'milestone' | 'tags' | 'proposedByAgentId' | 'modelChoice'> {
+  modelChoice: RunModelChoice;
   id: string;
   status: TaskStatus;
   milestone: string | null;
@@ -79,6 +82,7 @@ export class Task {
       milestone: normalizeMilestone(task.milestone),
       tags: normalizeTags(task.tags),
       proposedByAgentId,
+      modelChoice: requireModelChoice(task.modelChoice ?? {}),
       queuePosition: null,
       status,
       resultSummary: null,
@@ -153,6 +157,10 @@ export class Task {
   /** Pending, running or waiting for subtasks. */
   get isActive(): boolean {
     return !this.isPlanned && !this.isFinished;
+  }
+
+  get modelChoice(): RunModelChoice {
+    return this.state.modelChoice;
   }
 
   get milestone(): string | null {
@@ -282,7 +290,7 @@ export class Task {
   }
 
   toSnapshot(): TaskSnapshot {
-    return { ...this.state };
+    return { ...this.state, modelChoice: { ...this.state.modelChoice } };
   }
 
   private finish(status: TaskStatus, now: Date, summary: string): void {

@@ -1,6 +1,7 @@
 import {
   type AgentDto,
   type AgentInput,
+  type ModelSelectionMode,
   type SkillDto,
   DEFAULT_AGENT_TOOLS,
   MAX_AGENT_SKILLS,
@@ -9,8 +10,9 @@ import {
   parseSkillName,
 } from '@fleet/shared';
 
-export interface AgentFormValues extends Omit<AgentInput, 'allowedTools'> {
+export interface AgentFormValues extends Omit<AgentInput, 'allowedTools' | 'modelSelection'> {
   allowedTools: string;
+  modelSelection: ModelSelectionMode;
   collaboratorIds: string[];
   /** Extra requests for Claude when drafting the instructions; not stored with the agent. */
   instructionsGuidance: string;
@@ -23,6 +25,7 @@ export const EMPTY_AGENT_FORM: AgentFormValues = {
   instructions: '',
   model: 'sonnet',
   effort: 'high',
+  modelSelection: 'fixed',
   allowedTools: DEFAULT_AGENT_TOOLS.join(', '),
   permissionMode: 'dontAsk',
   maxTurns: 50,

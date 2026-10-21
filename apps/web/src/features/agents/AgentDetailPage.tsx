@@ -3,7 +3,13 @@ import type { ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Markdown } from '../../components/Markdown';
 import { Button, ErrorMessage, LinkButton, Loading, PageHeader } from '../../components/ui';
-import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
+import {
+  EFFORT_LABELS,
+  MODEL_LABELS,
+  MODEL_SELECTION_LABELS,
+  PERMISSION_LABELS,
+  modelFieldLabels,
+} from './agentLabels';
 import { useSyncOrganization } from '../organizations/OrganizationContext';
 import { AgentAvatar } from './AgentAvatar';
 import { AgentSection } from './AgentSection';
@@ -94,9 +100,12 @@ export function AgentDetailPage() {
         <ErrorMessage error={deleteAgent.error} />
         {agent.description && <Markdown className="text-fg-muted">{agent.description}</Markdown>}
         <AgentSection title="Configuración">
-          <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <Property label="Modelo">{MODEL_LABELS[agent.model]}</Property>
-            <Property label="Intensidad">{EFFORT_LABELS[agent.effort]}</Property>
+          <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            <Property label="Selección de modelo">{MODEL_SELECTION_LABELS[agent.modelSelection]}</Property>
+            <Property label={modelFieldLabels(agent.modelSelection).model}>{MODEL_LABELS[agent.model]}</Property>
+            <Property label={modelFieldLabels(agent.modelSelection).effort}>
+              {EFFORT_LABELS[agent.effort]}
+            </Property>
             <Property label="Permisos">{PERMISSION_LABELS[agent.permissionMode]}</Property>
             <Property label="Máx. turnos">{agent.maxTurns}</Property>
             <Property label="Actualizado">{new Date(agent.updatedAt).toLocaleString()}</Property>

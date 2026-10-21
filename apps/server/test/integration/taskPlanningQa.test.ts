@@ -212,6 +212,7 @@ describe('planning guards (QA)', () => {
         instructions: 'i',
         model: 'sonnet',
         effort: 'high',
+        modelSelection: 'fixed',
         allowedTools: [],
         skills: [],
         permissionMode: 'dontAsk',

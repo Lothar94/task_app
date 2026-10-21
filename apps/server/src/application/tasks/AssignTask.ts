@@ -42,6 +42,10 @@ export class AssignTask {
       description: input.description,
       milestone: input.milestone,
       tags: input.tags,
+      modelChoice:
+        agent.modelSelection === 'auto'
+          ? { model: input.model ?? null, effort: input.effort ?? null }
+          : undefined,
     };
     const id = ids.next();
     const now = clock.now();

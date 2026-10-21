@@ -4,6 +4,22 @@ export type AgentModel = (typeof AGENT_MODELS)[number];
 export const EFFORT_LEVELS = ['low', 'medium', 'high', 'xhigh', 'max'] as const;
 export type AgentEffort = (typeof EFFORT_LEVELS)[number];
 
+/**
+ * How the model and effort of an agent's runs are chosen:
+ * - `fixed`: always the agent's `model` and `effort` (default, previous behaviour).
+ * - `auto`: whoever invokes the agent (the delegating agent or the project manager) picks them per
+ *   task according to its difficulty; the agent's `model` and `effort` are the fallback when the
+ *   invoker picks none.
+ */
+export const MODEL_SELECTION_MODES = ['fixed', 'auto'] as const;
+export type ModelSelectionMode = (typeof MODEL_SELECTION_MODES)[number];
+
+/** Model and effort picked by the invoker of an `auto` agent for one task; null fields use the agent's. */
+export interface RunModelChoice {
+  model: AgentModel | null;
+  effort: AgentEffort | null;
+}
+
 export const PERMISSION_MODES = ['dontAsk', 'acceptEdits', 'bypassPermissions'] as const;
 export type AgentPermissionMode = (typeof PERMISSION_MODES)[number];
 
@@ -16,6 +32,8 @@ export interface AgentDto {
   instructions: string;
   model: AgentModel;
   effort: AgentEffort;
+  /** `auto` lets the invoker choose model and effort per task; `model`/`effort` become the fallback. */
+  modelSelection: ModelSelectionMode;
   allowedTools: string[];
   /** Skills the agent must use; empty means skills are disabled for it. */
   skills: string[];
@@ -33,6 +51,8 @@ export interface AgentInput {
   instructions: string;
   model: AgentModel;
   effort: AgentEffort;
+  /** Defaults to `fixed` when omitted (older clients and export files). */
+  modelSelection?: ModelSelectionMode;
   allowedTools: string[];
   skills: string[];
   permissionMode: AgentPermissionMode;

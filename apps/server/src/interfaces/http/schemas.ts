@@ -5,6 +5,7 @@ import {
   AGENT_MODELS,
   EFFORT_LEVELS,
   MAX_IMPORTED_AGENTS,
+  MODEL_SELECTION_MODES,
   PERMISSION_MODES,
   TASK_START_MODES,
 } from '@fleet/shared';
@@ -23,6 +24,7 @@ export const agentProfileSchema = z.object({
   instructions: z.string().default(''),
   model: z.enum(AGENT_MODELS),
   effort: z.enum(EFFORT_LEVELS).default('high'),
+  modelSelection: z.enum(MODEL_SELECTION_MODES).default('fixed'),
   allowedTools: z.array(z.string()).default([]),
   skills: z.array(z.string()).default([]),
   permissionMode: z.enum(PERMISSION_MODES).default('dontAsk'),
@@ -81,6 +83,8 @@ export const assignTaskSchema = z.object({
   start: z.enum(TASK_START_MODES).default('now'),
   milestone: z.string().nullable().optional(),
   tags: z.array(z.string()).optional(),
+  model: z.enum(AGENT_MODELS).nullable().optional(),
+  effort: z.enum(EFFORT_LEVELS).nullable().optional(),
 });
 
 export const updateTaskSchema = z.object({
