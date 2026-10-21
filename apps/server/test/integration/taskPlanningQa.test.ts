@@ -10,6 +10,7 @@ import {
   eventually,
   FakeInstructionWriter,
   fakeSkillSupport,
+  TEST_APP_VERSION,
 } from '../support/testFleet.js';
 
 type Start = 'now' | 'draft' | 'queue';
@@ -324,6 +325,7 @@ describe('restart with a shared database (QA)', () => {
         ...fakeSkillSupport(),
         logger: { info: () => undefined, error: () => undefined },
         maxDelegationDepth: 4,
+        appVersion: TEST_APP_VERSION,
         reservedPorts: [],
       });
     let busyReached = false;

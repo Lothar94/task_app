@@ -34,6 +34,7 @@ async function main(): Promise<void> {
     ),
     logger,
     maxDelegationDepth: config.maxDelegationDepth,
+    appVersion: config.appVersion,
     reservedPorts: config.reservedPorts,
   });
 

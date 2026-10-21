@@ -14,13 +14,13 @@ const PANEL_CHOICES = ['shown', 'hidden'] as const;
 
 /** Drawer below 1280px (only while open); a fixed-width rail above it unless the user hid it. */
 function inspectorLayout(isDrawerOpen: boolean, isRailShown: boolean) {
-  const drawer = isDrawerOpen ? 'fixed right-0 bottom-0 z-40 flex w-[min(22rem,100vw)]' : 'hidden';
+  const drawer = isDrawerOpen ? 'fixed right-0 bottom-(--status-bar-height) z-40 flex w-[min(22rem,100vw)]' : 'hidden';
   const rail = isRailShown ? 'xl:static xl:z-auto xl:flex xl:w-[340px] xl:shrink-0' : 'xl:hidden';
   return `${drawer} ${rail}`;
 }
 
 /**
- * Viewport-high workspace of the task page (masthead excluded): central column and inspector,
+ * Viewport-high workspace of the task page (masthead and status bar excluded): central column and inspector,
  * each scrolling on its own. Below 1280px the inspector becomes a drawer.
  */
 export function TaskWorkspace({
@@ -46,7 +46,7 @@ export function TaskWorkspace({
 
   return (
     <div
-      style={{ height: `calc(100dvh - ${mastheadHeight}px)` }}
+      style={{ height: `calc(100dvh - ${mastheadHeight}px - var(--status-bar-height))` }}
       className="-mx-4 -my-8 flex overflow-hidden bg-canvas lg:-mx-8"
     >
       <section aria-label="Detalle de la tarea" className="flex min-w-0 flex-1 flex-col">

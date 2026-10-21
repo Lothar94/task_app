@@ -10,6 +10,9 @@ import { OrganizationsPage } from './features/organizations/OrganizationsPage';
 import { useCurrentOrganization } from './features/organizations/OrganizationContext';
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
+import { GlobalSearch } from './features/shell/GlobalSearch';
+import { FleetStatusBar } from './features/shell/FleetStatusBar';
+import { NotificationCenter } from './features/shell/NotificationCenter';
 import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
 
@@ -26,7 +29,7 @@ function Layout() {
   const { pathname } = useLocation();
   const { id: organizationId } = useCurrentOrganization();
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-(--status-bar-height)">
       <header className="sticky top-0 z-50 flex min-h-[52px] w-full flex-wrap items-center gap-x-3 border-b border-line bg-canvas px-4">
         <div className="flex items-center gap-2">
           <span
@@ -37,18 +40,20 @@ function Layout() {
         </div>
         <span aria-hidden className="h-4 w-px bg-line-strong" />
         <OrganizationSelect />
-        <nav aria-label="Principal" className="ml-3 flex items-center">
+        <nav aria-label="Principal" className="flex items-center sm:ml-3">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} className={navLinkClass}>
               <Icon aria-hidden className="size-4" />
-              {label}
+              <span className="sr-only sm:not-sr-only">{label}</span>
             </NavLink>
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <GlobalSearch />
+          <NotificationCenter />
           <NavLink to="/organizations" className={navLinkClass}>
             <Building2 aria-hidden className="size-4" />
-            Organizaciones
+            <span className="sr-only sm:not-sr-only">Organizaciones</span>
           </NavLink>
           <ThemeToggle />
         </div>
@@ -58,6 +63,7 @@ function Layout() {
           <Outlet />
         </ErrorBoundary>
       </main>
+      <FleetStatusBar />
     </div>
   );
 }

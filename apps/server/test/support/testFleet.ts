@@ -19,6 +19,8 @@ export class FakeInstructionWriter implements InstructionWriter {
   }
 }
 
+export const TEST_APP_VERSION = '1.2.3-test';
+
 const silentLogger = { info: () => undefined, error: () => undefined };
 
 export function profile(name: string, overrides: Partial<AgentProfile> = {}): AgentProfile {
@@ -83,6 +85,7 @@ export function createTestFleet(
     logger: silentLogger,
     git,
     maxDelegationDepth,
+    appVersion: TEST_APP_VERSION,
     reservedPorts,
   });
   return { runtime, git, instructionWriter, skillWorkspace: skillSupport.skillWorkspace, ...container };

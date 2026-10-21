@@ -91,6 +91,7 @@ const { useCases } = createContainer({
   ),
   logger,
   maxDelegationDepth: config.maxDelegationDepth,
+  appVersion: config.appVersion,
 });
 
 const [organization] = useCases.listOrganizations.execute();
