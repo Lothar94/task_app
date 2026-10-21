@@ -51,6 +51,8 @@
 
 :root {
   color-scheme: dark;
+  /* Fixed fleet status bar at the bottom of every page. */
+  --status-bar-height: 2rem;
   /* Chart tokens (validated on the card surface #1e1f26): indigo, emerald, amber, crimson. */
   --series-1: #8083ff;
   --series-2: #4edea3;

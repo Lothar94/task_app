@@ -11,6 +11,7 @@ import { useCurrentOrganization } from './features/organizations/OrganizationCon
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
 import { GlobalSearch } from './features/shell/GlobalSearch';
+import { FleetStatusBar } from './features/shell/FleetStatusBar';
 import { NotificationCenter } from './features/shell/NotificationCenter';
 import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
@@ -28,7 +29,7 @@ function Layout() {
   const { pathname } = useLocation();
   const { id: organizationId } = useCurrentOrganization();
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-(--status-bar-height)">
       <header className="sticky top-0 z-50 flex min-h-[52px] w-full flex-wrap items-center gap-x-3 border-b border-line bg-canvas px-4">
         <div className="flex items-center gap-2">
           <span
@@ -62,6 +63,7 @@ function Layout() {
           <Outlet />
         </ErrorBoundary>
       </main>
+      <FleetStatusBar />
     </div>
   );
 }
