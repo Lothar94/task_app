@@ -83,3 +83,21 @@ describe('readImportFile', () => {
     });
   });
 });
+
+describe('parseImportFile model selection', () => {
+  const file = (agent: object) =>
+    JSON.stringify({ format: AGENT_EXPORT_FORMAT, version: AGENT_EXPORT_VERSION, agents: [agent] });
+  const modes = (text: string) => {
+    const parsed = parseImportFile(text);
+    return parsed.ok ? parsed.file.agents.map((agent) => agent.modelSelection) : parsed.error;
+  };
+
+  it('treats a missing or unknown mode as fixed', () => {
+    expect(modes(file({ name: 'A' }))).toEqual(['fixed']);
+    expect(modes(file({ name: 'A', modelSelection: 'weird' }))).toEqual(['fixed']);
+  });
+
+  it('keeps the auto mode', () => {
+    expect(modes(file({ name: 'A', modelSelection: 'auto' }))).toEqual(['auto']);
+  });
+});

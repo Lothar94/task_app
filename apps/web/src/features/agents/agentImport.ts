@@ -2,6 +2,9 @@ import {
   AGENT_EXPORT_FORMAT,
   AGENT_EXPORT_VERSION,
   MAX_IMPORTED_AGENTS,
+  MODEL_SELECTION_MODES,
+  type ExportedAgent,
+  type ModelSelectionMode,
   type AgentExportDto,
 } from '@fleet/shared';
 
@@ -11,6 +14,15 @@ const fail = (error: string): ParsedImport => ({ ok: false, error });
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** Files exported before automatic selection existed carry no mode: they are fixed agents. */
+const modelSelectionOf = (value: unknown): ModelSelectionMode =>
+  MODEL_SELECTION_MODES.find((mode) => mode === value) ?? 'fixed';
+
+const withModelSelection = (agent: ExportedAgent): ExportedAgent => ({
+  ...agent,
+  modelSelection: modelSelectionOf(agent.modelSelection),
+});
 
 export function parseImportFile(text: string): ParsedImport {
   let data: unknown;
@@ -33,7 +45,8 @@ export function parseImportFile(text: string): ParsedImport {
   }
   const invalidAt = data.agents.findIndex((agent) => !isRecord(agent) || typeof agent.name !== 'string');
   if (invalidAt >= 0) return fail(`El agente nº ${invalidAt + 1} no tiene un nombre válido.`);
-  return { ok: true, file: data as unknown as AgentExportDto };
+  const file = data as unknown as AgentExportDto;
+  return { ok: true, file: { ...file, agents: file.agents.map(withModelSelection) } };
 }
 
 /** Names in the file that already exist in the organization (exact match after trimming). */

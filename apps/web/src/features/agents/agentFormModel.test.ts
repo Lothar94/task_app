@@ -14,6 +14,8 @@ import {
   validateSkillName,
 } from './agentFormModel';
 
+const AUTO_AGENT = { name: 'A', modelSelection: 'auto', model: 'sonnet', effort: 'high' };
+
 describe('agent form model', () => {
   it('builds the brief Claude needs to draft instructions', () => {
     const values = {
@@ -127,5 +129,17 @@ describe('skill catalog helpers', () => {
   it('explains missing skills differently for plain and plugin names', () => {
     expect(missingSkillNote('code-review')).toMatch(/debe existir en el proyecto/);
     expect(missingSkillNote('caveman:caveman')).toMatch(/plugin no instalado o desactivado/);
+  });
+
+  it('defaults to fixed model selection and sends it in the input', () => {
+    expect(EMPTY_AGENT_FORM.modelSelection).toBe('fixed');
+    expect(toAgentInput(EMPTY_AGENT_FORM).modelSelection).toBe('fixed');
+  });
+
+  it('loads and sends the model selection of an existing auto agent', () => {
+    const agent = { ...AUTO_AGENT, allowedTools: ['Read'], collaboratorIds: [] } as unknown as AgentDto;
+    const values = toFormValues(agent);
+    expect(values.modelSelection).toBe('auto');
+    expect(toAgentInput(values).modelSelection).toBe('auto');
   });
 });

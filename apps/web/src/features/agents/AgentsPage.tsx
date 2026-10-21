@@ -18,7 +18,7 @@ import { useAgents } from './agentQueries';
 import { useAgentExportSelection } from './useAgentExportSelection';
 import { ExportToolbar } from './ExportToolbar';
 import { ImportButton } from './ImportButton';
-import { EFFORT_LABELS } from './agentLabels';
+import { modelEffortText } from './agentLabels';
 import { AgentAvatar } from './AgentAvatar';
 import { AgentGraph } from './diagram/AgentGraph';
 import { AgentSheet } from './AgentSheet';
@@ -68,7 +68,7 @@ function AgentRowBody({ agent, teammates }: { agent: AgentDto; teammates: Map<st
         {collaborators.length > 0 ? `Delega en: ${collaborators.join(', ')}` : 'Sin colaboradores'}
       </p>
       <span className="rounded-sm border border-line-strong bg-surface-raised px-2 py-0.5 font-mono text-xs whitespace-nowrap text-fg-muted">
-        {agent.model} · {EFFORT_LABELS[agent.effort].toLowerCase()}
+        {modelEffortText(agent)}
       </span>
     </>
   );

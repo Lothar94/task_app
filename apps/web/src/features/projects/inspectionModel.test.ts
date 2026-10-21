@@ -23,7 +23,7 @@ const task = (id: string, patch: Partial<TaskNodeDto> = {}): TaskNodeDto =>
     ...patch,
   }) as TaskNodeDto;
 const agent = (id: string, collaboratorIds: string[] = []): AgentDto =>
-  ({ id, name: id.toUpperCase(), role: 'Rol', model: 'opus', collaboratorIds }) as AgentDto;
+  ({ id, name: id.toUpperCase(), role: 'Rol', model: 'opus', modelSelection: 'fixed', collaboratorIds }) as AgentDto;
 
 describe('recentRoots', () => {
   it('orders by createdAt desc, number desc on ties, and limits', () => {
