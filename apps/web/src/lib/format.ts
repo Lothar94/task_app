@@ -1,6 +1,7 @@
 const compact = new Intl.NumberFormat('es-ES', { notation: 'compact', maximumFractionDigits: 1 });
 const integer = new Intl.NumberFormat('es-ES');
 const usd = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+const price = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const percent = new Intl.NumberFormat('es-ES', { style: 'percent', maximumFractionDigits: 0 });
 
 /** 950 → "950", 12 400 → "12,4 mil", 3 200 000 → "3,2 M". */
@@ -10,6 +11,9 @@ export const formatInteger = (value: number) => integer.format(value);
 
 export const formatCost = (usdAmount: number) =>
   usdAmount > 0 && usdAmount < 0.01 ? `< ${usd.format(0.01)}` : usd.format(usdAmount);
+
+/** USD per million tokens without currency symbol: 3 → "3", 0.3 → "0,3", 3.75 → "3,75". */
+export const formatPrice = (usdPerMTok: number) => price.format(usdPerMTok);
 
 export const formatPercent = (ratio: number | null) => (ratio === null ? '—' : percent.format(ratio));
 
