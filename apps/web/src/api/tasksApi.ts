@@ -29,5 +29,6 @@ export const tasksApi = {
   execution: (id: string) => request<TaskExecutionDto>(`/tasks/${id}/execution`),
   git: (id: string) => request<TaskGitContextDto>(`/tasks/${id}/git`),
   gitDiff: (id: string) => request<TaskGitDiffDto>(`/tasks/${id}/git/diff`),
+  retry: (id: string) => request<TaskDto>(`/tasks/${id}/retry`, { method: 'POST' }),
   cancel: (id: string) => request<void>(`/tasks/${id}/cancel`, { method: 'POST' }),
 };

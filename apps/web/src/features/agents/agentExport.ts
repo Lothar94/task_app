@@ -1,4 +1,5 @@
 import type { AgentExportDto } from '@fleet/shared';
+import { downloadFile } from '../../lib/download';
 
 export function slugify(text: string): string {
   return text
@@ -16,13 +17,5 @@ export function exportFileName(bundle: AgentExportDto): string {
   return `agents-${organization}-${bundle.exportedAt.slice(0, 10)}.json`;
 }
 
-export function downloadJson(fileName: string, data: unknown): void {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
+export const downloadJson = (fileName: string, data: unknown): void =>
+  downloadFile(fileName, JSON.stringify(data, null, 2), 'application/json');
