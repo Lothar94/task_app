@@ -12,6 +12,8 @@ export const queryKeys = {
   git: (taskId: string) => ['git', taskId] as const,
   gitDiff: (taskId: string) => ['git-diff', taskId] as const,
   conversation: (taskId: string) => ['conversation', taskId] as const,
+  /** Prefix of every dashboard query, whatever its filters. */
+  dashboards: ['dashboard'] as const,
   dashboard: (organizationId: string, projectId: string | null, days: number | null) =>
     ['dashboard', organizationId, projectId, days] as const,
   search: (organizationId: string, query: string) => ['search', organizationId, query] as const,

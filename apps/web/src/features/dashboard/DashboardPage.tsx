@@ -1,15 +1,7 @@
 import type { DashboardDto } from '@fleet/shared';
-import { Bug, ChartColumn, Layers, Users } from 'lucide-react';
+import { ChartColumn, Layers, Users } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Card,
-  ErrorMessage,
-  Loading,
-  PageHeader,
-  SegmentedControl,
-  Select,
-  StatusChip,
-} from '../../components/ui';
+import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { projectOptionLabel } from '../projects/projectListModel';
 import { useProjects } from '../projects/projectQueries';
@@ -18,9 +10,9 @@ import { DailyActivityChart, DailyLegend } from './charts/DailyActivityChart';
 import { ModelLegend, ModelTokensChart } from './charts/ModelTokensChart';
 import { Headline } from './Headline';
 import { OutcomeBar } from './charts/OutcomeBar';
-import { PERIOD_OPTIONS, PERIODS, type Period, periodDays, periodLabel } from './dashboardModel';
+import { PERIOD_OPTIONS, PERIODS, type Period, periodDays } from './dashboardModel';
 import { useDashboard } from './dashboardQueries';
-import { ErrorList } from './ErrorList';
+import { ErrorsCard } from './ErrorsCard';
 import { ModelUsageTable } from './ModelUsageTable';
 
 function Filters(props: {
@@ -89,13 +81,12 @@ function DashboardContent({ data }: { data: DashboardDto }) {
         <Card title="Rendimiento por agente" icon={<Users />}>
           <AgentUsageTable rows={data.byAgent} />
         </Card>
-        <Card
-          title={`Errores (${data.errors.length})`}
-          icon={<Bug />}
-          meta={<StatusChip tone="danger">{periodLabel(data.filters.days)}</StatusChip>}
-        >
-          <ErrorList errors={data.errors} />
-        </Card>
+        <ErrorsCard
+          errors={data.errors}
+          errorsTotal={data.errorsTotal}
+          errorCauses={data.errorCauses}
+          days={data.filters.days}
+        />
       </div>
     </div>
   );
