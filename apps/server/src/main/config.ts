@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +13,8 @@ export interface AppConfig {
   /** Ports of this app (API and web) that agents must not use or stop. */
   reservedPorts: number[];
   allowedOrigin: string;
+  /** Version of the app, read from the server package.json. */
+  appVersion: string;
   /** Directory with the user's Agent Skills (one folder with a SKILL.md per skill). */
   userSkillsDir: string;
   /** Claude Code's config directory, where installed plugins and their enabled state are read. */
@@ -24,6 +27,13 @@ export interface AppConfig {
 }
 
 const DEFAULT_BASH_MAX_OUTPUT_CHARS = 15000;
+
+function readAppVersion(): string {
+  const manifest: unknown = JSON.parse(readFileSync(resolve(repositoryRoot, 'apps/server/package.json'), 'utf8'));
+  const version = (manifest as { version?: unknown }).version;
+  if (typeof version !== 'string') throw new Error('apps/server/package.json has no version');
+  return version;
+}
 
 function portOf(origin: string): number {
   const { port, protocol } = new URL(origin);
@@ -41,6 +51,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     databasePath: env.DATABASE_PATH ?? resolve(repositoryRoot, 'data/fleet.db'),
     maxDelegationDepth: Number(env.MAX_DELEGATION_DEPTH ?? 4),
     allowedOrigin,
+    appVersion: readAppVersion(),
     claudeConfigDir,
     userSkillsDir: env.USER_SKILLS_DIR ?? join(claudeConfigDir, 'skills'),
     reservedPorts: [port, portOf(allowedOrigin)],

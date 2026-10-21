@@ -8,6 +8,7 @@ import { type DashboardUseCases, registerDashboardRoutes } from './routes/dashbo
 import { registerEventRoutes } from './routes/eventRoutes.js';
 import { type OrganizationUseCases, registerOrganizationRoutes } from './routes/organizationRoutes.js';
 import { type ProjectUseCases, registerProjectRoutes } from './routes/projectRoutes.js';
+import { registerShellRoutes, type ShellUseCases } from './routes/shellRoutes.js';
 import { registerSkillRoutes, type SkillUseCases } from './routes/skillRoutes.js';
 import { registerTaskRoutes, type TaskUseCases } from './routes/taskRoutes.js';
 
@@ -17,7 +18,8 @@ export interface HttpServerDependencies {
     ProjectUseCases &
     TaskUseCases &
     DashboardUseCases &
-    SkillUseCases;
+    SkillUseCases &
+    ShellUseCases;
   events: EventSubscriber;
   logger: Logger;
   allowedOrigin: string;
@@ -33,6 +35,9 @@ export async function createHttpServer(deps: HttpServerDependencies): Promise<Fa
   registerProjectRoutes(app, deps.useCases);
   registerTaskRoutes(app, deps.useCases);
   registerDashboardRoutes(app, deps.useCases);
-  registerEventRoutes(app, deps.events);
+  registerShellRoutes(app, deps.useCases);
+  registerEventRoutes(app, deps.events, (projectId) =>
+    deps.useCases.resolveProjectOrganization.execute(projectId),
+  );
   return app;
 }

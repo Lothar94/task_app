@@ -1,15 +1,18 @@
-import type { FleetEvent } from '@fleet/shared';
 import type { FastifyInstance } from 'fastify';
 import type { EventSubscriber } from '../../../application/ports/EventBus.js';
+import { createEventFilter, type ProjectOrganizationLookup } from '../eventFilter.js';
 import { eventsQuery } from '../schemas.js';
 
 const HEARTBEAT_MS = 25_000;
 
 /** Streams fleet events to the browser with Server-Sent Events. */
-export function registerEventRoutes(app: FastifyInstance, events: EventSubscriber): void {
+export function registerEventRoutes(
+  app: FastifyInstance,
+  events: EventSubscriber,
+  organizationOf: ProjectOrganizationLookup,
+): void {
   app.get('/api/events', (request, reply) => {
-    const { projectId } = eventsQuery.parse(request.query);
-    const isRelevant = (event: FleetEvent) => !projectId || event.projectId === projectId;
+    const isRelevant = createEventFilter(eventsQuery.parse(request.query), organizationOf);
 
     reply.hijack();
     reply.raw.writeHead(200, {
