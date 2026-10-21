@@ -37,7 +37,9 @@ describe('global shell QA edge cases', () => {
   });
 
   const get = <T>(url: string) =>
-    app.inject({ method: 'GET', url }).then((response) => ({ status: response.statusCode, body: response.json<T>() }));
+    app
+      .inject({ method: 'GET', url })
+      .then((response) => ({ status: response.statusCode, body: response.json<T>() }));
   const search = (organizationId: string, query: string) =>
     get<SearchResultsDto>(`/api/organizations/${organizationId}/search?${query}`);
   const fleetStatus = (organizationId = ORG) =>
@@ -81,7 +83,9 @@ describe('global shell QA edge cases', () => {
 
     it('keeps archived projects in the results, flagged archived', async () => {
       const { project } = await createTeamProject(fleet, []);
-      expect((await app.inject({ method: 'POST', url: `/api/projects/${project.id}/archive` })).statusCode).toBe(200);
+      expect(
+        (await app.inject({ method: 'POST', url: `/api/projects/${project.id}/archive` })).statusCode,
+      ).toBe(200);
 
       const { body } = await search(ORG, 'q=demo');
 
@@ -143,11 +147,7 @@ describe('global shell QA edge cases', () => {
       expect((await search(ORG, 'q=%20%20demo%20')).body).toMatchObject({ query: 'demo' });
     });
 
-    it.each([
-      ['limit=-1'],
-      ['limit='],
-      ['limit=NaN'],
-    ])('rejects invalid %s with 400', async (limit) => {
+    it.each([['limit=-1'], ['limit='], ['limit=NaN']])('rejects invalid %s with 400', async (limit) => {
       expect((await search(ORG, `q=a&${limit}`)).status).toBe(400);
     });
 
@@ -205,7 +205,9 @@ describe('global shell QA edge cases', () => {
 
       await fleet.useCases.cancelTask.execute(task.id);
 
-      await eventually(async () => expect((await fleetStatus()).body).toMatchObject({ state: 'idle', activeNodes: [] }));
+      await eventually(async () =>
+        expect((await fleetStatus()).body).toMatchObject({ state: 'idle', activeNodes: [] }),
+      );
     });
 
     it('answers 404 for an unknown organization', async () => {
@@ -221,14 +223,20 @@ describe('global shell QA edge cases', () => {
       baseUrl = `http://127.0.0.1:${(app.server.address() as AddressInfo).port}`;
     });
 
-    async function seen(query: string, publish: () => void, sentinelProject: string | (() => string)): Promise<string[]> {
+    async function seen(
+      query: string,
+      publish: () => void,
+      sentinelProject: string | (() => string),
+    ): Promise<string[]> {
       const controller = new AbortController();
       const response = await fetch(`${baseUrl}/api/events?${query}`, { signal: controller.signal });
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let text = '';
       publish();
-      const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('no sentinel')), 3000));
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('no sentinel')), 3000),
+      );
       const sentinel = () => (typeof sentinelProject === 'string' ? sentinelProject : sentinelProject());
       while (!text.includes(`"projectId":"${sentinel()}"`)) {
         const { value, done } = await Promise.race([reader.read(), timeout]);
@@ -272,7 +280,9 @@ describe('global shell QA edge cases', () => {
       const mine = await createTeamProject(fleet, []);
       const task = addTask(mine.project.id, mine.cto.id, 't').id;
       const controller = new AbortController();
-      const response = await fetch(`${baseUrl}/api/events?organizationId=ghost`, { signal: controller.signal });
+      const response = await fetch(`${baseUrl}/api/events?organizationId=ghost`, {
+        signal: controller.signal,
+      });
       const reader = response.body!.getReader();
       fleet.events.publish(created(mine.project.id, task));
       const decoder = new TextDecoder();

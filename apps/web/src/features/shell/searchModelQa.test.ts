@@ -1,12 +1,27 @@
 // @vitest-environment jsdom
 import type { SearchResultsDto } from '@fleet/shared';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildSearchGroups, currentPlatform, isSearchShortcut, moveActiveIndex, resultCountLabel, shortcutLabel } from './searchModel';
+import {
+  buildSearchGroups,
+  currentPlatform,
+  isSearchShortcut,
+  moveActiveIndex,
+  resultCountLabel,
+  shortcutLabel,
+} from './searchModel';
 
 const key = (overrides: Partial<KeyboardEvent>) =>
-  ({ key: 'k', metaKey: false, ctrlKey: false, altKey: false, shiftKey: false, ...overrides }) as KeyboardEvent;
+  ({
+    key: 'k',
+    metaKey: false,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    ...overrides,
+  }) as KeyboardEvent;
 
-const setPlatform = (value: string) => Object.defineProperty(navigator, 'platform', { value, configurable: true });
+const setPlatform = (value: string) =>
+  Object.defineProperty(navigator, 'platform', { value, configurable: true });
 
 afterEach(() => {
   Reflect.deleteProperty(navigator, 'platform');
@@ -70,7 +85,10 @@ describe('search model QA', () => {
     };
     const groups = buildSearchGroups(results);
     expect(groups.map((group) => group.label)).toEqual(['Tareas', 'Agentes']);
-    expect(groups[0]?.options.map((option) => option.href)).toEqual(['/projects/p1/tasks/t2', '/projects/p1/tasks/t1']);
+    expect(groups[0]?.options.map((option) => option.href)).toEqual([
+      '/projects/p1/tasks/t2',
+      '/projects/p1/tasks/t1',
+    ]);
     expect(groups[1]?.options[0]?.href).toBe('/agents/a1');
     expect(buildSearchGroups(undefined)).toEqual([]);
   });

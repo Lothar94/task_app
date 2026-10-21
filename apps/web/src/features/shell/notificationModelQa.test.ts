@@ -1,6 +1,13 @@
 import type { FleetEvent } from '@fleet/shared';
 import { describe, expect, it } from 'vitest';
-import { applyFleetEvent, countUnread, type FleetNotification, markAllRead, markRead, MAX_NOTIFICATIONS } from './notificationModel';
+import {
+  applyFleetEvent,
+  countUnread,
+  type FleetNotification,
+  markAllRead,
+  markRead,
+  MAX_NOTIFICATIONS,
+} from './notificationModel';
 import { created, updated } from './notificationTestData';
 
 const NOW = '2026-10-21T09:00:00.000Z';
@@ -11,7 +18,9 @@ const ids = (items: FleetNotification[]) => items.map((item) => item.id);
 describe('notification derivation QA', () => {
   it('does not notify a completed subtask but does notify a failed one', () => {
     expect(apply([updated({ status: 'completed', parentTaskId: 'root' })])).toEqual([]);
-    expect(ids(apply([updated({ id: 'sub', status: 'failed', parentTaskId: 'root' })]))).toEqual(['sub:failed']);
+    expect(ids(apply([updated({ id: 'sub', status: 'failed', parentTaskId: 'root' })]))).toEqual([
+      'sub:failed',
+    ]);
   });
 
   it('removes a proposal when the task starts and does not notify the start', () => {
@@ -69,7 +78,9 @@ describe('notification derivation QA', () => {
   });
 
   it('caps at the maximum keeping the newest even when older ones are unread', () => {
-    const events = Array.from({ length: MAX_NOTIFICATIONS + 1 }, (_, i) => updated({ id: `t${i}`, status: 'failed' }));
+    const events = Array.from({ length: MAX_NOTIFICATIONS + 1 }, (_, i) =>
+      updated({ id: `t${i}`, status: 'failed' }),
+    );
     const items = apply(events);
     expect(items).toHaveLength(MAX_NOTIFICATIONS);
     expect(ids(items)).not.toContain('t0:failed');

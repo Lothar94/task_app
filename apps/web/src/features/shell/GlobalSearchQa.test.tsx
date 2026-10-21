@@ -17,7 +17,9 @@ const RESULTS: SearchResultsDto = {
     { id: 'p1', name: 'Vega', archived: false },
     { id: 'p2', name: 'Vieja', archived: true },
   ],
-  tasks: [{ id: 't9', number: 61, title: 'Revisar login', status: 'running', projectId: 'p1', projectName: 'Vega' }],
+  tasks: [
+    { id: 't9', number: 61, title: 'Revisar login', status: 'running', projectId: 'p1', projectName: 'Vega' },
+  ],
   agents: [{ id: 'a1', name: 'Vera', role: 'QA' }],
 };
 
@@ -103,7 +105,12 @@ describe('GlobalSearch QA', () => {
     const options = within(listbox).getAllByRole('option');
     expect(options).toHaveLength(4);
     expect(new Set(options.map((option) => option.id)).size).toBe(4);
-    expect(options.map((option) => option.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false', 'false']);
+    expect(options.map((option) => option.getAttribute('aria-selected'))).toEqual([
+      'true',
+      'false',
+      'false',
+      'false',
+    ]);
     expect(input.getAttribute('aria-activedescendant')).toBe(options[0]?.id);
     // focus stays in the input: options are never tabbable
     expect(options.every((option) => option.getAttribute('tabindex') === null)).toBe(true);
@@ -166,7 +173,9 @@ describe('GlobalSearch QA', () => {
     input.dispatchEvent(home);
     expect(home.defaultPrevented).toBe(false);
   });
+});
 
+describe('GlobalSearch QA navigation and failures', () => {
   it('highlights the hovered option and navigates to it on click', async () => {
     const input = mount();
     await userEvent.type(input, 've');
@@ -206,56 +215,61 @@ describe('GlobalSearch QA', () => {
     expect(input.getAttribute('aria-expanded')).toBe('false');
     expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
+});
 
-  describe('shortcut', () => {
-    const press = (init: KeyboardEventInit) => {
-      const event = new KeyboardEvent('keydown', { key: 'k', bubbles: true, cancelable: true, ...init });
-      document.body.dispatchEvent(event);
-      return event;
-    };
+describe('GlobalSearch QA shortcut', () => {
+  const press = (init: KeyboardEventInit) => {
+    const event = new KeyboardEvent('keydown', { key: 'k', bubbles: true, cancelable: true, ...init });
+    document.body.dispatchEvent(event);
+    return event;
+  };
 
-    it('shows ⌘K on a mac and Ctrl K otherwise', () => {
-      Object.defineProperty(navigator, 'platform', { value: 'MacIntel', configurable: true });
-      mount();
-      expect(document.querySelector('kbd')?.textContent).toBe('⌘K');
-      cleanup();
-      Object.defineProperty(navigator, 'platform', { value: 'Win32', configurable: true });
-      mount();
-      expect(document.querySelector('kbd')?.textContent).toBe('Ctrl K');
-    });
+  it('shows ⌘K on a mac and Ctrl K otherwise', () => {
+    Object.defineProperty(navigator, 'platform', { value: 'MacIntel', configurable: true });
+    mount();
+    expect(document.querySelector('kbd')?.textContent).toBe('⌘K');
+    cleanup();
+    Object.defineProperty(navigator, 'platform', { value: 'Win32', configurable: true });
+    mount();
+    expect(document.querySelector('kbd')?.textContent).toBe('Ctrl K');
+  });
 
-    it('opens from the shortcut whatever the platform, and selects the existing text', async () => {
-      const input = mount();
-      await userEvent.type(input, 'abc');
-      screen.getByRole('button', { name: 'fuera' }).focus();
-      expect(press({ metaKey: true }).defaultPrevented).toBe(true);
-      expect(document.activeElement).toBe(input);
-      expect(input.selectionStart).toBe(0);
-      expect(input.selectionEnd).toBe(3);
-    });
+  it('opens from the shortcut whatever the platform, and selects the existing text', async () => {
+    const input = mount();
+    await userEvent.type(input, 'abc');
+    screen.getByRole('button', { name: 'fuera' }).focus();
+    expect(press({ metaKey: true }).defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect(input.selectionStart).toBe(0);
+    expect(input.selectionEnd).toBe(3);
+  });
 
-    it('leaves other combinations alone', () => {
-      mount();
-      for (const init of [{}, { ctrlKey: true, shiftKey: true }, { ctrlKey: true, altKey: true }, { ctrlKey: true, key: 'j' }]) {
-        expect(press(init).defaultPrevented).toBe(false);
-      }
-    });
+  it('leaves other combinations alone', () => {
+    mount();
+    for (const init of [
+      {},
+      { ctrlKey: true, shiftKey: true },
+      { ctrlKey: true, altKey: true },
+      { ctrlKey: true, key: 'j' },
+    ]) {
+      expect(press(init).defaultPrevented).toBe(false);
+    }
+  });
 
-    it('removes its listener on unmount', () => {
-      mount();
-      cleanup();
-      expect(press({ ctrlKey: true }).defaultPrevented).toBe(false);
-    });
+  it('removes its listener on unmount', () => {
+    mount();
+    cleanup();
+    expect(press({ ctrlKey: true }).defaultPrevented).toBe(false);
+  });
 
-    it('exposes the toggle button state for narrow screens', async () => {
-      mount();
-      const toggle = screen.getByRole('button', { name: 'Buscar' });
-      expect(toggle.getAttribute('aria-expanded')).toBe('false');
-      await userEvent.click(toggle);
-      expect(toggle.getAttribute('aria-expanded')).toBe('true');
-      expect(document.activeElement).toBe(screen.getByRole('combobox'));
-      await userEvent.click(toggle);
-      expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    });
+  it('exposes the toggle button state for narrow screens', async () => {
+    mount();
+    const toggle = screen.getByRole('button', { name: 'Buscar' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    await userEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement).toBe(screen.getByRole('combobox'));
+    await userEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
   });
 });

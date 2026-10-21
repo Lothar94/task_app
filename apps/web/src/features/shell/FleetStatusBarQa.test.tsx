@@ -67,7 +67,11 @@ describe('FleetStatusBar QA', () => {
   });
 
   it('switches to the error state after a failed refresh and recovers when the API returns', async () => {
-    const footer = mount(ok(status()), down, ok(status({ state: 'idle', activeNodes: [], version: '0.2.0' })));
+    const footer = mount(
+      ok(status()),
+      down,
+      ok(status({ state: 'idle', activeNodes: [], version: '0.2.0' })),
+    );
     await waitFor(() => expect(screen.getByRole('status').textContent).toBe('Flota: Activa'));
 
     await client.refetchQueries({ queryKey: queryKeys.fleetStatus('org') });

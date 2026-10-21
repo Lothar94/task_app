@@ -66,7 +66,9 @@ afterEach(() => {
 describe('NotificationCenter QA', () => {
   it('opens exactly one EventSource for the organization', () => {
     render(tree());
-    expect(FakeEventSource.instances.map((source) => source.url)).toEqual(['/api/events?organizationId=org-a']);
+    expect(FakeEventSource.instances.map((source) => source.url)).toEqual([
+      '/api/events?organizationId=org-a',
+    ]);
   });
 
   it('keeps a separate list per organization and reconnects when switching', () => {
@@ -95,7 +97,9 @@ describe('NotificationCenter QA', () => {
     emit(updated({ id: 'a1', status: 'failed' }));
     current.id = 'org-b';
     view.rerender(tree());
-    const stored = JSON.parse(localStorage.getItem('fleet.notifications.org-b') ?? '[]') as { taskId: string }[];
+    const stored = JSON.parse(localStorage.getItem('fleet.notifications.org-b') ?? '[]') as {
+      taskId: string;
+    }[];
     expect(stored.map((item) => item.taskId)).not.toContain('a1');
   });
 
@@ -172,7 +176,9 @@ describe('NotificationCenter QA', () => {
     emit(updated({ id: 'a', number: 1, title: 'Alfa', status: 'failed' }));
     emit(updated({ id: 'b', number: 2, title: 'Beta', status: 'completed' }));
     await userEvent.click(bell());
-    const titles = within(screen.getByRole('dialog')).getAllByRole('listitem').map((item) => item.textContent);
+    const titles = within(screen.getByRole('dialog'))
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
     expect(titles[0]).toContain('Beta');
     expect(titles[1]).toContain('Alfa');
   });
