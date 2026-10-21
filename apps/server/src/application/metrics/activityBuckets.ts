@@ -20,13 +20,19 @@ export function localHourKey(date: Date): string {
   return `${localDateKey(date)}T${pad(date.getHours())}:00`;
 }
 
-/** The 24 local hours ending at the current one. */
+/**
+ * The 24 local hours ending at the current one. The 24-hour window starts inside the hour
+ * before the first bucket, so that partial hour is counted in the first bucket.
+ */
 export function hourlyBuckets(now: Date): ActivityBuckets {
   const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+  const firstHour = currentHour.getTime() - (HOURS_IN_DAY - 1) * HOUR_MS;
   const keys = Array.from({ length: HOURS_IN_DAY }, (_, index) =>
-    localHourKey(new Date(currentHour.getTime() - (HOURS_IN_DAY - 1 - index) * HOUR_MS)),
+    localHourKey(new Date(firstHour + index * HOUR_MS)),
   );
-  return { granularity: 'hour', keys: [...new Set(keys)], keyOf: localHourKey };
+  const firstKey = keys[0] ?? localHourKey(currentHour);
+  const keyOf = (date: Date) => (date.getTime() < firstHour ? firstKey : localHourKey(date));
+  return { granularity: 'hour', keys: [...new Set(keys)], keyOf };
 }
 
 /** Every local day from the day of `start` to the day of `now`, both included. */

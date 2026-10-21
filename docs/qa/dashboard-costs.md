@@ -31,7 +31,7 @@ Branch `test/dashboard-costs-qa` (from `feature/dashboard-costs`). Verdict: **PA
 
 ## Defects
 
-**D-1 (minor) — hourly chart drops runs from the oldest partial hour.**
+**D-1 (minor) — hourly chart drops runs from the oldest partial hour.** Fixed: `hourlyBuckets` folds the partial hour into the first bucket (`test/unit/activityBuckets.test.ts`).
 - File: `apps/server/src/application/metrics/activityBuckets.ts:24` (`hourlyBuckets`) vs window start in `buildDashboard.ts:periodOf` (`now - 24h`).
 - Repro: `now = 13:30`; first bucket is `2026-10-20T14:00`; a run finished 23.8 h ago (`13:42` the day before) is inside the 24 h totals but `keyOf` gives `…T13:00`, which is not a bucket, so the chart omits it (`b.keys.includes(key) === false`).
 - Expected: chart tokens/outcomes sum to the totals for the period. Actual: up to 59 min of activity counted in totals but absent from the chart.
