@@ -2,6 +2,7 @@ import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
+  Ref,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
@@ -50,7 +51,7 @@ export function IconButton({
   children,
   className = '',
   ...props
-}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> & { label: string }) {
+}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> & { label: string; ref?: Ref<HTMLButtonElement> }) {
   return (
     <button
       type="button"

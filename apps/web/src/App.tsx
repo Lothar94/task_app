@@ -11,6 +11,7 @@ import { useCurrentOrganization } from './features/organizations/OrganizationCon
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
 import { GlobalSearch } from './features/shell/GlobalSearch';
+import { NotificationCenter } from './features/shell/NotificationCenter';
 import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
 
@@ -48,6 +49,7 @@ function Layout() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <GlobalSearch />
+          <NotificationCenter />
           <NavLink to="/organizations" className={navLinkClass}>
             <Building2 aria-hidden className="size-4" />
             Organizaciones
