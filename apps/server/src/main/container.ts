@@ -36,6 +36,7 @@ import { GetTask, GetTaskConversation, GetTaskTree } from '../application/tasks/
 import { DequeueTask } from '../application/tasks/DequeueTask.js';
 import { EnqueueTask } from '../application/tasks/EnqueueTask.js';
 import { ReorderQueue } from '../application/tasks/ReorderQueue.js';
+import { RetryTask } from '../application/tasks/RetryTask.js';
 import { StartTask } from '../application/tasks/StartTask.js';
 import { TaskQueue } from '../application/tasks/TaskQueue.js';
 import { UpdateTask } from '../application/tasks/UpdateTask.js';
@@ -266,6 +267,7 @@ export function createContainer(options: ContainerOptions) {
       startTask: new StartTask(projects, tasks, launcher, queue),
       enqueueTask: new EnqueueTask(projects, tasks, recorder, queue),
       dequeueTask: new DequeueTask(tasks, recorder, queue),
+      retryTask: new RetryTask(projects, tasks, recorder, queue),
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
