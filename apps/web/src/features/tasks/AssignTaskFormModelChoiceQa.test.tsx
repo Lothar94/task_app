@@ -110,7 +110,7 @@ describe('TaskModelChoice (QA W28, W30)', () => {
   });
 
   // DEFECT D2: modelChoiceSummary reads choice.model without guarding undefined (old server payload). Remove .fails once fixed.
-  it.fails('does not crash for a legacy task without modelChoice', () => {
+  it('does not crash for a legacy task without modelChoice', () => {
     expect(() => show({ agentId: 'a' } as never, [auto])).not.toThrow();
   });
 });

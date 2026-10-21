@@ -82,12 +82,13 @@ export const defaultEffortOption = (agent: Pick<AgentDto, 'effort'>) =>
 /** Task detail line about who chose the model; null for fixed agents. */
 export function modelChoiceSummary(
   agent: Pick<AgentDto, 'model' | 'modelSelection'> | undefined,
-  choice: RunModelChoice,
+  choice: RunModelChoice | undefined,
 ): string | null {
   if (agent?.modelSelection !== 'auto') return null;
+  const { model, effort } = choice ?? { model: null, effort: null };
   const parts = [
-    choice.model && `Modelo elegido: ${choice.model}`,
-    choice.effort && (choice.model ? `esfuerzo ${choice.effort}` : `Esfuerzo elegido: ${choice.effort}`),
+    model && `Modelo elegido: ${model}`,
+    effort && (model ? `esfuerzo ${effort}` : `Esfuerzo elegido: ${effort}`),
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(' · ') : 'Automático: valores por defecto del agente';
 }
