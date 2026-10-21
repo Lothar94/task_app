@@ -17,7 +17,9 @@ function legacyFile(): string {
     db.exec('ALTER TABLE agents DROP COLUMN model_selection');
     db.exec('ALTER TABLE tasks DROP COLUMN model_choice_model');
     db.exec('ALTER TABLE tasks DROP COLUMN model_choice_effort');
-    db.pragma('user_version = user_version - 1');
+    // The feature adds two migrations (agents column, tasks columns).
+    const version = db.pragma('user_version', { simple: true }) as number;
+    db.pragma(`user_version = ${version - 2}`);
   }
   db.close();
   return file;

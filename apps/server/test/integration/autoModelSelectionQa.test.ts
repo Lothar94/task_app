@@ -197,16 +197,14 @@ describe('automatic model selection (QA)', () => {
       await eventually(() => expect(runOf('Dev')).toMatchObject({ model: 'sonnet', effort: 'high' }));
     });
 
-    it.each([{ model: 'gpt-4' }, { effort: 'ultra' }, { model: 5 }, { effort: ['max'] }])(
-      'answers 400 to %j and creates no task',
-      async (bad) => {
-        for (const mode of ['auto', 'fixed'] as const) {
-          const { res, project } = await assigned(mode, bad);
-          expect(res.statusCode).toBe(400);
-          expect(fleet.useCases.getTaskTree.execute(project.id)).toEqual([]);
-        }
-      },
-    );
+    const invalidChoices = [{ model: 'gpt-4' }, { effort: 'ultra' }, { model: 5 }, { effort: ['max'] }];
+    it.each(
+      (['auto', 'fixed'] as const).flatMap((mode) => invalidChoices.map((bad) => [mode, bad] as const)),
+    )('answers 400 for a %s agent to %j and creates no task', async (mode, bad) => {
+      const { res, project } = await assigned(mode, { ...bad });
+      expect(res.statusCode).toBe(400);
+      expect(fleet.useCases.getTaskTree.execute(project.id)).toEqual([]);
+    });
 
     it('does not apply a stored choice after the agent goes back to fixed', async () => {
       const { devId, project } = await assigned('auto', { model: 'opus', effort: 'max' });
@@ -299,7 +297,7 @@ describe('automatic model selection (QA)', () => {
 
       const imported = await app.inject({ method: 'POST', url: `/api/organizations/${other}/agents/import`, payload: { file } });
 
-      expect(imported.statusCode).toBe(200);
+      expect(imported.statusCode).toBe(201);
       const list = (await app.inject({ method: 'GET', url: `/api/organizations/${other}/agents` })).json();
       expect(Object.fromEntries(list.map((a: { name: string; modelSelection: string }) => [a.name, a.modelSelection]))).toEqual({
         AutoOne: 'auto',
@@ -320,7 +318,7 @@ describe('automatic model selection (QA)', () => {
         url: `/api/organizations/${ORG}/agents/import`,
         payload: { file: { ...base, agents: [oldAgent] } },
       });
-      expect(ok.statusCode).toBe(200);
+      expect(ok.statusCode).toBe(201);
       const list = (await app.inject({ method: 'GET', url: `/api/organizations/${ORG}/agents` })).json();
       expect(list.find((a: { name: string }) => a.name === 'Legacy').modelSelection).toBe('fixed');
 
