@@ -15,6 +15,9 @@ import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
+import { GetFleetStatus } from '../application/fleet/GetFleetStatus.js';
+import { SearchOrganization } from '../application/search/SearchOrganization.js';
+import { ResolveProjectOrganization } from '../application/projects/ResolveProjectOrganization.js';
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
 import { ResumeProject } from '../application/projects/ResumeProject.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
@@ -70,6 +73,8 @@ export interface ContainerOptions {
   /** Read-only git access to workspaces; defaults to the git CLI. */
   git?: GitWorkspace;
   maxDelegationDepth: number;
+  /** Version of the app, shown by the fleet status. */
+  appVersion: string;
   reservedPorts?: number[];
 }
 
@@ -236,6 +241,9 @@ export function createContainer(options: ContainerOptions) {
       getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
       resumeProject: new ResumeProject(projects, tasks, recorder, queue),
       getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
+      searchOrganization: new SearchOrganization(organizations, projects, tasks, agents),
+      getFleetStatus: new GetFleetStatus(organizations, projects, tasks, agents, clock, options.appVersion),
+      resolveProjectOrganization: new ResolveProjectOrganization(projects),
       ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),
     },

@@ -6,6 +6,7 @@ import {
   EFFORT_LEVELS,
   MAX_IMPORTED_AGENTS,
   PERMISSION_MODES,
+  SEARCH_LIMITS,
   TASK_START_MODES,
 } from '@fleet/shared';
 import { z } from 'zod';
@@ -100,4 +101,12 @@ export const dashboardQuery = z.object({
   days: z.coerce.number().int().min(1).max(365).optional(),
 });
 
-export const eventsQuery = z.object({ projectId: z.string().min(1).optional() });
+export const eventsQuery = z.object({
+  projectId: z.string().min(1).optional(),
+  organizationId: z.string().min(1).optional(),
+});
+
+export const searchQuery = z.object({
+  q: z.string().max(SEARCH_LIMITS.queryLength).default(''),
+  limit: z.coerce.number().int().min(1).max(SEARCH_LIMITS.maxPerGroup).default(SEARCH_LIMITS.defaultPerGroup),
+});
