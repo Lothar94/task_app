@@ -2,6 +2,12 @@ import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  DEFAULT_MODEL_PRICES,
+  mergePriceEntries,
+  type ModelPriceEntry,
+} from '../application/metrics/ModelPriceTable.js';
+import { loadModelPricingFile } from './modelPricingFile.js';
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), '../../../../..');
 
@@ -24,6 +30,8 @@ export interface AppConfig {
   bashMaxOutputChars: number;
   /** Command of a PreToolUse hook for Bash that rewrites commands to save tokens. */
   bashRewriteHook?: string;
+  /** Price table of the usage dashboard: the defaults plus the entries of MODEL_PRICING_FILE. */
+  modelPrices: ModelPriceEntry[];
 }
 
 const DEFAULT_BASH_MAX_OUTPUT_CHARS = 15000;
@@ -56,8 +64,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     userSkillsDir: env.USER_SKILLS_DIR ?? join(claudeConfigDir, 'skills'),
     reservedPorts: [port, portOf(allowedOrigin)],
     bashMaxOutputChars: Number(env.AGENT_BASH_MAX_OUTPUT ?? DEFAULT_BASH_MAX_OUTPUT_CHARS),
+    modelPrices: modelPricesOf(env),
     ...optionalSettings(env),
   };
+}
+
+function modelPricesOf(env: NodeJS.ProcessEnv): ModelPriceEntry[] {
+  const overrides = env.MODEL_PRICING_FILE ? loadModelPricingFile(env.MODEL_PRICING_FILE) : [];
+  return mergePriceEntries(DEFAULT_MODEL_PRICES, overrides);
 }
 
 function optionalSettings(
