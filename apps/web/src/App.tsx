@@ -10,6 +10,7 @@ import { OrganizationsPage } from './features/organizations/OrganizationsPage';
 import { useCurrentOrganization } from './features/organizations/OrganizationContext';
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
+import { GlobalSearch } from './features/shell/GlobalSearch';
 import { ThemeToggle } from './features/theme/ThemeToggle';
 import { TaskPage } from './features/tasks/TaskPage';
 
@@ -46,6 +47,7 @@ function Layout() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <GlobalSearch />
           <NavLink to="/organizations" className={navLinkClass}>
             <Building2 aria-hidden className="size-4" />
             Organizaciones

@@ -14,4 +14,6 @@ export const queryKeys = {
   conversation: (taskId: string) => ['conversation', taskId] as const,
   dashboard: (organizationId: string, projectId: string | null, days: number | null) =>
     ['dashboard', organizationId, projectId, days] as const,
+  search: (organizationId: string, query: string) => ['search', organizationId, query] as const,
+  fleetStatus: (organizationId: string) => ['fleet-status', organizationId] as const,
 };
