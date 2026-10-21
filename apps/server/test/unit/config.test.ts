@@ -1,6 +1,8 @@
-import { homedir } from 'node:os';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_MODEL_PRICES, pricingOf } from '../../src/application/metrics/ModelPriceTable.js';
 import { loadConfig } from '../../src/main/config.js';
 
 describe('loadConfig', () => {
@@ -43,5 +45,33 @@ describe('loadConfig user skills', () => {
     const config = loadConfig({ CLAUDE_CONFIG_DIR: '/opt/claude' });
     expect(config.claudeConfigDir).toBe('/opt/claude');
     expect(config.userSkillsDir).toBe(join('/opt/claude', 'skills'));
+  });
+});
+
+describe('loadConfig model prices', () => {
+  const pricingFile = (content: string) => {
+    const path = join(mkdtempSync(join(tmpdir(), 'fleet-pricing-')), 'prices.json');
+    writeFileSync(path, content);
+    return path;
+  };
+
+  it('uses the built-in price table without MODEL_PRICING_FILE', () => {
+    expect(loadConfig({}).modelPrices).toEqual(DEFAULT_MODEL_PRICES);
+  });
+
+  it('merges the entries of MODEL_PRICING_FILE over the defaults', () => {
+    const opus = { match: 'claude-opus', pricing: pricingOf(15, 75) };
+    const custom = { match: 'my-model', pricing: pricingOf(1, 2) };
+    const config = loadConfig({ MODEL_PRICING_FILE: pricingFile(JSON.stringify([opus, custom])) });
+    expect(config.modelPrices).toEqual([...DEFAULT_MODEL_PRICES.slice(1), opus, custom]);
+  });
+
+  it('stops with a clear error when the file is invalid', () => {
+    const badShape = pricingFile(JSON.stringify([{ match: '', pricing: { inputPerMTok: -1 } }]));
+    expect(() => loadConfig({ MODEL_PRICING_FILE: badShape })).toThrow(/Invalid MODEL_PRICING_FILE/);
+    expect(() => loadConfig({ MODEL_PRICING_FILE: pricingFile('not json') })).toThrow(
+      /Invalid MODEL_PRICING_FILE/,
+    );
+    expect(() => loadConfig({ MODEL_PRICING_FILE: '/nope/prices.json' })).toThrow(/Invalid MODEL_PRICING_FILE/);
   });
 });

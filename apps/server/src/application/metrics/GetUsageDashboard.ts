@@ -8,6 +8,7 @@ import type { TaskRepository } from '../ports/TaskRepository.js';
 import type { TaskRunRepository } from '../ports/TaskRunRepository.js';
 import { requireOrganization } from '../shared/lookups.js';
 import { buildDashboard } from './buildDashboard.js';
+import type { ModelPriceTable } from './ModelPriceTable.js';
 
 /** Usage of one organization; a project filter from another organization is reported as not found. */
 export class GetUsageDashboard {
@@ -18,6 +19,7 @@ export class GetUsageDashboard {
     private readonly agents: AgentRepository,
     private readonly projects: ProjectRepository,
     private readonly clock: Clock,
+    private readonly prices: ModelPriceTable,
   ) {}
 
   execute(organizationId: string, filters: DashboardFilters): DashboardDto {
@@ -36,6 +38,7 @@ export class GetUsageDashboard {
       projects,
       filters,
       now: this.clock.now(),
+      prices: this.prices,
     });
   }
 }

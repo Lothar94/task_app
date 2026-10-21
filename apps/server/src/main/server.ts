@@ -36,6 +36,7 @@ async function main(): Promise<void> {
     maxDelegationDepth: config.maxDelegationDepth,
     appVersion: config.appVersion,
     reservedPorts: config.reservedPorts,
+    modelPrices: config.modelPrices,
   });
 
   const recovered = container.recoverInterruptedTasks.execute();
