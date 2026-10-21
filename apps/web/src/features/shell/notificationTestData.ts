@@ -13,6 +13,7 @@ export const taskOf = (patch: Partial<TaskDto> = {}): TaskDto => ({
   resultSummary: null,
   milestone: null,
   tags: [],
+  modelChoice: { model: null, effort: null },
   queuePosition: null,
   createdAt: '2026-10-21T08:00:00.000Z',
   startedAt: null,
