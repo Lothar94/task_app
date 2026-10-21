@@ -22,7 +22,7 @@ Branch `test/dashboard-costs-qa` (from `feature/dashboard-costs`). Verdict: **PA
 - Filters: `projectId` of a project in another organization -> 404; `projectId=nope` -> 404; valid project narrows totals (14.07), models and errors. `days=0|-1|1.5|abc|100000` -> 400.
 - Empty organization with `days=1`: zero totals, `byModel=[]`, `errors=[]`, `errorsTotal=0`, 24 hourly buckets, `previous.successRate=null`.
 - Error causes: `429 rate limit` -> rate_limit, `usage limit reached` -> session_limit, `Interrupted by user` -> interrupted. `retryable` true for failed root tasks, false for the failed subtask.
-- Retry: failed root task -> 200 (task re-queued, then picked up and finished by the agent); completed root -> 409; failed subtask -> 409; unknown id -> 404; retry while the project had been archived attempt -> 409.
+- Retry: failed root task -> 200 (task re-queued, then picked up and finished by the agent); completed root -> 409; failed subtask -> 409; unknown id -> 404. Retry on an archived project not verified live: archiving was refused with 409 because tasks were running.
 - Retry caveat: the live server uses the real Claude runtime, so the two retried tasks really ran a (tiny) agent in empty temp workspaces.
 
 ## Edge cases / CSV
