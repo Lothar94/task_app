@@ -21,6 +21,7 @@ import { ResolveProjectOrganization } from '../application/projects/ResolveProje
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
 import { ResumeProject } from '../application/projects/ResumeProject.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
+import { ModelPriceTable, type ModelPriceEntry } from '../application/metrics/ModelPriceTable.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
 import { GetProject, ListProjects } from '../application/projects/QueryProjects.js';
 import { ArchiveProject } from '../application/projects/ArchiveProject.js';
@@ -76,6 +77,8 @@ export interface ContainerOptions {
   /** Version of the app, shown by the fleet status. */
   appVersion: string;
   reservedPorts?: number[];
+  /** Price table of the usage dashboard; defaults to the built-in estimates. */
+  modelPrices?: readonly ModelPriceEntry[];
 }
 
 interface Infrastructure {
@@ -179,6 +182,34 @@ function createTelemetrySupport(
   };
 }
 
+interface UsageSources {
+  organizations: SqliteOrganizationRepository;
+  tasks: SqliteTaskRepository;
+  runs: SqliteTaskRunRepository;
+  agents: SqliteAgentRepository;
+  projects: SqliteProjectRepository;
+  clock: SystemClock;
+}
+
+/** Wires the read-only usage views: project telemetry and the dashboard with its price table. */
+function createUsageUseCases(
+  { organizations, tasks, runs, agents, projects, clock }: UsageSources,
+  { modelPrices }: ContainerOptions,
+) {
+  return {
+    getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
+    getUsageDashboard: new GetUsageDashboard(
+      organizations,
+      tasks,
+      runs,
+      agents,
+      projects,
+      clock,
+      new ModelPriceTable(modelPrices),
+    ),
+  };
+}
+
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
   const { db, instructionWriter, skillCatalog } = options;
@@ -238,9 +269,8 @@ export function createContainer(options: ContainerOptions) {
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
-      getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
       resumeProject: new ResumeProject(projects, tasks, recorder, queue),
-      getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
+      ...createUsageUseCases({ organizations, tasks, runs, agents, projects, clock }, options),
       searchOrganization: new SearchOrganization(organizations, projects, tasks, agents),
       getFleetStatus: new GetFleetStatus(organizations, projects, tasks, agents, clock, options.appVersion),
       resolveProjectOrganization: new ResolveProjectOrganization(projects),
