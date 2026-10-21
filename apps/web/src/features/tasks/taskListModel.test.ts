@@ -22,6 +22,7 @@ const task = (number: number, extra: Partial<TaskNodeDto> = {}): TaskNodeDto => 
   resultSummary: null,
   milestone: null,
   tags: [],
+  modelChoice: { model: null, effort: null },
   queuePosition: null,
   createdAt: `2026-01-0${number}T00:00:00Z`,
   startedAt: null,

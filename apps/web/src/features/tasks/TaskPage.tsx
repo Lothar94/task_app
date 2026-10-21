@@ -10,6 +10,7 @@ import { TaskNumber, taskLabel } from './taskLabel';
 import { hasSubtreeTokens, runLabel } from './executionModel';
 import { formatCost, formatDuration, formatTokens } from '../../lib/format';
 import { TaskWorkspace } from './TaskWorkspace';
+import { TaskModelChoice } from './TaskModelChoice';
 import { TaskEditForm } from './TaskEditForm';
 import { TaskLabels } from './TaskLabels';
 import { existingMilestones, existingTags } from './taskListModel';
@@ -89,6 +90,7 @@ function TaskMeta({
             {new Date(task.startedAt).toLocaleString()}
           </span>
         )}
+        <TaskModelChoice task={task} />
         <TaskMetricsSummary task={task} />
       </div>
       <ProposalNote task={task} agentNames={agentNames} detailed />
