@@ -44,7 +44,7 @@ const project = (id: string, name: string, extra: Partial<ProjectDto> = {}): Pro
 });
 
 const agent = (id: string, name: string, collaboratorIds: string[] = []): AgentDto =>
-  ({ id, name, role: `rol-${name}`, model: 'opus', effort: 'high', collaboratorIds }) as unknown as AgentDto;
+  ({ id, name, role: `rol-${name}`, model: 'opus', effort: 'high', modelSelection: 'fixed', collaboratorIds }) as unknown as AgentDto;
 
 const metrics = (totalTokens: number, durationMs = 0) => ({
   runs: 1,

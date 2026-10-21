@@ -2,7 +2,16 @@ import type { AgentDto, TaskDto } from '@fleet/shared';
 import { type FormEvent, useState } from 'react';
 import { Button, ErrorMessage, Field, Select, TextArea, TextInput } from '../../components/ui';
 import { LabelFields } from './LabelFields';
-import { milestoneOrNull, parseTags, startModeOf, validateLabels } from './taskFormModel';
+import { ModelChoiceFields } from './ModelChoiceFields';
+import {
+  allowsModelChoice,
+  EMPTY_MODEL_CHOICE,
+  milestoneOrNull,
+  modelChoicePayload,
+  parseTags,
+  startModeOf,
+  validateLabels,
+} from './taskFormModel';
 import { useAssignTask } from './taskQueries';
 
 interface AssignTaskFormProps {
@@ -20,11 +29,14 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
   const [description, setDescription] = useState('');
   const [milestone, setMilestone] = useState('');
   const [tagsText, setTagsText] = useState('');
+  const [modelChoice, setModelChoice] = useState(EMPTY_MODEL_CHOICE);
   const assignTask = useAssignTask(projectId);
 
   if (members.length === 0)
     return <p className="text-sm text-fg-subtle">Añade agentes al proyecto primero.</p>;
 
+  const selectedAgentId = agentId || (members[0]?.id ?? '');
+  const selectedAgent = members.find((agent) => agent.id === selectedAgentId);
   const labelsError = validateLabels(milestone, tagsText);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -34,12 +46,13 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
     if (labelsError) return;
     assignTask.mutate(
       {
-        agentId: agentId || (members[0]?.id ?? ''),
+        agentId: selectedAgentId,
         title,
         description,
         start,
         milestone: milestoneOrNull(milestone),
         tags: parseTags(tagsText),
+        ...modelChoicePayload(selectedAgent, modelChoice),
       },
       { onSuccess: onAssigned },
     );
@@ -48,7 +61,13 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <Field label="Responsable">
-        <Select value={agentId} onChange={(e) => setAgentId(e.target.value)}>
+        <Select
+          value={selectedAgentId}
+          onChange={(e) => {
+            setAgentId(e.target.value);
+            setModelChoice(EMPTY_MODEL_CHOICE);
+          }}
+        >
           {members.map((agent) => (
             <option key={agent.id} value={agent.id}>
               {agent.name} — {agent.role}
@@ -56,6 +75,9 @@ export function AssignTaskForm({ projectId, members, milestones, tags, onAssigne
           ))}
         </Select>
       </Field>
+      {selectedAgent && allowsModelChoice(selectedAgent) && (
+        <ModelChoiceFields agent={selectedAgent} value={modelChoice} onChange={setModelChoice} />
+      )}
       <Field label="Título">
         <TextInput required autoFocus value={title} onChange={(e) => setTitle(e.target.value)} />
       </Field>

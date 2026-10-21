@@ -3,7 +3,7 @@ import { Check, X } from 'lucide-react';
 import { forwardRef } from 'react';
 import { FOCUS_RING, LinkButton, StatusChip } from '../../components/ui';
 import { formatInteger, formatPercent } from '../../lib/format';
-import { EFFORT_LABELS } from './agentLabels';
+import { EFFORT_LABELS, modelText } from './agentLabels';
 import { AgentAvatar } from './AgentAvatar';
 import { type AgentTrackRecord, isOrchestrator } from './agentSheetModel';
 
@@ -97,7 +97,7 @@ export const AgentSheet = forwardRef<HTMLElement, AgentSheetProps>(function Agen
         </Section>
         <Section title="Modelo asignado">
           <p className="border border-line bg-surface px-2.5 py-1.5 font-mono text-xs text-fg">
-            {agent.model}
+            {modelText(agent)}
           </p>
           <p className="mt-2 font-mono text-xs text-fg-subtle">
             Esfuerzo: <span className="text-fg">{EFFORT_LABELS[agent.effort]}</span>

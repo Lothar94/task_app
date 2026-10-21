@@ -1,4 +1,12 @@
-import { TASK_LIMITS, type TaskStartMode } from '@fleet/shared';
+import {
+  type AgentDto,
+  type AgentEffort,
+  type AgentModel,
+  type RunModelChoice,
+  TASK_LIMITS,
+  type TaskStartMode,
+} from '@fleet/shared';
+import { EFFORT_LABELS } from '../agents/agentLabels';
 
 /** Splits a comma-separated text into trimmed, case-insensitively unique tags. */
 export function parseTags(text: string): string[] {
@@ -44,3 +52,42 @@ const START_MODES: readonly TaskStartMode[] = ['now', 'queue', 'draft'];
  */
 export const startModeOf = (submitterValue: string | undefined): TaskStartMode =>
   START_MODES.find((mode) => mode === submitterValue) ?? 'draft';
+
+/** Model/effort the invoker picks for one task; empty strings mean "use the agent's default". */
+export interface ModelChoiceValues {
+  model: AgentModel | '';
+  effort: AgentEffort | '';
+}
+
+export const EMPTY_MODEL_CHOICE: ModelChoiceValues = { model: '', effort: '' };
+
+/** Only auto agents let the invoker choose; fixed agents never show nor send the selects. */
+export const allowsModelChoice = (agent: Pick<AgentDto, 'modelSelection'> | undefined) =>
+  agent?.modelSelection === 'auto';
+
+/** Payload fields for the assignment: omitted unless the agent is auto, null when left on default. */
+export function modelChoicePayload(agent: Pick<AgentDto, 'modelSelection'> | undefined, choice: ModelChoiceValues) {
+  if (!allowsModelChoice(agent)) return {};
+  return { model: choice.model || null, effort: choice.effort || null };
+}
+
+/** First option of the model select: keeps the agent's own model. */
+export const defaultModelOption = (agent: Pick<AgentDto, 'model'>) =>
+  `Por defecto del agente (${agent.model})`;
+
+/** First option of the effort select: keeps the agent's own effort. */
+export const defaultEffortOption = (agent: Pick<AgentDto, 'effort'>) =>
+  `Por defecto del agente (${EFFORT_LABELS[agent.effort].toLowerCase()})`;
+
+/** Task detail line about who chose the model; null for fixed agents. */
+export function modelChoiceSummary(
+  agent: Pick<AgentDto, 'model' | 'modelSelection'> | undefined,
+  choice: RunModelChoice,
+): string | null {
+  if (agent?.modelSelection !== 'auto') return null;
+  const parts = [
+    choice.model && `Modelo elegido: ${choice.model}`,
+    choice.effort && (choice.model ? `esfuerzo ${choice.effort}` : `Esfuerzo elegido: ${choice.effort}`),
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(' · ') : 'Automático: valores por defecto del agente';
+}

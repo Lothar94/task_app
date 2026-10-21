@@ -1,14 +1,56 @@
-import { AGENT_MODELS, type AgentDto, EFFORT_LEVELS, PERMISSION_MODES } from '@fleet/shared';
+import {
+  AGENT_MODELS,
+  type AgentDto,
+  EFFORT_LEVELS,
+  MODEL_SELECTION_MODES,
+  PERMISSION_MODES,
+} from '@fleet/shared';
 import { type FormEvent, useState } from 'react';
-import { Button, CheckboxList, ErrorMessage, Field, Select, TextInput } from '../../components/ui';
+import {
+  Button,
+  CheckboxList,
+  ErrorMessage,
+  Field,
+  Select,
+  SegmentedControl,
+  TextInput,
+} from '../../components/ui';
 import type { AgentFormValues } from './agentFormModel';
-import { EFFORT_LABELS, MODEL_LABELS, PERMISSION_LABELS } from './agentLabels';
+import {
+  AUTO_SELECTION_HINT,
+  EFFORT_LABELS,
+  MODEL_LABELS,
+  MODEL_SELECTION_LABELS,
+  PERMISSION_LABELS,
+  modelFieldLabels,
+} from './agentLabels';
 import { AgentSection } from './AgentSection';
 import { InstructionsField } from './InstructionsField';
 import { SkillsField } from './SkillsField';
 
 const submittingLabel = (isNew: boolean, values: AgentFormValues) =>
   isNew && !values.instructions.trim() ? 'Creando y redactando instrucciones…' : 'Guardando…';
+
+function ModelSelectionField({
+  value,
+  onChange,
+}: {
+  value: AgentFormValues['modelSelection'];
+  onChange: (mode: AgentFormValues['modelSelection']) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="label-mono text-fg-subtle">Selección de modelo</p>
+      <SegmentedControl
+        label="Selección de modelo"
+        value={value}
+        onChange={onChange}
+        options={MODEL_SELECTION_MODES.map((mode) => ({ value: mode, label: MODEL_SELECTION_LABELS[mode] }))}
+      />
+      {value === 'auto' && <p className="text-xs text-fg-subtle">{AUTO_SELECTION_HINT}</p>}
+    </div>
+  );
+}
 
 interface AgentFormProps {
   initialValues: AgentFormValues;
@@ -25,6 +67,8 @@ export function AgentForm(props: AgentFormProps) {
   const [values, setValues] = useState(initialValues);
   const set = <K extends keyof AgentFormValues>(key: K, value: AgentFormValues[K]) =>
     setValues((current) => ({ ...current, [key]: value }));
+
+  const labels = modelFieldLabels(values.modelSelection);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -59,8 +103,12 @@ export function AgentForm(props: AgentFormProps) {
       </AgentSection>
 
       <AgentSection title="Configuración">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Field label="Modelo">
+        <ModelSelectionField
+          value={values.modelSelection}
+          onChange={(mode) => set('modelSelection', mode)}
+        />
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Field label={labels.model}>
             <Select
               value={values.model}
               onChange={(e) => set('model', e.target.value as AgentFormValues['model'])}
@@ -72,7 +120,7 @@ export function AgentForm(props: AgentFormProps) {
               ))}
             </Select>
           </Field>
-          <Field label="Intensidad" hint="Cuánto razona el modelo antes de actuar">
+          <Field label={labels.effort} hint="Cuánto razona el modelo antes de actuar">
             <Select
               value={values.effort}
               onChange={(e) => set('effort', e.target.value as AgentFormValues['effort'])}

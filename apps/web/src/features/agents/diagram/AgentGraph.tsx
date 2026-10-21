@@ -2,7 +2,7 @@ import type { AgentDto } from '@fleet/shared';
 import { useMemo, useState } from 'react';
 import { EmptyState } from '../../../components/ui';
 import { agentInitials } from '../AgentAvatar';
-import { EFFORT_LABELS } from '../agentLabels';
+import { modelEffortText, modelText } from '../agentLabels';
 import { DEFAULT_LAYOUT, type GraphEdge, type GraphNode, layoutAgentGraph } from './agentGraphLayout';
 
 const { nodeWidth: W, nodeHeight: H } = DEFAULT_LAYOUT;
@@ -75,8 +75,8 @@ function nodeLabel(
 }
 
 function modelLine(agent: AgentDto, showStatus: boolean, isWorking: boolean) {
-  if (showStatus) return `${isWorking ? '●' : '○'} ${isWorking ? 'trabajando' : 'idle'} · ${agent.model}`;
-  return `${agent.model} · ${EFFORT_LABELS[agent.effort].toLowerCase()}`;
+  if (showStatus) return `${isWorking ? '●' : '○'} ${isWorking ? 'trabajando' : 'idle'} · ${modelText(agent)}`;
+  return modelEffortText(agent);
 }
 
 function OrchestratorTag() {

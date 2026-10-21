@@ -38,6 +38,7 @@ const node = (
   resultSummary: null,
   milestone: null,
   tags: [],
+  modelChoice: { model: null, effort: null },
   queuePosition: null,
   createdAt: '',
   startedAt: null,
