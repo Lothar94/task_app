@@ -55,3 +55,31 @@ describe('AgentBriefing.systemPromptAppendix', () => {
     });
   });
 });
+
+describe('AgentBriefing model selection guidance', () => {
+  const briefing = new AgentBriefing();
+  const team = (...modes: ('fixed' | 'auto')[]) =>
+    briefing.systemPromptAppendix({
+      ...context,
+      collaborators: modes.map((modelSelection, index) => ({
+        name: `Mate${index}`,
+        role: 'r',
+        description: '',
+        modelSelection,
+      })),
+    });
+
+  it('marks auto collaborators and explains how to choose', () => {
+    const appendix = team('auto', 'fixed');
+    expect(appendix).toContain('"Mate0" — r [auto model: you choose model and effort]');
+    expect(appendix).not.toContain('"Mate1" — r [auto');
+    expect(appendix).toContain('haiku + low');
+    expect(appendix).toContain('opus + high/xhigh');
+  });
+
+  it('adds no model rule when every collaborator is fixed', () => {
+    const appendix = team('fixed');
+    expect(appendix).not.toContain('auto model');
+    expect(appendix).not.toContain('haiku');
+  });
+});

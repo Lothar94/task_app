@@ -1,4 +1,5 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk';
+import { AGENT_MODELS, EFFORT_LEVELS } from '@fleet/shared';
 import { z } from 'zod';
 import type { DelegationGateway, DelegationOutcome } from '../../../application/ports/AgentRuntime.js';
 
@@ -6,6 +7,11 @@ export const FLEET_SERVER_NAME = 'fleet';
 export const FLEET_TOOL_NAMES = ['list_collaborators', 'delegate_task', 'create_task', 'report_result'].map(
   (name) => `mcp__${FLEET_SERVER_NAME}__${name}`,
 );
+
+const MODEL_HINT =
+  'Only for collaborators with automatic model selection: model to use, chosen by subtask difficulty. Ignored for fixed collaborators.';
+const EFFORT_HINT =
+  'Only for collaborators with automatic model selection: effort level, chosen by subtask difficulty. Ignored for fixed collaborators.';
 
 type ToolResult = { content: { type: 'text'; text: string }[]; isError?: boolean };
 
@@ -25,6 +31,7 @@ async function guarded(action: () => Promise<string> | string): Promise<ToolResu
 function describeOutcome(collaboratorName: string, outcome: DelegationOutcome): string {
   return [
     `Subtask ${outcome.subtaskId} (Task ${outcome.subtaskNumber}) assigned to "${collaboratorName}" finished with status: ${outcome.status}.`,
+    `Ran with model ${outcome.model}, effort ${outcome.effort}.`,
     'Summary:',
     outcome.summary || '(no summary provided)',
   ].join('\n');
@@ -79,12 +86,14 @@ export function createFleetToolServer(gateway: DelegationGateway) {
           instructions: z
             .string()
             .describe('Self-contained instructions: context, expected outcome and acceptance criteria'),
+          model: z.enum(AGENT_MODELS).optional().describe(MODEL_HINT),
+          effort: z.enum(EFFORT_LEVELS).optional().describe(EFFORT_HINT),
         },
-        ({ collaborator, title, instructions }) =>
+        ({ collaborator, title, instructions, model, effort }) =>
           guarded(async () =>
             describeOutcome(
               collaborator,
-              await gateway.delegate({ collaboratorName: collaborator, title, instructions }),
+              await gateway.delegate({ collaboratorName: collaborator, title, instructions, model, effort }),
             ),
           ),
       ),

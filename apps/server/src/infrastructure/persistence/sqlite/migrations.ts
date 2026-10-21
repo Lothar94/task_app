@@ -157,6 +157,9 @@ const MIGRATIONS: readonly string[] = [
     head_sha TEXT,
     head_branch TEXT
   );`,
+  `ALTER TABLE agents ADD COLUMN model_selection TEXT NOT NULL DEFAULT 'fixed';`,
+  `ALTER TABLE tasks ADD COLUMN model_choice_model TEXT;
+   ALTER TABLE tasks ADD COLUMN model_choice_effort TEXT;`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */

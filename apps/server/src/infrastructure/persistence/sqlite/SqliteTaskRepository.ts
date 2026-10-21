@@ -1,4 +1,4 @@
-import type { TaskStatus } from '@fleet/shared';
+import type { AgentEffort, AgentModel, TaskStatus } from '@fleet/shared';
 import type { TaskRepository } from '../../../application/ports/TaskRepository.js';
 import { Task } from '../../../domain/task/Task.js';
 import type { SqliteDatabase } from './openDatabase.js';
@@ -21,6 +21,8 @@ interface TaskRow {
   tags: string;
   queue_position: number | null;
   proposed_by_agent_id: string | null;
+  model_choice_model: AgentModel | null;
+  model_choice_effort: AgentEffort | null;
 }
 
 const ACTIVE_STATUSES = "('pending', 'running', 'waiting_subtasks')";
@@ -35,10 +37,10 @@ export class SqliteTaskRepository implements TaskRepository {
       .prepare(
         `INSERT INTO tasks (id, number, project_id, parent_task_id, agent_id, title, description, status,
            result_summary, session_id, created_at, started_at, finished_at, milestone, tags, queue_position,
-           proposed_by_agent_id)
+           proposed_by_agent_id, model_choice_model, model_choice_effort)
          VALUES (@id, @number, @projectId, @parentTaskId, @agentId, @title, @description, @status,
            @resultSummary, @sessionId, @createdAt, @startedAt, @finishedAt, @milestone, @tags, @queuePosition,
-           @proposedByAgentId)
+           @proposedByAgentId, @modelChoiceModel, @modelChoiceEffort)
          ON CONFLICT(id) DO UPDATE SET title = @title, description = @description, agent_id = @agentId,
            milestone = @milestone, tags = @tags, queue_position = @queuePosition,
            status = @status, result_summary = @resultSummary,
@@ -47,6 +49,8 @@ export class SqliteTaskRepository implements TaskRepository {
       .run({
         ...snapshot,
         tags: JSON.stringify(snapshot.tags),
+        modelChoiceModel: snapshot.modelChoice.model,
+        modelChoiceEffort: snapshot.modelChoice.effort,
         createdAt: snapshot.createdAt.toISOString(),
         startedAt: snapshot.startedAt?.toISOString() ?? null,
         finishedAt: snapshot.finishedAt?.toISOString() ?? null,
@@ -131,5 +135,6 @@ function toTask(row: TaskRow): Task {
     tags: JSON.parse(row.tags) as string[],
     queuePosition: row.queue_position,
     proposedByAgentId: row.proposed_by_agent_id,
+    modelChoice: { model: row.model_choice_model, effort: row.model_choice_effort },
   });
 }

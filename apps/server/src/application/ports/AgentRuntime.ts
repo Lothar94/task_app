@@ -3,6 +3,7 @@ import type {
   AgentModel,
   ModelTokenUsage,
   AgentPermissionMode,
+  ModelSelectionMode,
   MessagePayload,
 } from '@fleet/shared';
 
@@ -10,12 +11,16 @@ export interface CollaboratorInfo {
   name: string;
   role: string;
   description: string;
+  modelSelection: ModelSelectionMode;
 }
 
 export interface DelegationRequest {
   collaboratorName: string;
   title: string;
   instructions: string;
+  /** Only honoured when the collaborator has automatic model selection. */
+  model?: AgentModel;
+  effort?: AgentEffort;
 }
 
 export interface DelegationOutcome {
@@ -23,6 +28,9 @@ export interface DelegationOutcome {
   subtaskNumber: number;
   status: 'completed' | 'failed' | 'cancelled';
   summary: string;
+  /** Model and effort the subtask ran with. */
+  model: AgentModel;
+  effort: AgentEffort;
 }
 
 export interface TaskProposal {

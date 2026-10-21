@@ -225,4 +225,25 @@ describe('task telemetry migrations', () => {
     db.prepare("DELETE FROM tasks WHERE id = 't1'").run();
     expect(db.prepare('SELECT COUNT(*) AS n FROM task_git_snapshots').get()).toEqual({ n: 0 });
   });
+
+  it('adds fixed model selection to existing agents and an empty model choice to existing tasks', () => {
+    const db = openDatabase(
+      legacyDatabase(
+        15,
+        `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort,
+            allowed_tools, permission_mode, max_turns, created_at, updated_at)
+          VALUES ('a1', '${DEFAULT_ORGANIZATION_ID}', 'CTO', 'Lead', '', 'Lead', 'opus', 'high', '[]', 'dontAsk',
+            10, '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');
+        INSERT INTO projects (id, organization_id, name, description, workspace_path, created_at)
+          VALUES ('p1', '${DEFAULT_ORGANIZATION_ID}', 'P1', '', '/tmp/p1', '2026-01-01T00:00:00Z');
+        INSERT INTO tasks (id, number, project_id, agent_id, title, description, status, created_at)
+          VALUES ('t1', 1, 'p1', 'a1', 'T', 'd', 'completed', '2026-01-01');`,
+      ),
+    );
+
+    expect(db.prepare('SELECT model_selection FROM agents').all()).toEqual([{ model_selection: 'fixed' }]);
+    expect(db.prepare('SELECT model_choice_model, model_choice_effort FROM tasks').all()).toEqual([
+      { model_choice_model: null, model_choice_effort: null },
+    ]);
+  });
 });

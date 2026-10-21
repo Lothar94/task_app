@@ -2,6 +2,10 @@ import type { Agent } from '../../domain/agent/Agent.js';
 import type { Task } from '../../domain/task/Task.js';
 import type { CollaboratorInfo } from '../ports/AgentRuntime.js';
 
+const AUTO_MODEL_MARK = ' [auto model: you choose model and effort]';
+const AUTO_MODEL_RULE =
+  '- For [auto model] collaborators set `model` and `effort` in `delegate_task` by difficulty: haiku + low for trivial or mechanical work, sonnet + medium/high for standard feature work, opus + high/xhigh for architecture, hard debugging or broad refactors. If unsure, omit them to use the collaborator\'s defaults.';
+
 export interface BriefingContext {
   agent: Agent;
   instructions: string;
@@ -60,7 +64,10 @@ export class AgentBriefing {
       return '# Your team\nYou have no collaborators available in this project: do the work yourself.';
     }
     const roster = collaborators
-      .map(({ name, role, description }) => `- "${name}" — ${role}${description ? `: ${description}` : ''}`)
+      .map(
+        ({ name, role, description, modelSelection }) =>
+          `- "${name}" — ${role}${description ? `: ${description}` : ''}${modelSelection === 'auto' ? AUTO_MODEL_MARK : ''}`,
+      )
       .join('\n');
     return [
       '# Your team',
@@ -73,6 +80,7 @@ export class AgentBriefing {
       '- Each call waits until the collaborator finishes and returns its summary; review it before moving on.',
       "- Delegate only what fits the collaborator's role; do the rest yourself.",
       '- Use `create_task` to propose follow-up work outside your task: it is only a draft until the project manager starts it.',
+      ...(collaborators.some(({ modelSelection }) => modelSelection === 'auto') ? [AUTO_MODEL_RULE] : []),
     ].join('\n');
   }
 
