@@ -1,6 +1,7 @@
 import type { RunModelChoice } from '@fleet/shared';
 import type { Agent } from '../../domain/agent/Agent.js';
 import { ValidationError } from '../../domain/errors/DomainError.js';
+import { requireModelChoice } from '../../domain/shared/guards.js';
 import { Task } from '../../domain/task/Task.js';
 import type { AgentRepository } from '../ports/AgentRepository.js';
 import type { DelegationOutcome, DelegationRequest } from '../ports/AgentRuntime.js';
@@ -32,9 +33,10 @@ export class DelegateSubtask {
   ) {}
 
   async execute({ parent, request, executor, signal }: DelegateSubtaskCommand): Promise<DelegationOutcome> {
+    const choice = requireModelChoice(request);
     const collaborator = this.resolveCollaborator(parent, request.collaboratorName);
     this.ensureNoCycle(parent, collaborator);
-    const subtask = this.createSubtask(parent, collaborator, request);
+    const subtask = this.createSubtask(parent, collaborator, request, choice);
 
     parent.waitForSubtasks();
     this.recorder.recordChange(parent);
@@ -80,7 +82,12 @@ export class DelegateSubtask {
     return chain;
   }
 
-  private createSubtask(parent: Task, collaborator: Agent, request: DelegationRequest): Task {
+  private createSubtask(
+    parent: Task,
+    collaborator: Agent,
+    request: DelegationRequest,
+    choice: RunModelChoice,
+  ): Task {
     const subtask = Task.create(
       this.ids.next(),
       {
@@ -90,7 +97,7 @@ export class DelegateSubtask {
         agentId: collaborator.id,
         title: request.title,
         description: request.instructions,
-        modelChoice: collaborator.modelSelection === 'auto' ? chosenModel(request) : undefined,
+        modelChoice: collaborator.modelSelection === 'auto' ? choice : undefined,
       },
       this.clock.now(),
     );
@@ -116,8 +123,4 @@ export class DelegateSubtask {
       ...resolveRunModel(collaborator.toSnapshot(), subtask.modelChoice),
     };
   }
-}
-
-function chosenModel({ model, effort }: DelegationRequest): RunModelChoice {
-  return { model: model ?? null, effort: effort ?? null };
 }

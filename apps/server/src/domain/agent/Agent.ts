@@ -4,11 +4,14 @@ import {
   type AgentPermissionMode,
   type ModelSelectionMode,
   MAX_AGENT_SKILLS,
+  AGENT_MODELS,
+  EFFORT_LEVELS,
+  MODEL_SELECTION_MODES,
   isValidSkillName,
   MAX_SKILL_NAME_LENGTH,
 } from '@fleet/shared';
 import { ValidationError } from '../errors/DomainError.js';
-import { requireIntegerInRange, requireText } from '../shared/guards.js';
+import { requireIntegerInRange, requireOneOf, requireText } from '../shared/guards.js';
 
 export const MAX_AGENT_TURNS = 500;
 
@@ -125,9 +128,9 @@ export class Agent {
       role: requireText(profile.role, 'role', 120),
       description: profile.description.trim(),
       instructions: requireText(profile.instructions, 'instructions'),
-      model: profile.model,
-      effort: profile.effort,
-      modelSelection: profile.modelSelection,
+      model: requireOneOf(profile.model, 'model', AGENT_MODELS),
+      effort: requireOneOf(profile.effort, 'effort', EFFORT_LEVELS),
+      modelSelection: requireOneOf(profile.modelSelection, 'modelSelection', MODEL_SELECTION_MODES),
       allowedTools: [...new Set(profile.allowedTools.map((tool) => tool.trim()).filter(Boolean))],
       skills: normalizeSkills(profile.skills),
       permissionMode: profile.permissionMode,

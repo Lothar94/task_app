@@ -1,6 +1,6 @@
 import { TASK_LIMITS, type RunModelChoice, type TaskStatus } from '@fleet/shared';
 import { ConflictError, ValidationError } from '../errors/DomainError.js';
-import { requireIntegerInRange, requireText } from '../shared/guards.js';
+import { requireIntegerInRange, requireModelChoice, requireText } from '../shared/guards.js';
 
 const requirePositiveInteger = (value: number) =>
   requireIntegerInRange(value, 'number', 1, Number.MAX_SAFE_INTEGER);
@@ -82,7 +82,7 @@ export class Task {
       milestone: normalizeMilestone(task.milestone),
       tags: normalizeTags(task.tags),
       proposedByAgentId,
-      modelChoice: { ...(task.modelChoice ?? { model: null, effort: null }) },
+      modelChoice: requireModelChoice(task.modelChoice ?? {}),
       queuePosition: null,
       status,
       resultSummary: null,

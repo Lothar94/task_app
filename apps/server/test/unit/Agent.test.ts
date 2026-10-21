@@ -108,4 +108,11 @@ describe('Agent model selection', () => {
     agent.updateProfile(profile('Fixed', { modelSelection: 'auto' }), now);
     expect(agent.modelSelection).toBe('auto');
   });
+
+  it.each([{ model: 'gpt-4' }, { effort: 'ultra' }, { modelSelection: 'smart' }])(
+    'rejects invalid profile %o',
+    (overrides) => {
+      expect(() => Agent.create('a1', 'org', profile('Dev', overrides as never), now)).toThrow(ValidationError);
+    },
+  );
 });

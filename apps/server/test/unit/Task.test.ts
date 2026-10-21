@@ -211,4 +211,33 @@ describe('Task', () => {
       expect(draft({ tags: eleven.slice(0, 10) }).tags).toHaveLength(10);
     });
   });
+
+  describe('modelChoice', () => {
+    const withChoice = (modelChoice: unknown) =>
+      Task.create(
+        't1',
+        {
+          projectId: 'p1',
+          number: 1,
+          parentTaskId: null,
+          agentId: 'a1',
+          title: 'Build',
+          description: 'Do it',
+          modelChoice,
+        } as never,
+        now,
+      );
+
+    it('defaults to no choice and keeps valid values', () => {
+      expect(newTask().modelChoice).toEqual({ model: null, effort: null });
+      expect(withChoice({ model: 'haiku', effort: null }).modelChoice).toEqual({ model: 'haiku', effort: null });
+    });
+
+    it.each([{ model: 'gpt-4', effort: null }, { model: null, effort: 'ultra' }, { model: 42, effort: null }])(
+      'rejects invalid choice %o',
+      (choice) => {
+        expect(() => withChoice(choice)).toThrow(ValidationError);
+      },
+    );
+  });
 });
