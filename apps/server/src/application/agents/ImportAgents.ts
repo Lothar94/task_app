@@ -92,7 +92,12 @@ export class ImportAgents {
     now: Date,
   ): { agent: Agent; entry: ExportedAgent } {
     const { collaborators: _collaborators, ...profile } = entry;
-    const agent = Agent.create(this.ids.next(), organizationId, { ...profile, name }, now);
+    const agent = Agent.create(
+      this.ids.next(),
+      organizationId,
+      { ...profile, modelSelection: profile.modelSelection ?? 'fixed', name },
+      now,
+    );
     idByFileName.set(entry.name, agent.id);
     return { agent, entry };
   }

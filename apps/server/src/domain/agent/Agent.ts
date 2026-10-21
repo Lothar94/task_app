@@ -2,6 +2,7 @@ import {
   type AgentEffort,
   type AgentModel,
   type AgentPermissionMode,
+  type ModelSelectionMode,
   MAX_AGENT_SKILLS,
   isValidSkillName,
   MAX_SKILL_NAME_LENGTH,
@@ -18,6 +19,7 @@ export interface AgentProfile {
   instructions: string;
   model: AgentModel;
   effort: AgentEffort;
+  modelSelection: ModelSelectionMode;
   allowedTools: string[];
   skills: string[];
   permissionMode: AgentPermissionMode;
@@ -74,6 +76,10 @@ export class Agent {
     return this.state.description;
   }
 
+  get modelSelection(): ModelSelectionMode {
+    return this.state.modelSelection;
+  }
+
   get skills(): readonly string[] {
     return this.state.skills;
   }
@@ -121,6 +127,7 @@ export class Agent {
       instructions: requireText(profile.instructions, 'instructions'),
       model: profile.model,
       effort: profile.effort,
+      modelSelection: profile.modelSelection,
       allowedTools: [...new Set(profile.allowedTools.map((tool) => tool.trim()).filter(Boolean))],
       skills: normalizeSkills(profile.skills),
       permissionMode: profile.permissionMode,

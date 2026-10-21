@@ -29,6 +29,7 @@ export function profile(name: string, overrides: Partial<AgentProfile> = {}): Ag
     instructions: `Act as ${name}`,
     model: 'sonnet',
     effort: 'high',
+    modelSelection: 'fixed',
     allowedTools: ['Read'],
     skills: [],
     permissionMode: 'dontAsk',

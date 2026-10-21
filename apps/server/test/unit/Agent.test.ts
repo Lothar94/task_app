@@ -95,3 +95,17 @@ describe('Agent', () => {
     });
   });
 });
+
+describe('Agent model selection', () => {
+  it('keeps the selection mode in its snapshot', () => {
+    const agent = Agent.create('a1', 'org', profile('Auto', { modelSelection: 'auto' }), now);
+    expect(agent.modelSelection).toBe('auto');
+    expect(agent.toSnapshot().modelSelection).toBe('auto');
+  });
+
+  it('switches the mode when the profile is updated', () => {
+    const agent = Agent.create('a1', 'org', profile('Fixed'), now);
+    agent.updateProfile(profile('Fixed', { modelSelection: 'auto' }), now);
+    expect(agent.modelSelection).toBe('auto');
+  });
+});

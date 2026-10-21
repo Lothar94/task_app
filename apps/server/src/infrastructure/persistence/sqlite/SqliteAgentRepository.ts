@@ -1,4 +1,4 @@
-import type { AgentEffort, AgentModel, AgentPermissionMode } from '@fleet/shared';
+import type { AgentEffort, AgentModel, AgentPermissionMode, ModelSelectionMode } from '@fleet/shared';
 import type { AgentRepository } from '../../../application/ports/AgentRepository.js';
 import { Agent, type AgentSnapshot } from '../../../domain/agent/Agent.js';
 import type { SqliteDatabase } from './openDatabase.js';
@@ -12,6 +12,7 @@ interface AgentRow {
   instructions: string;
   model: AgentModel;
   effort: AgentEffort;
+  model_selection: ModelSelectionMode;
   allowed_tools: string;
   skills: string;
   permission_mode: AgentPermissionMode;
@@ -61,12 +62,12 @@ export class SqliteAgentRepository implements AgentRepository {
   private upsert(snapshot: AgentSnapshot): void {
     this.db
       .prepare(
-        `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools, skills,
+        `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, model_selection, allowed_tools, skills,
            permission_mode, max_turns, created_at, updated_at)
-         VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @allowedTools, @skills,
+         VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @modelSelection, @allowedTools, @skills,
            @permissionMode, @maxTurns, @createdAt, @updatedAt)
          ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
-           instructions = @instructions, model = @model, effort = @effort, allowed_tools = @allowedTools,
+           instructions = @instructions, model = @model, effort = @effort, model_selection = @modelSelection, allowed_tools = @allowedTools,
            skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
       )
       .run({
@@ -97,6 +98,7 @@ export class SqliteAgentRepository implements AgentRepository {
       instructions: row.instructions,
       model: row.model,
       effort: row.effort,
+      modelSelection: row.model_selection,
       allowedTools: JSON.parse(row.allowed_tools) as string[],
       skills: JSON.parse(row.skills) as string[],
       permissionMode: row.permission_mode,

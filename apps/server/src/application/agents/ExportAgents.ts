@@ -56,8 +56,8 @@ export class ExportAgents {
 
 /** Portable form of an agent: no ids or timestamps, collaborators by name and only inside the export. */
 function toExportedAgent(agent: Agent, namesInExport: ReadonlyMap<string, string>): ExportedAgent {
-  const { name, role, description, instructions, model, effort, allowedTools, skills, permissionMode, maxTurns } =
-    agent.toSnapshot();
+  const { name, role, description, instructions, model, effort, modelSelection } = agent.toSnapshot();
+  const { allowedTools, skills, permissionMode, maxTurns } = agent.toSnapshot();
   const collaborators = agent.collaboratorIds.flatMap((id) => namesInExport.get(id) ?? []);
   return {
     name,
@@ -66,6 +66,7 @@ function toExportedAgent(agent: Agent, namesInExport: ReadonlyMap<string, string
     instructions,
     model,
     effort,
+    modelSelection,
     allowedTools: [...allowedTools],
     skills: [...skills],
     permissionMode,

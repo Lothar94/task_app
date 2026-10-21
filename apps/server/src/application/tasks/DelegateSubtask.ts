@@ -1,3 +1,4 @@
+import type { RunModelChoice } from '@fleet/shared';
 import type { Agent } from '../../domain/agent/Agent.js';
 import { ValidationError } from '../../domain/errors/DomainError.js';
 import { Task } from '../../domain/task/Task.js';
@@ -7,6 +8,7 @@ import type { Clock } from '../ports/Clock.js';
 import type { IdGenerator } from '../ports/IdGenerator.js';
 import type { ProjectRepository } from '../ports/ProjectRepository.js';
 import type { TaskRepository } from '../ports/TaskRepository.js';
+import { resolveRunModel } from './resolveRunModel.js';
 import { requireAgent, requireProject } from '../shared/lookups.js';
 import type { TaskExecutor } from './TaskExecutor.js';
 import type { TaskRecorder } from './TaskRecorder.js';
@@ -39,7 +41,7 @@ export class DelegateSubtask {
 
     const finished = await executor.execute(subtask.id, { parentSignal: signal });
     this.resumeParentWhenIdle(parent);
-    return this.toOutcome(finished);
+    return this.toOutcome(finished, collaborator);
   }
 
   private resolveCollaborator(parent: Task, collaboratorName: string): Agent {
@@ -88,6 +90,7 @@ export class DelegateSubtask {
         agentId: collaborator.id,
         title: request.title,
         description: request.instructions,
+        modelChoice: collaborator.modelSelection === 'auto' ? chosenModel(request) : undefined,
       },
       this.clock.now(),
     );
@@ -102,7 +105,7 @@ export class DelegateSubtask {
     this.recorder.recordChange(parent);
   }
 
-  private toOutcome(subtask: Task): DelegationOutcome {
+  private toOutcome(subtask: Task, collaborator: Agent): DelegationOutcome {
     const status =
       subtask.status === 'completed' || subtask.status === 'cancelled' ? subtask.status : 'failed';
     return {
@@ -110,6 +113,11 @@ export class DelegateSubtask {
       subtaskNumber: subtask.number,
       status,
       summary: subtask.resultSummary ?? '',
+      ...resolveRunModel(collaborator.toSnapshot(), subtask.modelChoice),
     };
   }
+}
+
+function chosenModel({ model, effort }: DelegationRequest): RunModelChoice {
+  return { model: model ?? null, effort: effort ?? null };
 }

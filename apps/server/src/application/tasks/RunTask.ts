@@ -9,6 +9,7 @@ import type { Clock } from '../ports/Clock.js';
 import type { ProjectRepository } from '../ports/ProjectRepository.js';
 import type { TaskRepository } from '../ports/TaskRepository.js';
 import { requireAgent, requireProject, requireTask } from '../shared/lookups.js';
+import { resolveRunModel } from './resolveRunModel.js';
 import { ToolTimeTracker } from '../metrics/toolTiming.js';
 import type { AgentBriefing } from './AgentBriefing.js';
 import type { DelegateSubtask } from './DelegateSubtask.js';
@@ -108,8 +109,7 @@ export class RunTask implements TaskExecutor {
         instructions: profile.instructions,
         collaborators,
       }),
-      model: profile.model,
-      effort: profile.effort,
+      ...resolveRunModel(profile, task.modelChoice),
       allowedTools: profile.allowedTools,
       skills: profile.skills,
       skillsDirectory,
@@ -207,7 +207,7 @@ export class RunTask implements TaskExecutor {
         (collaborator): collaborator is Agent =>
           collaborator !== null && collaborator.organizationId === agent.organizationId,
       )
-      .map(({ name, role, description }) => ({ name, role, description }));
+      .map(({ name, role, description, modelSelection }) => ({ name, role, description, modelSelection }));
   }
 }
 
