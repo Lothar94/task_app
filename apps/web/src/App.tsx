@@ -40,11 +40,11 @@ function Layout() {
         </div>
         <span aria-hidden className="h-4 w-px bg-line-strong" />
         <OrganizationSelect />
-        <nav aria-label="Principal" className="ml-3 flex items-center">
+        <nav aria-label="Principal" className="flex items-center sm:ml-3">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} className={navLinkClass}>
               <Icon aria-hidden className="size-4" />
-              {label}
+              <span className="sr-only sm:not-sr-only">{label}</span>
             </NavLink>
           ))}
         </nav>
@@ -53,7 +53,7 @@ function Layout() {
           <NotificationCenter />
           <NavLink to="/organizations" className={navLinkClass}>
             <Building2 aria-hidden className="size-4" />
-            Organizaciones
+            <span className="sr-only sm:not-sr-only">Organizaciones</span>
           </NavLink>
           <ThemeToggle />
         </div>
