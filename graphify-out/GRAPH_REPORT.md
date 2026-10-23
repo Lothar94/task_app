@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3245 nodes · 7252 edges · 149 communities (135 shown, 14 thin omitted)
+- 3245 nodes · 7252 edges · 148 communities (131 shown, 17 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 52 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3272a382`
+- Built from commit: `e31f7ba4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -159,7 +159,6 @@
 - [[_COMMUNITY_Community 141|Community 141]]
 - [[_COMMUNITY_Community 142|Community 142]]
 - [[_COMMUNITY_Community 143|Community 143]]
-- [[_COMMUNITY_Community 144|Community 144]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Task` - 74 edges
@@ -189,27 +188,27 @@
 - **AgentRuntime port and its adapters** — ports_agentruntime_agentruntime, claude_claudeagentruntime_claudeagentruntime, support_fakeagentruntime_fakeagentruntime [EXTRACTED 1.00]
 - **QA validation reports** — auto_model_selection_qa_plan, dashboard_costs_qa_report, global_shell_qa_report [INFERRED 0.85]
 
-## Communities (149 total, 14 thin omitted)
+## Communities (148 total, 17 thin omitted)
 
 ### Community 0 - "Task Domain & Recording"
-Cohesion: 0.06
-Nodes (49): AgentProfile, AgentSettings, AgentSnapshot, normalizeMaxOutputTokens(), CreateAgentCommand, DraftInstructionsCommand, ensureRuntimeSupports(), RUNTIME_SETTINGS (+41 more)
+Cohesion: 0.05
+Nodes (38): GetTaskExecution, mergeModels(), timeBreakdown(), ModelPriceTable, TaskRepository, TaskRunRepository, toMessageDto(), toTaskDto() (+30 more)
 
 ### Community 1 - "Global Search UI"
-Cohesion: 0.07
-Nodes (24): TaskRepository, toMessageDto(), toTaskDto(), requireActiveProject(), requirePlannedRootTask(), requireRootTask(), requireTask(), FINISHED_STATUSES (+16 more)
+Cohesion: 0.12
+Nodes (28): AgentProfile, AgentSettings, CreateAgentCommand, DraftInstructionsCommand, ensureRuntimeSupports(), RUNTIME_SETTINGS, ExportAgentsInput, ImportAgentsInput (+20 more)
 
 ### Community 2 - "Task Execution & Delegation"
-Cohesion: 0.09
-Nodes (25): ExportAgentsInput, ConflictError, NotFoundError, buildFleetStatus(), GetAgentActivity, GetFleetStatus, ModelPriceTable, OrganizationSnapshot (+17 more)
-
-### Community 3 - "Project Domain & Errors"
 Cohesion: 0.05
 Nodes (41): GlobalSearch(), event, groups, input, listbox, RESULTS, selected, groups (+33 more)
 
+### Community 3 - "Project Domain & Errors"
+Cohesion: 0.05
+Nodes (28): AgentSnapshot, ActivitySources, Container, EMPTY_MCP_CATALOG, Infrastructure, UsageSources, GitDiff, GitWorkspace (+20 more)
+
 ### Community 4 - "Agent Use Cases & Lookups"
-Cohesion: 0.07
-Nodes (44): ModelLegend(), Dialog(), DialogProps, Badge(), Button(), BUTTON_STYLES, ButtonVariant, Card() (+36 more)
+Cohesion: 0.04
+Nodes (34): ListAgents, buildFleetStatus(), GetAgentActivity, GetFleetStatus, agentEnabledSchema, agentProfileSchema, assignTaskSchema, collaboratorsSchema (+26 more)
 
 ### Community 5 - "Task Result & Git Views"
 Cohesion: 0.05
@@ -217,131 +216,131 @@ Nodes (36): groupBy(), summarizeRuns(), Project, buildAlerts(), buildProject(), 
 
 ### Community 6 - "HTTP Routes & DTOs"
 Cohesion: 0.06
-Nodes (46): AgentEditor(), addSkill(), AddSkillResult, AgentFormValues, canAddSkill(), canDraftInstructions(), EMPTY_AGENT_FORM, groupSkills() (+38 more)
+Nodes (28): draft, setEnabled(), tasks, teamWithDisabledDev(), AgentRuntime, CollaboratorInfo, DelegationGateway, DelegationOutcome (+20 more)
 
 ### Community 7 - "Task Entity Rules"
+Cohesion: 0.05
+Nodes (12): normalizeMaxOutputTokens(), DraftAgentInstructions, requireOptionalText(), optionalOneOf(), requireIntegerInRange(), requireModelChoice(), requireOneOf(), requireText() (+4 more)
+
+### Community 8 - "SQLite Persistence & Container"
 Cohesion: 0.04
 Nodes (43): dashboardWith(), env, SONNET_OVERRIDE, a, b, blocker, build(), busy (+35 more)
 
-### Community 8 - "SQLite Persistence & Container"
-Cohesion: 0.05
-Nodes (27): CreateAgent, DeleteAgent, ExportAgents, GetAgent, ListAgents, SetAgentCollaborators, SetAgentEnabled, agentEnabledSchema (+19 more)
-
 ### Community 9 - "Planning & Pricing Integration Tests"
+Cohesion: 0.06
+Nodes (42): addSkill(), AddSkillResult, canAddSkill(), canDraftInstructions(), EMPTY_AGENT_FORM, groupSkills(), missingSkillNote(), parseTools() (+34 more)
+
+### Community 10 - "Migrations & Agent Transfer Tests"
 Cohesion: 0.06
 Nodes (44): ProposalNote(), ProposalNoteProps, GROUP_VALUES, SORT_VALUES, TaskListProps, awaitsConfirmation(), bucket(), buildTaskList() (+36 more)
 
-### Community 10 - "Migrations & Agent Transfer Tests"
-Cohesion: 0.05
-Nodes (7): DraftAgentInstructions, requireOptionalText(), requireText(), normalizeMilestone(), normalizeTags(), requirePositiveInteger(), Task
-
 ### Community 11 - "Agent Form Model"
-Cohesion: 0.06
-Nodes (20): ActivitySources, Container, EMPTY_MCP_CATALOG, Infrastructure, UsageSources, GitDiff, GitWorkspace, McpServerCatalog (+12 more)
+Cohesion: 0.05
+Nodes (38): createHttpServer(), HttpServerDependencies, createErrorHandler(), start(), CATALOG, { id }, { skills: _skills, ...withoutSkills }, task (+30 more)
 
 ### Community 12 - "Dashboard Model & Cards"
 Cohesion: 0.06
-Nodes (19): queryKeys, shellApi, useDebouncedValue(), appendMessage(), applyEvent(), invalidateTelemetry(), FakeEventSource, key (+11 more)
+Nodes (36): formatDate(), ActiveSubtaskRow(), ProjectListControls(), byArchivedAtDesc(), byName(), byRecentActivity(), memberNames(), PROJECT_SORT_LABELS (+28 more)
 
 ### Community 13 - "SQLite Migrations Tests"
-Cohesion: 0.06
-Nodes (34): formatDate(), ActiveSubtaskRow(), ProjectListControls(), byArchivedAtDesc(), byName(), byRecentActivity(), memberNames(), PROJECT_SORT_LABELS (+26 more)
+Cohesion: 0.09
+Nodes (32): AgentDetailPage(), AgentEditor(), AgentEditorPage(), AgentForm(), AgentFormProps, submittingLabel(), AgentFormValues, toFormValues() (+24 more)
 
 ### Community 14 - "Project Table & Telemetry"
-Cohesion: 0.05
-Nodes (28): absent, createAgent(), dto, empty, createAgent(), dto, header, mine (+20 more)
+Cohesion: 0.08
+Nodes (32): Defect D3: SegmentedControl lacks roving tabindex, ModelLegend(), Button(), BUTTON_STYLES, ButtonVariant, Card(), CheckboxList(), CHIP_TONES (+24 more)
 
 ### Community 15 - "Shared UI Components"
-Cohesion: 0.07
-Nodes (26): runCto(), runCto(), budget, completeTaskIn(), start(), REASONS, { requeued }, startTask() (+18 more)
+Cohesion: 0.06
+Nodes (27): runCto(), runCto(), budget, completeTaskIn(), start(), delegationSetup(), REASONS, { requeued } (+19 more)
 
 ### Community 16 - "Assign/Edit Task Forms"
 Cohesion: 0.09
 Nodes (32): useAgentRuntime(), CapabilityFields(), CheckOption, FieldsProps, MaxOutputTokensField(), ModelFields(), runtimeHint(), TemperatureField() (+24 more)
 
 ### Community 17 - "App Shell & Organizations"
-Cohesion: 0.05
-Nodes (30): all, byProject, devGate, dto, everything, file, fleet, foreign (+22 more)
+Cohesion: 0.09
+Nodes (21): AgentAvatar(), agentInitials(), AgentInspector(), Focusable, useSheetSelection(), AgentList(), AgentRowBody(), ExportSelection (+13 more)
 
 ### Community 18 - "Test Fleet Harness"
 Cohesion: 0.06
-Nodes (13): createProjectSchema, membersSchema, ArchiveProject, CreateProject, GetProjectsTelemetry, GetProject, ListProjects, ResumeProject (+5 more)
+Nodes (25): absent, createAgent(), dto, empty, createAgent(), dto, header, mine (+17 more)
 
 ### Community 19 - "Agent Import Dialog"
-Cohesion: 0.11
-Nodes (34): activity(), buildDashboard(), byAgent(), byModel(), chartStart(), countStatus(), daily(), DashboardInput (+26 more)
+Cohesion: 0.07
+Nodes (30): activities, byOrganization, byProject, events, root, snapshots, start(), task (+22 more)
 
 ### Community 20 - "Project Inspection Model"
 Cohesion: 0.07
 Nodes (30): COLUMNS, again, before, db, file, legacyFile(), raw, taskColumns (+22 more)
 
 ### Community 21 - "Task List & Proposals"
-Cohesion: 0.1
-Nodes (27): ChipTone, useNow(), Duration(), RootItem(), flattenDescendants(), taskElapsedMs(), ProjectTable(), isTaskActive() (+19 more)
+Cohesion: 0.11
+Nodes (31): averageRunMs(), averageTaskMs(), cacheShare(), causeSummary(), countByCause(), CSV_COLUMNS, errorRate(), errorsToCsv() (+23 more)
 
 ### Community 22 - "Agent Diagram Graph"
-Cohesion: 0.08
-Nodes (20): organizationsApi, ErrorBoundary, ErrorBoundaryState, OrganizationContext, OrganizationContextValue, OrganizationProvider(), useOrganizationContext(), OrganizationNameResult (+12 more)
+Cohesion: 0.11
+Nodes (28): projectsApi, Dialog(), DialogProps, TabOption, tabPanelProps(), Tabs(), TabsProps, IconButton() (+20 more)
 
 ### Community 23 - "Dashboard Page Tests & Export"
-Cohesion: 0.12
-Nodes (30): averageRunMs(), averageTaskMs(), cacheShare(), causeSummary(), countByCause(), CSV_COLUMNS, errorRate(), errorsToCsv() (+22 more)
-
-### Community 24 - "Agents Page & Sheet"
-Cohesion: 0.09
-Nodes (25): buildSdkOptions(), ClaudeRuntimeConfig, environmentFor(), guardProcessCommands(), SelectedMcpServers, selectMcpServers(), settingsFor(), ClaudeAgentRuntime (+17 more)
-
-### Community 25 - "Task Tree & Status"
-Cohesion: 0.08
-Nodes (29): createHttpServer(), HttpServerDependencies, createErrorHandler(), start(), CATALOG, dto, file, fileWith() (+21 more)
-
-### Community 26 - "Task Page & Queue"
 Cohesion: 0.1
 Nodes (24): fail(), findNameConflicts(), isRecord(), modelSelectionOf(), ParsedImport, parseImportFile(), readImportFile(), agents (+16 more)
 
-### Community 27 - "Dashboard Charts"
+### Community 24 - "Agents Page & Sheet"
+Cohesion: 0.12
+Nodes (33): activity(), activityBucketsOf(), buildDashboard(), byAgent(), byModel(), chartStart(), countStatus(), daily() (+25 more)
+
+### Community 25 - "Task Tree & Status"
+Cohesion: 0.1
+Nodes (24): useFleetEvents(), AgentState, findOrchestrator(), FlatTask, recentRoots(), members, projects, root (+16 more)
+
+### Community 26 - "Task Page & Queue"
 Cohesion: 0.07
 Nodes (20): TaskGitSnapshot, TaskGitSnapshotRepository, SnapshotRow, SqliteTaskGitSnapshotRepository, toSnapshot(), FakeGitWorkspace, TaskGitTracker, BASE (+12 more)
 
-### Community 28 - "Project Inspection QA Tests"
+### Community 27 - "Dashboard Charts"
 Cohesion: 0.1
-Nodes (16): GetBudget, startOfUtcMonth(), GetTaskExecution, mergeModels(), timeBreakdown(), TaskRunRepository, TaskRunRow, TaskRun (+8 more)
+Nodes (23): buildSdkOptions(), ClaudeRuntimeConfig, environmentFor(), guardProcessCommands(), SelectedMcpServers, selectMcpServers(), settingsFor(), ClaudeAgentRuntime (+15 more)
+
+### Community 28 - "Project Inspection QA Tests"
+Cohesion: 0.11
+Nodes (16): organizationsApi, queryKeys, shellApi, useDebouncedValue(), appendMessage(), applyEvent(), invalidateTelemetry(), OrganizationContext (+8 more)
 
 ### Community 29 - "Claude Plugin Skills"
-Cohesion: 0.13
-Nodes (24): useAgents(), projectsApi, Defect D3: SegmentedControl lacks roving tabindex, TabOption, tabPanelProps(), Tabs(), TabsProps, Defect D-1: /projects 7px overflow at 320px (Tabs) (+16 more)
-
-### Community 30 - "Server Bootstrap & Seed"
 Cohesion: 0.07
 Nodes (20): agents, ago(), { container }, depths, done, FakeEventSource, items, metrics() (+12 more)
 
-### Community 31 - "HTTP Server Factory"
+### Community 30 - "Server Bootstrap & Seed"
 Cohesion: 0.09
 Nodes (22): commitAll(), empty, git(), indexAfter, indexBefore, indexFile, plain, statusBefore (+14 more)
 
+### Community 31 - "HTTP Server Factory"
+Cohesion: 0.11
+Nodes (19): a, b, c, names, plugins(), workspace(), names, workspace (+11 more)
+
 ### Community 32 - "Delegation & Archive Tests"
-Cohesion: 0.12
-Nodes (24): DailyActivityChart(), DailyLegend(), DayTooltip(), niceMax(), breakdownLabel(), CacheSavingsLine(), ModelTokensChart(), ModelTooltip() (+16 more)
+Cohesion: 0.11
+Nodes (22): ChipTone, useNow(), Duration(), ExecutionStack(), RootItem(), flattenDescendants(), taskElapsedMs(), ProjectTable() (+14 more)
 
 ### Community 33 - "Formatting Helpers"
+Cohesion: 0.13
+Nodes (24): BUDGET_TONES, budgetDetail(), CostTile(), FleetTiles(), McpTile(), TokensTile(), BudgetLevel, budgetUsage() (+16 more)
+
+### Community 34 - "Dashboard Builder & Error Classes"
 Cohesion: 0.08
 Nodes (25): ActivityTask, buildAgentActivity(), DELEGATED_STATUSES, delegationsOf(), liveStatusOf(), toRef(), agents, { agents: live } (+17 more)
 
-### Community 34 - "Dashboard Builder & Error Classes"
-Cohesion: 0.1
-Nodes (13): ConversationMessage, organizationSchema, CreateOrganization, GetOrganization, ListOrganizations, ConversationRepository, toAgentDto(), toIso() (+5 more)
-
 ### Community 35 - "Project Page"
-Cohesion: 0.12
-Nodes (18): a, b, c, names, plugins(), workspace(), names, workspace (+10 more)
+Cohesion: 0.07
+Nodes (28): Defect D1: invalid model/effort via delegation gateway, QA plan: automatic model/effort selection, Agent effort levels (low..max), AGENT_IMPORT_CONFLICT_STRATEGIES, AGENT_MODELS, AGENT_TEMPERATURE_RANGE, AgentDto, AgentEnabledInput (+20 more)
 
 ### Community 36 - "Skill Workspace Tests"
-Cohesion: 0.14
-Nodes (24): BUDGET_TONES, budgetDetail(), CostTile(), FleetTiles(), McpTile(), TokensTile(), BudgetLevel, budgetUsage() (+16 more)
+Cohesion: 0.09
+Nodes (9): CreateAgent, DeleteAgent, ensureUniqueAgentName(), GetAgent, SetAgentCollaborators, SetAgentEnabled, UpdateAgent, requireAgent() (+1 more)
 
 ### Community 37 - "Agent Detail & Editor"
-Cohesion: 0.12
-Nodes (16): AgentInspector(), Focusable, useSheetSelection(), AgentList(), ExportSelection, AgentSheetProps, AgentSheetFields(), AgentTrackRecord (+8 more)
+Cohesion: 0.09
+Nodes (9): organizationSchema, Organization, CreateOrganization, GetOrganization, ListOrganizations, RenameOrganization, later, now (+1 more)
 
 ### Community 38 - "Task Execution Metrics UI"
 Cohesion: 0.09
@@ -352,104 +351,104 @@ Cohesion: 0.09
 Nodes (14): fleet, ignore, project, root, { skills: _omitted, ...withoutSkills }, task, workspace, ContainerOptions (+6 more)
 
 ### Community 40 - "Auto Model Selection Tests"
+Cohesion: 0.08
+Nodes (18): all, byProject, devGate, dto, everything, file, fleet, foreign (+10 more)
+
+### Community 41 - "Claude SDK Options"
 Cohesion: 0.13
 Nodes (18): formatDuration(), ExecutionMetricsBody(), ExecutionMetricsSection(), SEGMENT_COLORS, TimeDistribution(), hasSubtreeTokens(), OUTCOME_LABELS, runLabel() (+10 more)
 
-### Community 41 - "Claude SDK Options"
-Cohesion: 0.18
-Nodes (22): Field(), Select(), TextArea(), TextInput(), AssignTaskForm(), AssignTaskFormProps, LabelFields(), LabelFieldsProps (+14 more)
-
 ### Community 42 - "Model Price Table"
-Cohesion: 0.14
-Nodes (19): buildPullRequestText(), changeCounts(), commitLabel(), CopyState, copyToClipboard(), fileName(), GitContextOk, isGitOk() (+11 more)
+Cohesion: 0.11
+Nodes (17): DelegationSummary, describeDelegation(), parseSubtaskReference(), Payload, shortToolName(), call, [item], result (+9 more)
 
 ### Community 43 - "Organization Tests"
+Cohesion: 0.11
+Nodes (15): ErrorBoundary, ErrorBoundaryState, Badge(), useOrganizationContext(), OrganizationNameForm(), OrganizationNameFormProps, useCreateOrganization(), useRenameOrganization() (+7 more)
+
+### Community 44 - "Fleet MCP Tool Server"
 Cohesion: 0.09
 Nodes (24): MODEL_PRICING_FILE price override, ActivityGranularity, AgentUsageRow, CostBreakdown, DailyActivity, DashboardFilters, DashboardTotals, ModelPricing (+16 more)
 
-### Community 44 - "Fleet MCP Tool Server"
+### Community 45 - "Task Run Usage Math"
+Cohesion: 0.1
+Nodes (16): ClaudeInstructionWriter, ContentBlock, claudeRuntimeConfig(), AppConfig, byName, config, cto, existing (+8 more)
+
+### Community 46 - "Search Matching"
 Cohesion: 0.12
 Nodes (14): InMemoryEventBus, AgentActivityNotifier, EventListener, EventPublisher, EventSubscriber, Unsubscribe, Hexagonal / Clean Architecture, activity (+6 more)
 
-### Community 45 - "Task Run Usage Math"
+### Community 47 - "Shared Agent Contract & QA Plan"
 Cohesion: 0.1
 Nodes (22): assign(), assigned(), attempts, base, briefing(), Choice, choices, createAgent() (+14 more)
 
-### Community 46 - "Search Matching"
+### Community 48 - "Projects Telemetry Tests"
 Cohesion: 0.14
 Nodes (17): ProfileCard(), TasksTile(), SuccessBar(), compact, formatInteger(), formatPercent(), formatPrice(), integer (+9 more)
 
-### Community 47 - "Shared Agent Contract & QA Plan"
-Cohesion: 0.16
-Nodes (15): QueueCard(), QueueCardProps, TaskLabels(), CancelTaskButton(), ParentTaskLink(), PlannedActions(), TaskMetricsSummary(), useCancelTask() (+7 more)
-
-### Community 48 - "Projects Telemetry Tests"
-Cohesion: 0.11
-Nodes (21): AgentEdge(), ArrowMarkers(), EDGE_STYLES, edgeClass(), edgePath(), EdgeState, MARKER_FILLS, assignLevels() (+13 more)
-
 ### Community 49 - "Task Git Snapshots"
-Cohesion: 0.09
-Nodes (23): a, acmeAgents, acmeDashboard, acmeProjects, agent, b, before, boss (+15 more)
+Cohesion: 0.15
+Nodes (21): DailyActivityChart(), DailyLegend(), DayTooltip(), niceMax(), breakdownLabel(), CacheSavingsLine(), ModelTokensChart(), ModelTooltip() (+13 more)
 
 ### Community 50 - "Task Planning Tests"
-Cohesion: 0.14
-Nodes (17): useFleetEvents(), ExecutionStack(), AgentState, findOrchestrator(), FlatTask, recentRoots(), members, projects (+9 more)
+Cohesion: 0.15
+Nodes (18): buildPullRequestText(), changeCounts(), commitLabel(), CopyState, copyToClipboard(), fileName(), GitContextOk, isGitOk() (+10 more)
 
 ### Community 51 - "Fleet Status Bar"
 Cohesion: 0.16
-Nodes (17): applyFleetEvent(), dropResolvedProposal(), markRead(), NOTIFICATION_KINDS, notificationId(), notificationKindOf(), TaskEvent, toNotification() (+9 more)
+Nodes (15): QueueCard(), QueueCardProps, TaskLabels(), CancelTaskButton(), ParentTaskLink(), PlannedActions(), TaskMetricsSummary(), useCancelTask() (+7 more)
 
 ### Community 52 - "Project Inspection Tests"
-Cohesion: 0.08
-Nodes (23): AGENT_IMPORT_CONFLICT_STRATEGIES, AGENT_MODELS, AGENT_TEMPERATURE_RANGE, AgentDto, AgentEnabledInput, AgentExportDto, AgentExportRequest, AgentImportConflictStrategy (+15 more)
+Cohesion: 0.16
+Nodes (20): Field(), Select(), TextArea(), TextInput(), AssignTaskForm(), AssignTaskFormProps, auto, fixed (+12 more)
 
 ### Community 53 - "Conversation View"
+Cohesion: 0.11
+Nodes (21): AgentEdge(), ArrowMarkers(), EDGE_STYLES, edgeClass(), edgePath(), EdgeState, MARKER_FILLS, assignLevels() (+13 more)
+
+### Community 54 - "Dashboard Builder Tests"
+Cohesion: 0.09
+Nodes (23): a, acmeAgents, acmeDashboard, acmeProjects, agent, b, before, boss (+15 more)
+
+### Community 55 - "Organization Domain & Drafts"
 Cohesion: 0.1
 Nodes (24): Design mockup HTML: Agents & org chart, Design mockup HTML: Task detail / execution chat, Design mockup HTML: Projects, Design color roles (indigo/emerald/amber/crimson/cyan), Agent fleet hierarchy graph, Split-pane 8/4 layout with responsive context rail, Obsidian Fleet Engine design system, Status chips (Completada/Trabajando/Esperando subtareas) (+16 more)
 
-### Community 54 - "Dashboard Builder Tests"
+### Community 56 - "Agent Domain Entity"
+Cohesion: 0.15
+Nodes (16): LabelFields(), LabelFieldsProps, all, grouped, ids, roots, tags, TaskEditForm() (+8 more)
+
+### Community 57 - "Projects Page QA Tests"
+Cohesion: 0.14
+Nodes (12): agents, cost, mcp, dashboardApi, DashboardQuery, dashboard(), modelRow(), totals() (+4 more)
+
+### Community 58 - "HTTP Client & Queries"
 Cohesion: 0.13
 Nodes (15): cacheSavingsOf(), costOf(), DEFAULT_MODEL_PRICES, pricingOf(), sumCost(), UsageEstimate, usd(), ZERO_COST (+7 more)
 
-### Community 55 - "Organization Domain & Drafts"
+### Community 59 - "Model Selection Tests"
 Cohesion: 0.14
 Nodes (17): Candidate, matchSearch(), normalizeText(), parseTaskNumber(), Rank, RANK_ORDER, rankAndCap(), rankText() (+9 more)
 
-### Community 56 - "Agent Domain Entity"
-Cohesion: 0.11
-Nodes (14): ClaudeInstructionWriter, claudeRuntimeConfig(), AppConfig, byName, config, cto, existing, logger (+6 more)
-
-### Community 57 - "Projects Page QA Tests"
-Cohesion: 0.18
-Nodes (19): useSyncOrganization(), ArchiveBanner(), ArchiveError(), html, useProjectArchive(), ProjectPage(), ProjectTasks(), ProjectTeam() (+11 more)
-
-### Community 58 - "HTTP Client & Queries"
+### Community 60 - "Agent Import Tests"
 Cohesion: 0.1
 Nodes (14): archived, build(), costRuns, costTasks, cto, dashboard, dev, failedRuns (+6 more)
 
-### Community 60 - "Agent Import Tests"
-Cohesion: 0.18
-Nodes (13): AgentDetailPage(), AgentEditorPage(), AgentForm(), AgentFormProps, submittingLabel(), EFFORT_LABELS, MODEL_LABELS, MODEL_SELECTION_LABELS (+5 more)
-
-### Community 61 - "Project List Model"
+### Community 62 - "Conversation Repository & Queries"
 Cohesion: 0.14
 Nodes (5): describeBrief(), SqliteTaskRepository, TaskRow, toDate(), toTask()
 
-### Community 62 - "Conversation Repository & Queries"
+### Community 63 - "SQLite Task Repository"
 Cohesion: 0.11
 Nodes (11): busy, childId, create(), createId(), draft, Fleet, gate, ids (+3 more)
-
-### Community 63 - "SQLite Task Repository"
-Cohesion: 0.15
-Nodes (13): DelegationSummary, describeDelegation(), parseSubtaskReference(), Payload, shortToolName(), TimelineItem, DelegationLink(), MessageItem (+5 more)
 
 ### Community 64 - "Query Keys & Live Events"
 Cohesion: 0.12
 Nodes (12): ago(), FakeEventSource, grandchild, metrics(), mount(), node(), second, stubFetch() (+4 more)
 
 ### Community 65 - "Projects Page"
-Cohesion: 0.14
-Nodes (13): currentTask, dual, list, sheet, team, user, agentsApi, InstructionsBrief (+5 more)
+Cohesion: 0.18
+Nodes (14): applyFleetEvent(), dropResolvedProposal(), NOTIFICATION_KINDS, notificationId(), notificationKindOf(), TaskEvent, toNotification(), FIELD_TYPES (+6 more)
 
 ### Community 66 - "Conversation Panel Timeline"
 Cohesion: 0.18
@@ -460,8 +459,8 @@ Cohesion: 0.18
 Nodes (12): asRecord(), ClaudeUserMcpServers, describe(), isNonEmptyString(), isStringArray(), isStringRecord(), parseRemoteServer(), parseServer() (+4 more)
 
 ### Community 68 - "Design System & Mockups"
-Cohesion: 0.12
-Nodes (14): activities, byOrganization, byProject, events, root, snapshots, start(), task (+6 more)
+Cohesion: 0.11
+Nodes (14): createAgent(), exported(), file, fileOf(), first, ids, long, many() (+6 more)
 
 ### Community 69 - "Task List Model Tests"
 Cohesion: 0.13
@@ -472,88 +471,88 @@ Cohesion: 0.19
 Nodes (15): modelEffortText(), modelText(), AgentRowBody(), modelLine(), AgentNode(), AgentNodeProps, clip(), frameClass() (+7 more)
 
 ### Community 71 - "Notifications Hook"
-Cohesion: 0.15
-Nodes (10): agents, cost, mcp, dashboard(), modelRow(), totals(), get, labels (+2 more)
+Cohesion: 0.18
+Nodes (9): ConversationMessage, ConversationRepository, toAgentDto(), toIso(), toOrganizationDto(), toProjectDto(), MessageRow, GetTask (+1 more)
 
 ### Community 72 - "Notification Center Tests"
-Cohesion: 0.11
-Nodes (12): auto, file, Fleet, { modelSelection: _omit, ...legacy }, old, other, outcomes, server (+4 more)
+Cohesion: 0.22
+Nodes (15): ArchiveBanner(), ArchiveError(), html, useProjectArchive(), ProjectTasks(), ProjectTeam(), ProjectView(), TaskList() (+7 more)
 
 ### Community 73 - "Shared Metrics & Pricing Contract"
-Cohesion: 0.12
-Nodes (14): AgentSheet, agent, confirm, instructions, legacy, mcp, mount(), other (+6 more)
+Cohesion: 0.15
+Nodes (8): FleetDetails(), FleetStatusBar(), formatNodes(), StatePresentation, footer, footer, FleetStatusSnapshot, useFleetStatus()
 
 ### Community 74 - "Skill Catalog"
-Cohesion: 0.12
-Nodes (12): file, fileOf(), first, ids, long, many(), now, other (+4 more)
+Cohesion: 0.18
+Nodes (13): formatDistanceLabel(), relative, UNITS, bellLabel(), NotificationCenter(), useOutsidePress(), KIND_PRESENTATION, NotificationItem() (+5 more)
 
 ### Community 75 - "Server Config Loading"
+Cohesion: 0.12
+Nodes (13): agent, confirm, instructions, legacy, mcp, mount(), other, tokens (+5 more)
+
+### Community 76 - "Project Archive QA Tests"
+Cohesion: 0.14
+Nodes (11): ErrorBody, request(), skillsApi, tasksApi, errorRow(), errorCauses, errors, group (+3 more)
+
+### Community 77 - "Live Telemetry Hook Tests"
+Cohesion: 0.15
+Nodes (12): Accordion(), AccordionProps, BAR_STYLES, closed, html, opened, COMPONENTS, Markdown() (+4 more)
+
+### Community 78 - "Live Telemetry QA Tests"
 Cohesion: 0.14
 Nodes (13): ConversationMessageDto, MESSAGE_KINDS, MessageKind, MessagePayload, FleetEvent, ActiveDelegationDto, ActiveTaskRef, AGENT_LIVE_STATES (+5 more)
 
-### Community 76 - "Project Archive QA Tests"
+### Community 79 - "Global Search Hook & Tabs"
 Cohesion: 0.16
 Nodes (12): AgentGraphProps, AgentNode(), clip(), Edge(), EDGE_STYLES, edgePath(), EdgeState, GraphCanvas() (+4 more)
 
-### Community 77 - "Live Telemetry Hook Tests"
-Cohesion: 0.18
-Nodes (8): InstalledPlugin, PluginRegistry, SkillCatalog, ListSkills, parseFrontmatter(), readSkill(), readSkills(), unquote()
-
-### Community 78 - "Live Telemetry QA Tests"
-Cohesion: 0.2
-Nodes (12): buildTimeline(), call, flags(), [item], result, timeline, toolStepIds(), ConversationPanel() (+4 more)
-
-### Community 79 - "Global Search Hook & Tabs"
-Cohesion: 0.16
-Nodes (11): Accordion(), AccordionProps, BAR_STYLES, closed, html, opened, COMPONENTS, Markdown() (+3 more)
-
 ### Community 80 - "Accordion & Result Panel"
+Cohesion: 0.2
+Nodes (10): ConversationHeader(), html, buildTimeline(), flags(), toolStepIds(), ConversationPanel(), ConversationScroller(), ConversationView() (+2 more)
+
+### Community 81 - "Notification Storage"
+Cohesion: 0.22
+Nodes (9): useStoredChoice(), TaskActions(), InspectorToggles(), isTaskPlanned(), inspectorLayout(), PANEL_CHOICES, TaskWorkspace(), useInspectorDrawer() (+1 more)
+
+### Community 82 - "Notification Center QA"
 Cohesion: 0.19
 Nodes (13): applyHeaderLine(), applyPathLine(), DiffFile, DiffHunk, DiffLine, DiffLineKind, lineKind(), parseHeaderPaths() (+5 more)
 
-### Community 81 - "Notification Storage"
+### Community 83 - "Activity Buckets"
 Cohesion: 0.16
 Nodes (9): Defect D2: TaskModelChoice crashes without modelChoice, auto, field, fixed, model, mutate, owner, modelChoiceSummary() (+1 more)
 
-### Community 82 - "Notification Center QA"
-Cohesion: 0.17
-Nodes (7): FakeEventSource, item, markAll, panel, created(), taskOf(), updated()
-
-### Community 83 - "Activity Buckets"
+### Community 84 - "Event Filter & Routes"
 Cohesion: 0.26
 Nodes (11): AgentGraph(), fitScale(), ZOOM_STEPS, zoomInFrom(), zoomOutFrom(), zoomPercent(), DiagramZoom, useDiagramZoom() (+3 more)
 
-### Community 84 - "Event Filter & Routes"
+### Community 85 - "Task Queue Model"
 Cohesion: 0.18
 Nodes (10): activeAgentsLabel(), delegationKeys(), liveStatusById(), newestActivity(), activity, currentTask, newer, older (+2 more)
 
-### Community 85 - "Task Queue Model"
+### Community 86 - "Notification Panel Items"
 Cohesion: 0.15
 Nodes (7): activityEvent(), agentFixture(), agents, FakeEventSource, invalidate, queryClient, setData
 
-### Community 86 - "Notification Panel Items"
+### Community 87 - "RunTask Use Case"
+Cohesion: 0.2
+Nodes (7): SkillCatalog, ListSkills, FileSystemSkillCatalog, parseFrontmatter(), readSkill(), readSkills(), unquote()
+
+### Community 88 - "Agent Queries & Export"
 Cohesion: 0.19
 Nodes (11): createFleetToolServer(), createTaskTool(), FLEET_TOOL_NAMES, guarded(), textResult(), ToolResult, gateway, parsed (+3 more)
 
-### Community 87 - "RunTask Use Case"
+### Community 89 - "Instructions Markdown Field"
 Cohesion: 0.18
 Nodes (12): archive(), createTask(), draft, foreignProject, live, other, post(), project (+4 more)
 
-### Community 88 - "Agent Queries & Export"
+### Community 90 - "Shared Task Contract"
 Cohesion: 0.18
 Nodes (8): createEventFilter(), EventFilterCriteria, ProjectOrganizationLookup, eventsQuery, accepts, late, organizationOf, owners
 
-### Community 89 - "Instructions Markdown Field"
-Cohesion: 0.22
-Nodes (9): ResultPanel(), TaskActions(), InspectorToggles(), isTaskPlanned(), inspectorLayout(), PANEL_CHOICES, TaskWorkspace(), useInspectorDrawer() (+1 more)
-
-### Community 90 - "Shared Task Contract"
-Cohesion: 0.26
-Nodes (8): useStoredChoice(), resolveInitialTheme(), Theme, THEMES, toggleTheme(), ThemeToggle(), systemTheme(), useTheme()
-
 ### Community 91 - "Shared Project Telemetry Contract"
-Cohesion: 0.22
-Nodes (10): SaveAgentCommand, useAgentActivity(), useExportAgents(), useInvalidateAgent(), useSetAgentEnabled(), useUpdateAgent(), agentCountLabel(), AgentsPage() (+2 more)
+Cohesion: 0.14
+Nodes (5): FakeEventSource, key, snapshot, { source }, { source, unmount }
 
 ### Community 92 - "Assign Model Choice QA"
 Cohesion: 0.14
@@ -564,176 +563,160 @@ Cohesion: 0.14
 Nodes (6): data, FakeEventSource, key, snapshot, { source }, { source, unmount }
 
 ### Community 94 - "Task Workspace Layout"
-Cohesion: 0.18
-Nodes (4): Organization, later, now, organization
+Cohesion: 0.16
+Nodes (11): AgentSheet, chips, client(), currentTask, group, initial, mountPage(), mountSheet() (+3 more)
 
 ### Community 95 - "Shared Shell Contract"
 Cohesion: 0.23
 Nodes (4): PreparedSkills, SkillWorkspace, bridgeId(), FileSystemSkillWorkspace
 
 ### Community 96 - "Shared Telemetry Contract"
-Cohesion: 0.18
-Nodes (7): all, grouped, ids, roots, tags, moveItem(), items
-
-### Community 97 - "Agent Briefing Tests"
-Cohesion: 0.21
-Nodes (10): formatDistanceLabel(), relative, UNITS, KIND_PRESENTATION, NotificationItem(), NotificationItemProps, FleetNotification, NotificationKind (+2 more)
-
-### Community 98 - "Agent Briefing Prompt"
 Cohesion: 0.15
 Nodes (12): Accordion & Collapsible Tool Execution Traces, Agent Fleet Architecture Graph / Hierarchy Tree, Brand & Style, Buttons & Quick Actions, Colors, Components, Elevation & Depth, Form Inputs & Chat Console (+4 more)
 
-### Community 99 - "Git CLI Workspace Tests"
+### Community 97 - "Agent Briefing Tests"
 Cohesion: 0.15
 Nodes (10): activity, dev, fitWidth, idle, lead, live, qa, team (+2 more)
 
 ### Community 100 - "Fleet Status Builder"
-Cohesion: 0.18
-Nodes (10): chips, client(), currentTask, group, initial, mountPage(), mountSheet(), team (+2 more)
+Cohesion: 0.23
+Nodes (9): allRead, before, events, items, message, proposed, created(), taskOf() (+1 more)
 
 ### Community 101 - "Notification Model QA"
-Cohesion: 0.29
-Nodes (10): ActivityBuckets, dailyBuckets(), hourlyBuckets(), localDateKey(), localHourKey(), pad(), activityBucketsOf(), buckets (+2 more)
-
-### Community 104 - "Event Bus & Architecture"
-Cohesion: 0.24
-Nodes (9): auto, fixed, ModelChoiceFields(), agent, html, defaultEffortOption(), defaultModelOption(), EMPTY_MODEL_CHOICE (+1 more)
-
-### Community 105 - "Git Workspace Port"
 Cohesion: 0.17
 Nodes (7): event, FakeEventSource, invalidate, newer, onEvent, view, working
 
-### Community 106 - "HTTP Logging & Errors"
+### Community 102 - "Tool Time Tracking"
 Cohesion: 0.17
 Nodes (11): ActiveSubtaskDto, PROJECT_ALERT_KINDS, PROJECT_STATUSES, ProjectAlertDto, ProjectAlertKind, ProjectOperationalStatus, ProjectsSummaryDto, ProjectsTelemetryDto (+3 more)
 
-### Community 107 - "Dashboard Costs QA"
+### Community 103 - "README Overview"
 Cohesion: 0.17
 Nodes (11): AgentEffort, AgentModel, AssignTaskInput, FollowUpInput, ReorderQueueInput, TASK_LIMITS, TASK_START_MODES, TASK_STATUSES (+3 more)
 
-### Community 108 - "Git Read-only Tests"
-Cohesion: 0.18
-Nodes (8): tasksApi, errorRow(), errorCauses, errors, group, invalidate, keys, retry
+### Community 104 - "Event Bus & Architecture"
+Cohesion: 0.31
+Nodes (9): ActivityBuckets, dailyBuckets(), hourlyBuckets(), localDateKey(), localHourKey(), pad(), buckets, insideWindow (+1 more)
 
-### Community 109 - "ImportAgents Use Case"
+### Community 105 - "Git Workspace Port"
 Cohesion: 0.31
 Nodes (7): TaskLink(), hasDescription(), TaskBrief(), html, taskLabel(), TaskNumber(), Breadcrumbs()
 
-### Community 110 - "Skill Workspace Bridge"
-Cohesion: 0.18
-Nodes (8): markAllRead(), again, events, first, items, read, snapshot, statuses
+### Community 106 - "HTTP Logging & Errors"
+Cohesion: 0.35
+Nodes (7): resolveInitialTheme(), Theme, THEMES, toggleTheme(), ThemeToggle(), systemTheme(), useTheme()
 
-### Community 111 - "SDK Message Mapper"
+### Community 107 - "Dashboard Costs QA"
+Cohesion: 0.2
+Nodes (8): GitContextBody(), empty, html(), many, one, out, totals, view()
+
+### Community 108 - "Git Read-only Tests"
+Cohesion: 0.25
+Nodes (10): Accessible combobox ARIA pattern, QA report: global shell (search, bell, status bar), countUnread(), markAllRead(), markRead(), useGlobalSearch(), loadState(), NotificationsState (+2 more)
+
+### Community 109 - "ImportAgents Use Case"
+Cohesion: 0.18
+Nodes (4): FakeEventSource, item, markAll, panel
+
+### Community 110 - "Skill Workspace Bridge"
 Cohesion: 0.18
 Nodes (10): AgentSearchHit, FLEET_STATES, FleetNodeDto, FleetState, FleetStatusDto, ProjectSearchHit, SEARCH_LIMITS, SearchResultsDto (+2 more)
 
-### Community 112 - "Shared Conversation & Events"
+### Community 111 - "SDK Message Mapper"
 Cohesion: 0.18
 Nodes (10): Agent Fleet, Arquitectura, Cómo funciona la delegación, Calidad, code:bash (pnpm install), code:block2 (packages/shared      Contrato API: DTOs y eventos compartido), code:bash (pnpm test        # Vitest: dominio, delegación con runtime f), Organizaciones (+2 more)
 
-### Community 113 - "SQLite Organization Repo"
-Cohesion: 0.24
-Nodes (5): AgentAvatar(), agentInitials(), AgentRowBody(), Inspection, RowList()
+### Community 112 - "Shared Conversation & Events"
+Cohesion: 0.2
+Nodes (8): currentTask, dual, list, sheet, team, user, agentsApi, InstructionsBrief
 
-### Community 114 - "Git CLI Workspace"
+### Community 113 - "SQLite Organization Repo"
 Cohesion: 0.2
 Nodes (6): ACTIVE_STATUSES, FleetStatusInput, agents, now, status, statuses
 
-### Community 115 - "Notification Model"
+### Community 114 - "Git CLI Workspace"
 Cohesion: 0.2
 Nodes (8): agent, appendix, briefing, context, efficiency, finishing, section, withSkills
 
-### Community 117 - "Stick-to-bottom Scroll"
-Cohesion: 0.27
-Nodes (8): archive(), createTask(), draft, first, post(), second, task, unarchive()
+### Community 116 - "SQLite Task Run Repo"
+Cohesion: 0.22
+Nodes (7): CATALOG, dto, file, fileWith(), importFile(), project, { temperature: _t, maxOutputTokens: _m, mcpServers: _s, ...legacy }
 
-### Community 118 - "Task Brief"
+### Community 117 - "Stick-to-bottom Scroll"
 Cohesion: 0.2
 Nodes (5): base, eleven, now, proposed, task
 
-### Community 119 - "ExportAgents Use Case"
+### Community 118 - "Task Brief"
 Cohesion: 0.2
 Nodes (7): activeSubtask, agents, archived, cell, { container }, onResume, project
 
-### Community 120 - "DeleteAgent Use Case"
-Cohesion: 0.22
-Nodes (7): empty, html(), many, one, out, totals, view()
+### Community 119 - "ExportAgents Use Case"
+Cohesion: 0.2
+Nodes (7): again, events, first, items, read, snapshot, statuses
 
-### Community 121 - "Search Organization Use Case"
+### Community 120 - "DeleteAgent Use Case"
 Cohesion: 0.33
 Nodes (5): downloadJson(), exportFileName(), slugify(), downloadCsv(), downloadFile()
 
-### Community 122 - "SQLite Conversation Repo"
+### Community 121 - "Search Organization Use Case"
 Cohesion: 0.2
 Nodes (9): Acceptance criteria, Commands, Defects, Edge cases / CSV, Manual API checks (server on :4318, temp DB, `MODEL_PRICING_FILE` sonnet 4/20/5/0.4), Not verified, Observations (not defects), QA — dashboard costs, cache savings, deltas, error causes, retry, CSV export (+1 more)
 
-### Community 123 - "TaskGitTracker"
+### Community 122 - "SQLite Conversation Repo"
 Cohesion: 0.31
 Nodes (4): Interval, ToolTimeTracker, unionDurationMs(), tracker
 
-### Community 124 - "SQLite Git Snapshot Repo"
-Cohesion: 0.22
-Nodes (7): countUnread(), allRead, before, events, items, message, proposed
-
-### Community 125 - "Conversation Header"
-Cohesion: 0.36
-Nodes (8): Accessible combobox ARIA pattern, QA report: global shell (search, bell, status bar), bellLabel(), NotificationCenter(), useOutsidePress(), useGlobalSearch(), useNotifications(), useOrganizationEvents()
-
-### Community 126 - "Fake Git Workspace"
+### Community 123 - "TaskGitTracker"
 Cohesion: 0.22
 Nodes (8): Briefing, Persistence / migration / portability, Phase 2 results, QA plan: automatic model and effort selection, Regression, Resolution, UI (web), Validation
 
-### Community 128 - "Shared Organization Contract"
+### Community 125 - "Conversation Header"
 Cohesion: 0.25
 Nodes (7): agent, create(), later, names, now, snapshot, { temperature: _t, maxOutputTokens: _m, mcpServers: _s, ...legacy }
 
-### Community 130 - "Server Vitest Config"
+### Community 127 - "Organization Entity Tests"
 Cohesion: 0.32
 Nodes (3): DomainErrorCode, STATUS_BY_CODE, Logger
 
-### Community 132 - "Shared Package Index"
+### Community 129 - "ESLint Config"
 Cohesion: 0.29
 Nodes (7): Design mockup HTML: Metrics & fleet dashboard, Defect D-1: hourly chart dropped oldest partial hour (fixed), QA report: dashboard costs, cache savings, retry, CSV, isRetryable(), Run metrics and dashboard, Design screenshot: Metrics & fleet dashboard, DashboardDto
 
-### Community 133 - "Community 133"
+### Community 130 - "Server Vitest Config"
 Cohesion: 0.29
 Nodes (4): normalizeMcpServers(), normalizeSkills(), normalizeTemperature(), requireValidSkillName()
 
-### Community 135 - "Community 135"
+### Community 132 - "Shared Package Index"
 Cohesion: 0.29
 Nodes (6): Acceptance criteria, Defects, Gaps / assumptions, Known limitations, Mobile measurements (`scrollWidth` of html / body vs `innerWidth`), QA — global shell (⌘K search, notification bell, fleet status bar)
 
-### Community 136 - "Community 136"
+### Community 133 - "Community 133"
 Cohesion: 0.29
 Nodes (6): Criteria matrix, Defects, Gaps and risks, Observations (not defects), QA: agent live org chart + editable sheet (task 63 / QA task 98), Summary
 
-### Community 140 - "Community 140"
+### Community 137 - "Community 137"
 Cohesion: 0.4
 Nodes (3): ExportToolbar(), ExportToolbarProps, html
-
-### Community 143 - "Community 143"
-Cohesion: 0.4
-Nodes (5): Defect D1: invalid model/effort via delegation gateway, QA plan: automatic model/effort selection, Agent effort levels (low..max), ModelSelectionMode, RunModelChoice
 
 ## Knowledge Gaps
 - **961 isolated node(s):** `DraftInstructionsCommand`, `CreateAgentCommand`, `ExportAgentsInput`, `ImportAgentsInput`, `Interval` (+956 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Task` connect `Migrations & Agent Transfer Tests` to `Task Domain & Recording`, `Global Search UI`, `Dashboard Builder & Error Classes`, `Task Execution & Delegation`, `Conversation Panel Timeline`, `Task Result & Git Views`, `Fleet MCP Tool Server`, `Shared UI Components`, `Agent Import Dialog`, `Task Brief`, `HTTP Client & Queries`, `Project Inspection QA Tests`, `Project List Model`?**
+- **Why does `Task` connect `Task Entity Rules` to `Task Domain & Recording`, `Global Search UI`, `Conversation Panel Timeline`, `Task Result & Git Views`, `HTTP Routes & DTOs`, `Notifications Hook`, `Search Matching`, `Shared UI Components`, `Stick-to-bottom Scroll`, `Agents Page & Sheet`, `Agent Import Tests`, `Conversation Repository & Queries`?**
   _High betweenness centrality (0.219) - this node is a cross-community bridge._
-- **Why does `DashboardPage()` connect `Conversation Panel Timeline` to `Agent Use Cases & Lookups`, `Agent Detail & Editor`, `Notifications Hook`, `Agent Diagram Graph`, `Shared Task Contract`?**
+- **Why does `DashboardPage()` connect `Conversation Panel Timeline` to `Organization Tests`, `Project Table & Telemetry`, `Notification Storage`, `App Shell & Organizations`, `Projects Page QA Tests`?**
   _High betweenness centrality (0.158) - this node is a cross-community bridge._
-- **Why does `QA report: dashboard costs, cache savings, retry, CSV` connect `Shared Package Index` to `Global Search UI`, `Design System & Mockups`, `Organization Tests`, `Agent Import Dialog`, `Dashboard Page Tests & Export`?**
+- **Why does `QA report: dashboard costs, cache savings, retry, CSV` connect `ESLint Config` to `Task Domain & Recording`, `Fleet MCP Tool Server`, `Agent Import Dialog`, `Task List & Proposals`, `Agents Page & Sheet`?**
   _High betweenness centrality (0.150) - this node is a cross-community bridge._
 - **What connects `DraftInstructionsCommand`, `CreateAgentCommand`, `ExportAgentsInput` to the rest of the system?**
   _961 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Task Domain & Recording` be split into smaller, more focused modules?**
-  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Global Search UI` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12 - nodes in this community are weakly interconnected._
 - **Should `Task Execution & Delegation` be split into smaller, more focused modules?**
-  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
