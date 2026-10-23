@@ -27,7 +27,7 @@ describe('global shell QA edge cases', () => {
     app = await createHttpServer({
       useCases: fleet.useCases,
       events: fleet.events,
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       allowedOrigin: '*',
     });
   });
@@ -247,7 +247,8 @@ describe('global shell QA edge cases', () => {
       return text
         .split('\n')
         .filter((line) => line.startsWith('data: '))
-        .map((line) => (JSON.parse(line.slice(6)) as FleetEvent).projectId);
+        .map((line) => JSON.parse(line.slice(6)) as FleetEvent)
+        .flatMap((event) => ('projectId' in event ? [event.projectId] : []));
     }
 
     const created = (projectId: string, taskId: string): FleetEvent => ({

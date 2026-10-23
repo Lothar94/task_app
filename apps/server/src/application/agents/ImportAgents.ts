@@ -2,11 +2,13 @@ import type { AgentImportConflictStrategy, AgentImportResultDto, AgentExportDto,
 import { Agent } from '../../domain/agent/Agent.js';
 import { ConflictError, ValidationError } from '../../domain/errors/DomainError.js';
 import type { AgentRepository } from '../ports/AgentRepository.js';
+import type { RuntimeCapabilities } from '../ports/AgentRuntime.js';
 import type { Clock } from '../ports/Clock.js';
 import type { IdGenerator } from '../ports/IdGenerator.js';
 import type { OrganizationRepository } from '../ports/OrganizationRepository.js';
 import { requireOrganization } from '../shared/lookups.js';
 import { toAgentDto } from '../shared/dtos.js';
+import { ensureRuntimeSupports } from './ensureRuntimeSupports.js';
 
 const MAX_NAME_LENGTH = 60;
 
@@ -20,6 +22,7 @@ export class ImportAgents {
   constructor(
     private readonly organizations: OrganizationRepository,
     private readonly agents: AgentRepository,
+    private readonly runtime: RuntimeCapabilities,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
@@ -27,6 +30,7 @@ export class ImportAgents {
   execute(organizationId: string, { file, onConflict }: ImportAgentsInput): AgentImportResultDto {
     requireOrganization(this.organizations, organizationId);
     const entries = file.agents.map((agent) => ({ ...agent, name: agent.name.trim() }));
+    for (const entry of entries) ensureRuntimeSupports(this.runtime, entry);
     this.ensureNamesAreUniqueInFile(entries);
     this.ensureCollaboratorsAreInFile(entries);
     const conflicts = entries.filter((entry) => this.agents.findByName(organizationId, entry.name));

@@ -1,6 +1,7 @@
 import type {
   AgentEffort,
   AgentModel,
+  AgentRuntimeSupportDto,
   ModelTokenUsage,
   AgentPermissionMode,
   ModelSelectionMode,
@@ -69,6 +70,10 @@ export interface AgentRunRequest {
   pluginPaths: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
+  /** Cap on the output tokens of each model response; null keeps the runtime default. */
+  maxOutputTokens: number | null;
+  /** Names of the user's MCP servers the agent may use; unknown names are skipped. */
+  mcpServers: string[];
   workspacePath: string;
   resumeSessionId: string | null;
   signal: AbortSignal;
@@ -87,6 +92,11 @@ export type RuntimeEvent =
   | { type: 'message'; payload: MessagePayload }
   | { type: 'finished'; resultText: string; isError: boolean; usage: RunUsage | null };
 
-export interface AgentRuntime {
+/** Agent settings the runtime honours; the others must stay null. */
+export interface RuntimeCapabilities {
+  readonly supports: AgentRuntimeSupportDto;
+}
+
+export interface AgentRuntime extends RuntimeCapabilities {
   run(request: AgentRunRequest): AsyncIterable<RuntimeEvent>;
 }

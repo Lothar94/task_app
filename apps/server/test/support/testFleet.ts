@@ -6,7 +6,7 @@ import { DEFAULT_ORGANIZATION_ID } from '../../src/infrastructure/persistence/sq
 import type { AgentProfile } from '../../src/domain/agent/Agent.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
 import type { AgentBrief, InstructionWriter } from '../../src/application/ports/InstructionWriter.js';
-import { createContainer } from '../../src/main/container.js';
+import { type ContainerOptions, createContainer } from '../../src/main/container.js';
 import { type AgentBehaviour, FakeAgentRuntime } from './FakeAgentRuntime.js';
 import { FakeGitWorkspace } from './FakeGitWorkspace.js';
 
@@ -21,7 +21,7 @@ export class FakeInstructionWriter implements InstructionWriter {
 
 export const TEST_APP_VERSION = '1.2.3-test';
 
-const silentLogger = { info: () => undefined, error: () => undefined };
+const silentLogger = { info: () => undefined, warn: () => undefined, error: () => undefined };
 
 export function profile(name: string, overrides: Partial<AgentProfile> = {}): AgentProfile {
   return {
@@ -36,6 +36,9 @@ export function profile(name: string, overrides: Partial<AgentProfile> = {}): Ag
     skills: [],
     permissionMode: 'dontAsk',
     maxTurns: 10,
+    temperature: null,
+    maxOutputTokens: null,
+    mcpServers: [],
     ...overrides,
   };
 }
@@ -72,6 +75,10 @@ export function createTestFleet(
   maxDelegationDepth = 4,
   reservedPorts: number[] = [],
   catalogSkills: SkillDto[] = [],
+  extraOptions: Pick<
+    ContainerOptions,
+    'mcpServerCatalog' | 'monthlyBudgetUsd' | 'agentActivityCoalesceMs'
+  > = {},
 ) {
   const runtime = new FakeAgentRuntime(behaviours);
   const instructionWriter = new FakeInstructionWriter();
@@ -87,6 +94,7 @@ export function createTestFleet(
     maxDelegationDepth,
     appVersion: TEST_APP_VERSION,
     reservedPorts,
+    ...extraOptions,
   });
   return { runtime, git, instructionWriter, skillWorkspace: skillSupport.skillWorkspace, ...container };
 }

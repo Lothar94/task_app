@@ -27,7 +27,7 @@ describe('shell endpoints', () => {
     app = await createHttpServer({
       useCases: fleet.useCases,
       events: fleet.events,
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       allowedOrigin: '*',
     });
   });
@@ -221,7 +221,8 @@ describe('shell endpoints', () => {
       return text
         .split('\n')
         .filter((line) => line.startsWith('data: '))
-        .map((line) => (JSON.parse(line.slice('data: '.length)) as FleetEvent).projectId);
+        .map((line) => JSON.parse(line.slice('data: '.length)) as FleetEvent)
+        .flatMap((event) => ('projectId' in event ? [event.projectId] : []));
     }
 
     async function twoOrganizations() {

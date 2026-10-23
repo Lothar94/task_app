@@ -5,12 +5,10 @@ import {
   type DashboardDto,
   type DashboardFilters,
   type DashboardTotals,
-  type ModelTokenUsage,
   type ModelUsageRow,
   type RunErrorCause,
   type RunErrorCauseCount,
   type RunErrorRow,
-  type TokenTotals,
 } from '@fleet/shared';
 import type { Agent } from '../../domain/agent/Agent.js';
 import type { Project } from '../../domain/project/Project.js';
@@ -19,7 +17,14 @@ import type { TaskRun } from '../../domain/task/TaskRun.js';
 import { dailyBuckets, hourlyBuckets, type ActivityBuckets } from './activityBuckets.js';
 import { classifyRunError } from './classifyRunError.js';
 import { addCost, ZERO_COST, type ModelPriceTable } from './ModelPriceTable.js';
-import { addTotals, EMPTY_TOTALS, runDurationMs, totalsOfModel, totalsOfRun } from './usageMath.js';
+import {
+  addTotals,
+  EMPTY_TOTALS,
+  estimatedTotalsOfRun,
+  runDurationMs,
+  totalsOfModel,
+  totalsOfRun,
+} from './usageMath.js';
 
 const DAY_MS = 86_400_000;
 const MAX_CHART_DAYS = 90;
@@ -76,14 +81,6 @@ function scopeOf({ tasks, runs, filters, prices }: DashboardInput, { from, to }:
     prices,
   };
 }
-
-/** Token totals with the cost estimated from the price table. */
-function estimatedTotals(usage: ModelTokenUsage, prices: ModelPriceTable): TokenTotals {
-  return { ...totalsOfModel(usage), costUsd: prices.estimate(usage).costUsd };
-}
-
-const estimatedTotalsOfRun = (run: TaskRun, prices: ModelPriceTable) =>
-  run.models.map((usage) => estimatedTotals(usage, prices)).reduce(addTotals, EMPTY_TOTALS);
 
 function totalsOf(scope: Scope): DashboardTotals {
   const completed = countStatus(scope.finishedTasks, 'completed');

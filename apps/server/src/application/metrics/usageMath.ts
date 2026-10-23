@@ -1,5 +1,6 @@
 import type { ModelTokenUsage, TaskMetricsDto, TokenTotals } from '@fleet/shared';
 import type { TaskRun } from '../../domain/task/TaskRun.js';
+import type { ModelPriceTable } from './ModelPriceTable.js';
 
 export const EMPTY_TOTALS: TokenTotals = {
   inputTokens: 0,
@@ -37,6 +38,14 @@ export function addTotals<T extends TokenTotals>(target: T, extra: TokenTotals):
 export function totalsOfRun(run: TaskRun): TokenTotals {
   return run.models.map(totalsOfModel).reduce(addTotals, EMPTY_TOTALS);
 }
+
+/** Token totals with the cost estimated from the price table. */
+export function estimatedTotals(usage: ModelTokenUsage, prices: ModelPriceTable): TokenTotals {
+  return { ...totalsOfModel(usage), costUsd: prices.estimate(usage).costUsd };
+}
+
+export const estimatedTotalsOfRun = (run: TaskRun, prices: ModelPriceTable) =>
+  run.models.map((usage) => estimatedTotals(usage, prices)).reduce(addTotals, EMPTY_TOTALS);
 
 export const runDurationMs = (run: TaskRun) =>
   Math.max(0, run.finishedAt.getTime() - run.startedAt.getTime());

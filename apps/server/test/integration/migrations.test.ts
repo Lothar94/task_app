@@ -247,3 +247,28 @@ describe('task telemetry migrations', () => {
     ]);
   });
 });
+
+describe('agent settings migration', () => {
+  it('gives existing agents default settings and keeps them enabled', () => {
+    const file = legacyDatabase(
+      13,
+      `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, allowed_tools,
+        skills, permission_mode, max_turns, created_at, updated_at) VALUES ('a1', 'default', 'CTO', 'Lead', '', 'Lead',
+        'opus', 'high', '[]', '[]', 'dontAsk', 10, '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');`,
+    );
+
+    const db = openDatabase(file);
+    const snapshot = new SqliteAgentRepository(db).findById('a1')?.toSnapshot();
+
+    expect(snapshot).toMatchObject({
+      temperature: null,
+      maxOutputTokens: null,
+      mcpServers: [],
+      enabled: true,
+    });
+    expect(db.prepare('SELECT enabled, mcp_servers FROM agents WHERE id = ?').get('a1')).toEqual({
+      enabled: 1,
+      mcp_servers: '[]',
+    });
+  });
+});

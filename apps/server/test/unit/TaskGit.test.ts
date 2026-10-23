@@ -146,7 +146,11 @@ describe('GetTaskGitDiff', () => {
 
 describe('TaskGitTracker', () => {
   const logs: unknown[] = [];
-  const logger = { info: () => undefined, error: (_m: string, e: unknown) => void logs.push(e) };
+  const logger = {
+    info: () => undefined,
+    warn: () => undefined,
+    error: (_m: string, e: unknown) => void logs.push(e),
+  };
 
   it('keeps the first base and replaces the head on every run', async () => {
     const git = new FakeGitWorkspace();

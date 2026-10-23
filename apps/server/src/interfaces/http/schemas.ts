@@ -30,6 +30,9 @@ export const agentProfileSchema = z.object({
   skills: z.array(z.string()).default([]),
   permissionMode: z.enum(PERMISSION_MODES).default('dontAsk'),
   maxTurns: z.number().int(),
+  temperature: z.number().nullable().default(null),
+  maxOutputTokens: z.number().nullable().default(null),
+  mcpServers: z.array(z.string()).default([]),
 });
 
 export const createAgentSchema = agentProfileSchema.extend({
@@ -65,6 +68,8 @@ export const draftInstructionsSchema = z.object({
   collaboratorIds: ids,
   guidance: z.string().default(''),
 });
+
+export const agentEnabledSchema = z.object({ enabled: z.boolean() });
 
 export const collaboratorsSchema = z.object({ collaboratorIds: ids });
 

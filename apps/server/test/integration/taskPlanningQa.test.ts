@@ -323,7 +323,7 @@ describe('restart with a shared database (QA)', () => {
         runtime,
         instructionWriter: new FakeInstructionWriter(),
         ...fakeSkillSupport(),
-        logger: { info: () => undefined, error: () => undefined },
+        logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
         maxDelegationDepth: 4,
         appVersion: TEST_APP_VERSION,
         reservedPorts: [],

@@ -116,6 +116,8 @@ export class RunTask implements TaskExecutor {
       pluginPaths,
       permissionMode: profile.permissionMode,
       maxTurns: profile.maxTurns,
+      maxOutputTokens: profile.maxOutputTokens,
+      mcpServers: profile.mcpServers,
       workspacePath: project.workspacePath,
       resumeSessionId: isFollowUp ? task.sessionId : null,
       signal,
@@ -205,7 +207,9 @@ export class RunTask implements TaskExecutor {
       .map((id) => this.deps.agents.findById(id))
       .filter(
         (collaborator): collaborator is Agent =>
-          collaborator !== null && collaborator.organizationId === agent.organizationId,
+          collaborator !== null &&
+          collaborator.organizationId === agent.organizationId &&
+          collaborator.enabled,
       )
       .map(({ name, role, description, modelSelection }) => ({ name, role, description, modelSelection }));
   }

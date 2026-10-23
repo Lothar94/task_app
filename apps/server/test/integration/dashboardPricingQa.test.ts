@@ -38,7 +38,7 @@ describe('dashboard over HTTP with MODEL_PRICING_FILE (QA)', () => {
       runtime: new FakeAgentRuntime({}),
       instructionWriter: new FakeInstructionWriter(),
       ...fakeSkillSupport(),
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       git: new FakeGitWorkspace(),
       maxDelegationDepth: 4,
       appVersion: TEST_APP_VERSION,
@@ -48,7 +48,7 @@ describe('dashboard over HTTP with MODEL_PRICING_FILE (QA)', () => {
     app = await createHttpServer({
       useCases: fleet.useCases,
       events: fleet.events,
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       allowedOrigin: '*',
     });
     const { cto, project } = await createTeamProject({ useCases: fleet.useCases } as never, []);

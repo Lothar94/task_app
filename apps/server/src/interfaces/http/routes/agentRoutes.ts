@@ -6,10 +6,13 @@ import type { ExportAgents } from '../../../application/agents/ExportAgents.js';
 import type { ImportAgents } from '../../../application/agents/ImportAgents.js';
 import type { GetAgent, ListAgents } from '../../../application/agents/QueryAgents.js';
 import type { SetAgentCollaborators } from '../../../application/agents/SetAgentCollaborators.js';
+import type { SetAgentEnabled } from '../../../application/agents/SetAgentEnabled.js';
 import type { UpdateAgent } from '../../../application/agents/UpdateAgent.js';
+import type { GetAgentRuntimeInfo } from '../../../application/runtime/GetAgentRuntimeInfo.js';
 import type { AgentExportDto } from '@fleet/shared';
 import { toAgentDto } from '../../../application/shared/dtos.js';
 import {
+  agentEnabledSchema,
   agentProfileSchema,
   collaboratorsSchema,
   createAgentSchema,
@@ -29,6 +32,8 @@ export interface AgentUseCases {
   setAgentCollaborators: SetAgentCollaborators;
   exportAgents: ExportAgents;
   importAgents: ImportAgents;
+  setAgentEnabled: SetAgentEnabled;
+  getAgentRuntimeInfo: GetAgentRuntimeInfo;
 }
 
 function slugify(text: string): string {
@@ -65,6 +70,8 @@ export function registerAgentRoutes(app: FastifyInstance, useCases: AgentUseCase
     return reply.status(201).send(useCases.importAgents.execute(id, input));
   });
 
+  app.get('/api/agent-runtime', () => useCases.getAgentRuntimeInfo.execute());
+
   app.get('/api/agents/:id', (request) => {
     const { id } = idParams.parse(request.params);
     return toAgentDto(useCases.getAgent.execute(id));
@@ -98,6 +105,12 @@ export function registerAgentRoutes(app: FastifyInstance, useCases: AgentUseCase
     const { id } = idParams.parse(request.params);
     const { collaboratorIds } = collaboratorsSchema.parse(request.body);
     return toAgentDto(useCases.setAgentCollaborators.execute(id, collaboratorIds));
+  });
+
+  app.put('/api/agents/:id/enabled', (request) => {
+    const { id } = idParams.parse(request.params);
+    const { enabled } = agentEnabledSchema.parse(request.body);
+    return toAgentDto(useCases.setAgentEnabled.execute(id, enabled));
   });
 
   app.delete('/api/agents/:id', (request, reply) => {
