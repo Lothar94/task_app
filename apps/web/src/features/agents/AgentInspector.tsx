@@ -79,7 +79,7 @@ export function AgentInspector({
           onClose={closeSheet}
         />
       )}
-      <FleetTiles />
+      <FleetTiles agents={agents} />
     </div>
   );
 }
