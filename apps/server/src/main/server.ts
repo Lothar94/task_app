@@ -40,6 +40,7 @@ async function main(): Promise<void> {
     reservedPorts: config.reservedPorts,
     modelPrices: config.modelPrices,
     mcpServerCatalog: mcpServers,
+    monthlyBudgetUsd: config.monthlyBudgetUsd,
   });
 
   const recovered = container.recoverInterruptedTasks.execute();

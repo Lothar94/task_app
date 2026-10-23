@@ -26,6 +26,7 @@ import { SearchOrganization } from '../application/search/SearchOrganization.js'
 import { ResolveProjectOrganization } from '../application/projects/ResolveProjectOrganization.js';
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
 import { ResumeProject } from '../application/projects/ResumeProject.js';
+import { GetBudget } from '../application/metrics/GetBudget.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
 import { ModelPriceTable, type ModelPriceEntry } from '../application/metrics/ModelPriceTable.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
@@ -84,10 +85,12 @@ export interface ContainerOptions {
   /** Version of the app, shown by the fleet status. */
   appVersion: string;
   reservedPorts?: number[];
-  /** Price table of the usage dashboard; defaults to the built-in estimates. */
+  /** Price table of the usage dashboard and the budget; defaults to the built-in estimates. */
   modelPrices?: readonly ModelPriceEntry[];
   /** MCP servers agents may be given; defaults to none. */
   mcpServerCatalog?: McpServerCatalog;
+  /** Monthly spending limit in USD; defaults to none. */
+  monthlyBudgetUsd?: number | null;
   /** Window in which task changes collapse into one `agent.activity` event per organization. */
   agentActivityCoalesceMs?: number;
 }
@@ -241,19 +244,13 @@ interface UsageSources {
 /** Wires the read-only usage views: project telemetry and the dashboard with its price table. */
 function createUsageUseCases(
   { organizations, tasks, runs, agents, projects, clock }: UsageSources,
-  { modelPrices }: ContainerOptions,
+  { modelPrices, monthlyBudgetUsd = null }: ContainerOptions,
 ) {
+  const prices = new ModelPriceTable(modelPrices);
   return {
     getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
-    getUsageDashboard: new GetUsageDashboard(
-      organizations,
-      tasks,
-      runs,
-      agents,
-      projects,
-      clock,
-      new ModelPriceTable(modelPrices),
-    ),
+    getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock, prices),
+    getBudget: new GetBudget(organizations, projects, tasks, runs, clock, prices, monthlyBudgetUsd),
   };
 }
 

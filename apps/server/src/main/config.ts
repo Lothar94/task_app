@@ -34,6 +34,8 @@ export interface AppConfig {
   bashRewriteHook?: string;
   /** Price table of the usage dashboard: the defaults plus the entries of MODEL_PRICING_FILE. */
   modelPrices: ModelPriceEntry[];
+  /** Monthly spending limit in USD (MONTHLY_BUDGET_USD); null when no limit is configured. */
+  monthlyBudgetUsd: number | null;
 }
 
 const DEFAULT_BASH_MAX_OUTPUT_CHARS = 15000;
@@ -68,6 +70,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     reservedPorts: [port, portOf(allowedOrigin)],
     bashMaxOutputChars: Number(env.AGENT_BASH_MAX_OUTPUT ?? DEFAULT_BASH_MAX_OUTPUT_CHARS),
     modelPrices: modelPricesOf(env),
+    monthlyBudgetUsd: monthlyBudgetOf(env),
     ...optionalSettings(env),
   };
 }
@@ -78,6 +81,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
  */
 function userConfigFileOf(env: NodeJS.ProcessEnv): string {
   return env.CLAUDE_USER_CONFIG_FILE ?? join(env.CLAUDE_CONFIG_DIR ?? homedir(), '.claude.json');
+}
+
+/** Unset or empty means no limit; anything but a positive number stops the startup. */
+function monthlyBudgetOf(env: NodeJS.ProcessEnv): number | null {
+  const raw = env.MONTHLY_BUDGET_USD?.trim();
+  if (!raw) return null;
+  const budget = Number(raw);
+  if (!Number.isFinite(budget) || budget <= 0) {
+    throw new Error(`MONTHLY_BUDGET_USD must be a positive number of USD, got "${raw}"`);
+  }
+  return budget;
 }
 
 function modelPricesOf(env: NodeJS.ProcessEnv): ModelPriceEntry[] {

@@ -76,6 +76,21 @@ describe('loadConfig model prices', () => {
   });
 });
 
+describe('loadConfig monthly budget', () => {
+  it('has no limit when MONTHLY_BUDGET_USD is unset or empty', () => {
+    expect(loadConfig({}).monthlyBudgetUsd).toBeNull();
+    expect(loadConfig({ MONTHLY_BUDGET_USD: '  ' }).monthlyBudgetUsd).toBeNull();
+  });
+
+  it('reads a positive amount', () => {
+    expect(loadConfig({ MONTHLY_BUDGET_USD: '250.5' }).monthlyBudgetUsd).toBe(250.5);
+  });
+
+  it.each(['0', '-10', 'abc', 'Infinity'])('stops the startup on %j', (value) => {
+    expect(() => loadConfig({ MONTHLY_BUDGET_USD: value })).toThrow(/MONTHLY_BUDGET_USD/);
+  });
+});
+
 describe('loadConfig user MCP servers', () => {
   it('reads ~/.claude.json by default', () => {
     expect(loadConfig({}).claudeUserConfigFile).toBe(join(homedir(), '.claude.json'));
