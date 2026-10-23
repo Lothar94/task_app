@@ -1,6 +1,4 @@
-import type { AgentDto } from '@fleet/shared';
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import type { AgentActivityDto, AgentDto } from '@fleet/shared';
 import {
   Badge,
   Button,
@@ -9,27 +7,25 @@ import {
   LinkButton,
   Loading,
   PageHeader,
-  ROW_CLASS,
-  RowList,
   SegmentedControl,
+  StatusChip,
 } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
-import { useAgents } from './agentQueries';
+import { useAgentActivity, useAgents } from './agentQueries';
+import { activeAgentsLabel } from './agentActivityModel';
+import { AgentInspector } from './AgentInspector';
+import { AgentList, type ExportSelection } from './AgentList';
 import { useAgentExportSelection } from './useAgentExportSelection';
 import { ExportToolbar } from './ExportToolbar';
 import { ImportButton } from './ImportButton';
-import { modelEffortText } from './agentLabels';
-import { AgentAvatar } from './AgentAvatar';
-import { AgentGraph } from './diagram/AgentGraph';
-import { AgentSheet } from './AgentSheet';
-import { agentTrackRecord } from './agentSheetModel';
-import { FleetTiles } from './FleetTiles';
-import { useDashboard } from '../dashboard/dashboardQueries';
 
-const VIEWS = ['list', 'diagram'] as const;
+/** Stored under 'fleet.agents.view'; 'list' and 'diagram' predate 'dual' and stay valid. */
+const VIEWS = ['list', 'diagram', 'dual'] as const;
+type AgentsView = (typeof VIEWS)[number];
 const VIEW_OPTIONS = [
   { value: 'list' as const, label: 'Lista' },
   { value: 'diagram' as const, label: 'Diagrama' },
+  { value: 'dual' as const, label: 'Dual' },
 ];
 
 const agentCountLabel = (count: number) => `${count} ${count === 1 ? 'agente' : 'agentes'}`;
@@ -55,119 +51,43 @@ function ExportStarters({
   );
 }
 
-function AgentRowBody({ agent, teammates }: { agent: AgentDto; teammates: Map<string, string> }) {
-  const collaborators = agent.collaboratorIds.map((id) => teammates.get(id)).filter(Boolean);
+function ActiveAgentsBadge({ activity }: { activity?: AgentActivityDto }) {
+  if (!activity) return null;
+  const count = activity.agents.length;
   return (
-    <>
-      <AgentAvatar name={agent.name} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold">{agent.name}</p>
-        <p className="truncate text-sm text-fg-muted">{agent.role}</p>
-      </div>
-      <p className="hidden min-w-0 max-w-[35%] flex-1 truncate text-xs text-fg-subtle md:block">
-        {collaborators.length > 0 ? `Delega en: ${collaborators.join(', ')}` : 'Sin colaboradores'}
-      </p>
-      <span className="rounded-sm border border-line-strong bg-surface-raised px-2 py-0.5 font-mono text-xs whitespace-nowrap text-fg-muted">
-        {modelEffortText(agent)}
-      </span>
-    </>
+    <StatusChip tone={count > 0 ? 'success' : 'neutral'} pulse={count > 0}>
+      {activeAgentsLabel(count)}
+    </StatusChip>
   );
 }
 
-interface Selection {
-  selected: Set<string>;
-  onToggle: (id: string) => void;
-}
-
-function AgentRow({
-  agent,
-  teammates,
+function AgentViews({
+  view,
+  agents,
+  activity,
   selection,
 }: {
-  agent: AgentDto;
-  teammates: Map<string, string>;
-  selection?: Selection;
+  view: AgentsView;
+  agents: AgentDto[];
+  activity?: AgentActivityDto;
+  selection?: ExportSelection;
 }) {
-  const body = <AgentRowBody agent={agent} teammates={teammates} />;
-  if (!selection) {
+  if (agents.length === 0) {
     return (
-      <li>
-        <Link to={`/agents/${agent.id}`} className={ROW_CLASS}>
-          {body}
-        </Link>
-      </li>
+      <EmptyState>
+        Aún no hay agentes. Crea uno o ejecuta `make seed` para cargar un equipo de ejemplo.
+      </EmptyState>
     );
   }
-  const checked = selection.selected.has(agent.id);
-  return (
-    <li>
-      <label
-        className={`${ROW_CLASS} cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-accent ${checked ? 'bg-accent/10' : ''}`}
-      >
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={() => selection.onToggle(agent.id)}
-          aria-label={`Seleccionar ${agent.name}`}
-        />
-        {body}
-      </label>
-    </li>
-  );
-}
-
-function AgentList({ agents, selection }: { agents: AgentDto[]; selection?: Selection }) {
-  const names = new Map(agents.map((agent) => [agent.id, agent.name]));
-  return (
-    <RowList>
-      {agents.map((agent) => (
-        <AgentRow key={agent.id} agent={agent} teammates={names} selection={selection} />
-      ))}
-    </RowList>
-  );
-}
-
-function AgentDiagramView({ agents }: { agents: AgentDto[] }) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const container = useRef<HTMLDivElement>(null);
-  const sheet = useRef<HTMLElement>(null);
-  const dashboard = useDashboard({ projectId: null, days: null });
-  const selected = agents.find((agent) => agent.id === selectedId);
-
-  useEffect(() => {
-    if (selectedId) sheet.current?.focus();
-  }, [selectedId]);
-
-  const close = () => {
-    const id = selectedId;
-    setSelectedId(null);
-    if (id) container.current?.querySelector<SVGElement>(`[data-agent-id="${id}"]`)?.focus();
-  };
-
-  return (
-    <div
-      ref={container}
-      className={selected ? 'space-y-6 lg:pr-[24rem]' : 'space-y-6'}
-      onKeyDown={(event) => event.key === 'Escape' && selected && close()}
-    >
-      <AgentGraph agents={agents} selectedId={selectedId} onSelect={setSelectedId} />
-      {selected && (
-        <AgentSheet
-          ref={sheet}
-          agent={selected}
-          record={dashboard.data && agentTrackRecord(dashboard.data.byAgent, selected.id)}
-          onClose={close}
-        />
-      )}
-      <FleetTiles />
-    </div>
-  );
+  if (view === 'list') return <AgentList agents={agents} selection={selection} />;
+  return <AgentInspector agents={agents} activity={activity} dual={view === 'dual'} selection={selection} />;
 }
 
 export function AgentsPage() {
   const agents = useAgents();
+  const activity = useAgentActivity();
   const [view, setView] = useStoredChoice('fleet.agents.view', VIEWS, 'diagram');
-  const exporting = useAgentExportSelection(view === 'list');
+  const exporting = useAgentExportSelection(view !== 'diagram');
   const { selected } = exporting;
   if (agents.isPending) return <Loading />;
   if (agents.error) return <ErrorMessage error={agents.error} />;
@@ -176,7 +96,12 @@ export function AgentsPage() {
     <>
       <PageHeader
         title="Agentes"
-        badge={<Badge>{agentCountLabel(agents.data.length)}</Badge>}
+        badge={
+          <>
+            <Badge>{agentCountLabel(agents.data.length)}</Badge>
+            <ActiveAgentsBadge activity={activity.data} />
+          </>
+        }
         subtitle="Tu flota: identidad, instrucciones y con quién puede colaborar cada uno."
         actions={
           <>
@@ -211,18 +136,12 @@ export function AgentsPage() {
           onCancel={exporting.cancel}
         />
       )}
-      {agents.data.length === 0 ? (
-        <EmptyState>
-          Aún no hay agentes. Crea uno o ejecuta `make seed` para cargar un equipo de ejemplo.
-        </EmptyState>
-      ) : view === 'diagram' ? (
-        <AgentDiagramView agents={agents.data} />
-      ) : (
-        <AgentList
-          agents={agents.data}
-          selection={selected ? { selected, onToggle: exporting.toggle } : undefined}
-        />
-      )}
+      <AgentViews
+        view={view}
+        agents={agents.data}
+        activity={activity.data}
+        selection={selected ? { selected, onToggle: exporting.toggle } : undefined}
+      />
     </>
   );
 }
