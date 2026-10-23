@@ -1,15 +1,7 @@
 import type { DashboardDto } from '@fleet/shared';
-import { ChartColumn, Layers, Users, Bug } from 'lucide-react';
+import { ChartColumn, Layers, Users } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Card,
-  ErrorMessage,
-  Loading,
-  PageHeader,
-  SegmentedControl,
-  Select,
-  StatusChip,
-} from '../../components/ui';
+import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
 import { projectOptionLabel } from '../projects/projectListModel';
 import { useProjects } from '../projects/projectQueries';
@@ -18,23 +10,16 @@ import { DailyActivityChart, DailyLegend } from './charts/DailyActivityChart';
 import { ModelLegend, ModelTokensChart } from './charts/ModelTokensChart';
 import { Headline } from './Headline';
 import { OutcomeBar } from './charts/OutcomeBar';
+import { PERIOD_OPTIONS, PERIODS, type Period, periodDays } from './dashboardModel';
 import { useDashboard } from './dashboardQueries';
-import { ErrorList } from './ErrorList';
+import { ErrorsCard } from './ErrorsCard';
 import { ModelUsageTable } from './ModelUsageTable';
-
-const PERIODS = ['7', '30', '90', 'all'] as const;
-const PERIOD_OPTIONS = [
-  { value: '7' as const, label: '7 días' },
-  { value: '30' as const, label: '30 días' },
-  { value: '90' as const, label: '90 días' },
-  { value: 'all' as const, label: 'Todo' },
-];
 
 function Filters(props: {
   projectId: string;
   onProjectChange: (projectId: string) => void;
-  period: (typeof PERIODS)[number];
-  onPeriodChange: (period: (typeof PERIODS)[number]) => void;
+  period: Period;
+  onPeriodChange: (period: Period) => void;
 }) {
   const projects = useProjects();
   return (
@@ -66,10 +51,14 @@ function Filters(props: {
 function DashboardContent({ data }: { data: DashboardDto }) {
   return (
     <div className="space-y-6">
-      <Headline totals={data.totals} />
+      <Headline totals={data.totals} previous={data.previous} />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Card title="Tokens por día" icon={<ChartColumn />} meta={<DailyLegend days={data.daily} />}>
-          <DailyActivityChart days={data.daily} />
+        <Card
+          title={data.activityGranularity === 'hour' ? 'Tokens por hora' : 'Tokens por día'}
+          icon={<ChartColumn />}
+          meta={<DailyLegend days={data.daily} granularity={data.activityGranularity} />}
+        >
+          <DailyActivityChart days={data.daily} granularity={data.activityGranularity} />
         </Card>
         <Card title="Resultado de las tareas terminadas">
           <OutcomeBar totals={data.totals} />
@@ -92,17 +81,12 @@ function DashboardContent({ data }: { data: DashboardDto }) {
         <Card title="Rendimiento por agente" icon={<Users />}>
           <AgentUsageTable rows={data.byAgent} />
         </Card>
-        <Card
-          title={`Errores (${data.errors.length})`}
-          icon={<Bug />}
-          meta={
-            <StatusChip tone="danger">
-              {data.filters.days ? `Últimos ${data.filters.days} días` : 'Todo el periodo'}
-            </StatusChip>
-          }
-        >
-          <ErrorList errors={data.errors} />
-        </Card>
+        <ErrorsCard
+          errors={data.errors}
+          errorsTotal={data.errorsTotal}
+          errorCauses={data.errorCauses}
+          days={data.filters.days}
+        />
       </div>
     </div>
   );
@@ -113,7 +97,7 @@ export function DashboardPage() {
   const [period, setPeriod] = useStoredChoice('fleet.dashboard.period', PERIODS, '30');
   const dashboard = useDashboard({
     projectId: projectId || null,
-    days: period === 'all' ? null : Number(period),
+    days: periodDays(period),
   });
 
   return (

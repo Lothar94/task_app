@@ -1,8 +1,9 @@
-import type { AgentExportRequest, AgentImportRequest, AgentInput } from '@fleet/shared';
+import type { AgentDto, AgentExportRequest, AgentImportRequest, AgentInput } from '@fleet/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
 import { skillsApi } from '../../api/skillsApi';
 import { queryKeys } from '../../api/queryKeys';
+import { newestActivity } from './agentActivityModel';
 import { downloadJson, exportFileName } from './agentExport';
 import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
@@ -70,5 +71,51 @@ export function useImportAgents() {
   return useMutation({
     mutationFn: (importRequest: AgentImportRequest) => agentsApi.import(organizationId, importRequest),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
+  });
+}
+
+/** Live state of the organization's agents: a REST snapshot kept current by SSE (useOrganizationEvents). */
+export function useAgentActivity() {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  const queryKey = queryKeys.agentActivity(organizationId);
+  return useQuery({
+    queryKey,
+    queryFn: async () =>
+      newestActivity(await agentsApi.activity(organizationId), queryClient.getQueryData(queryKey)),
+  });
+}
+
+export const useAgentRuntime = () =>
+  useQuery({ queryKey: queryKeys.agentRuntime, queryFn: agentsApi.runtime, staleTime: 60_000 });
+
+/** Shows the saved agent right away, then refetches it with the list. */
+function useInvalidateAgent() {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  return (agent: AgentDto) => {
+    queryClient.setQueryData(queryKeys.agent(agent.id), agent);
+    queryClient.setQueryData<AgentDto[]>(queryKeys.agents(organizationId), (agents) =>
+      agents?.map((existing) => (existing.id === agent.id ? agent : existing)),
+    );
+    void queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.agent(agent.id) });
+  };
+}
+
+/** PUT /api/agents/:id with a full AgentInput; collaborators are left untouched. */
+export function useUpdateAgent() {
+  const invalidate = useInvalidateAgent();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: AgentInput }) => agentsApi.update(id, input),
+    onSuccess: invalidate,
+  });
+}
+
+export function useSetAgentEnabled() {
+  const invalidate = useInvalidateAgent();
+  return useMutation({
+    mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => agentsApi.setEnabled(id, { enabled }),
+    onSuccess: invalidate,
   });
 }

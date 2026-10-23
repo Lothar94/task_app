@@ -8,6 +8,7 @@ import {
   markRead,
   MAX_NOTIFICATIONS,
 } from './notificationModel';
+import { activityEvent } from '../agents/agentTestData';
 import { created, updated } from './notificationTestData';
 
 const NOW = '2026-10-21T09:00:00.000Z';
@@ -47,6 +48,11 @@ describe('applyFleetEvent', () => {
     const message = { type: 'task.message_appended', projectId: 'p1', message: {} } as FleetEvent;
     const before: FleetNotification[] = [];
     expect(apply([updated({ status: 'running' }), created({ status: 'failed' }), message], before)).toBe(before);
+  });
+
+  it('ignores agent activity snapshots', () => {
+    const before: FleetNotification[] = [];
+    expect(apply([activityEvent()], before)).toBe(before);
   });
 
   it('dedupes by task and kind, newest first', () => {

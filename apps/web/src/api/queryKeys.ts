@@ -2,6 +2,10 @@ export const queryKeys = {
   organizations: ['organizations'] as const,
   agents: (organizationId: string) => ['agents', organizationId] as const,
   skills: ['skills'] as const,
+  agentRuntime: ['agent-runtime'] as const,
+  /** Kept current by `agent.activity` SSE events (useOrganizationEvents). */
+  agentActivity: (organizationId: string) => ['agent-activity', organizationId] as const,
+  budget: (organizationId: string) => ['budget', organizationId] as const,
   agent: (id: string) => ['agent', id] as const,
   projects: (organizationId: string) => ['projects', organizationId] as const,
   projectsTelemetry: (organizationId: string) => ['projects-telemetry', organizationId] as const,
@@ -12,6 +16,8 @@ export const queryKeys = {
   git: (taskId: string) => ['git', taskId] as const,
   gitDiff: (taskId: string) => ['git-diff', taskId] as const,
   conversation: (taskId: string) => ['conversation', taskId] as const,
+  /** Prefix of every dashboard query, whatever its filters. */
+  dashboards: ['dashboard'] as const,
   dashboard: (organizationId: string, projectId: string | null, days: number | null) =>
     ['dashboard', organizationId, projectId, days] as const,
   search: (organizationId: string, query: string) => ['search', organizationId, query] as const,

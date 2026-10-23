@@ -27,7 +27,7 @@ describe('agent import (QA gaps)', () => {
     app = await createHttpServer({
       useCases: fleet.useCases,
       events: fleet.events,
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       allowedOrigin: '*',
     });
   });

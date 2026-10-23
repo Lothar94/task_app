@@ -9,6 +9,7 @@ import type { SendFollowUp } from '../../../application/tasks/SendFollowUp.js';
 import type { DequeueTask } from '../../../application/tasks/DequeueTask.js';
 import type { EnqueueTask } from '../../../application/tasks/EnqueueTask.js';
 import type { ReorderQueue } from '../../../application/tasks/ReorderQueue.js';
+import type { RetryTask } from '../../../application/tasks/RetryTask.js';
 import type { StartTask } from '../../../application/tasks/StartTask.js';
 import type { UpdateTask } from '../../../application/tasks/UpdateTask.js';
 import {
@@ -27,6 +28,7 @@ export interface TaskUseCases {
   startTask: StartTask;
   enqueueTask: EnqueueTask;
   dequeueTask: DequeueTask;
+  retryTask: RetryTask;
   reorderQueue: ReorderQueue;
   getTask: GetTask;
   getTaskTree: GetTaskTree;
@@ -102,6 +104,11 @@ export function registerTaskRoutes(app: FastifyInstance, useCases: TaskUseCases)
   app.post('/api/tasks/:id/enqueue', (request) => {
     const { id } = idParams.parse(request.params);
     return toTaskDto(useCases.enqueueTask.execute(id));
+  });
+
+  app.post('/api/tasks/:id/retry', (request) => {
+    const { id } = idParams.parse(request.params);
+    return toTaskDto(useCases.retryTask.execute(id));
   });
 
   app.post('/api/tasks/:id/dequeue', (request) => {

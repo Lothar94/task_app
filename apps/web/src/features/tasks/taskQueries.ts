@@ -46,6 +46,18 @@ function invalidateTaskViews(queryClient: QueryClient, projectId: string, taskId
   if (taskId) void queryClient.invalidateQueries({ queryKey: queryKeys.task(taskId) });
 }
 
+/** Re-queues a failed task; callers must confirm with the user first. Refreshes the dashboard and the task views. */
+export function useRetryTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => tasksApi.retry(id),
+    onSuccess: (task) => {
+      invalidateTaskViews(queryClient, task.projectId, task.id);
+      return queryClient.invalidateQueries({ queryKey: queryKeys.dashboards });
+    },
+  });
+}
+
 /** Mutation on a single task whose result changes the project tree and that task. */
 function useTaskAction(action: (id: string) => Promise<unknown>) {
   const queryClient = useQueryClient();

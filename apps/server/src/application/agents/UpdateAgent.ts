@@ -1,17 +1,21 @@
 import type { Agent, AgentProfile } from '../../domain/agent/Agent.js';
 import type { AgentRepository } from '../ports/AgentRepository.js';
+import type { RuntimeCapabilities } from '../ports/AgentRuntime.js';
 import type { Clock } from '../ports/Clock.js';
 import { requireAgent } from '../shared/lookups.js';
+import { ensureRuntimeSupports } from './ensureRuntimeSupports.js';
 import { ensureUniqueAgentName } from './ensureUniqueAgentName.js';
 
 export class UpdateAgent {
   constructor(
     private readonly agents: AgentRepository,
+    private readonly runtime: RuntimeCapabilities,
     private readonly clock: Clock,
   ) {}
 
   execute(agentId: string, profile: AgentProfile): Agent {
     const agent = requireAgent(this.agents, agentId);
+    ensureRuntimeSupports(this.runtime, profile);
     ensureUniqueAgentName(this.agents, agent.organizationId, profile.name, agentId);
     agent.updateProfile(profile, this.clock.now());
     this.agents.save(agent);

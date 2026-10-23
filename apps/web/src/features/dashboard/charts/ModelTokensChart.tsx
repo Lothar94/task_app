@@ -1,7 +1,7 @@
 import type { ModelUsageRow } from '@fleet/shared';
 import { EmptyState } from '../../../components/ui';
 import { formatCost, formatInteger, formatPercent, formatTokens } from '../../../lib/format';
-import { MODEL_SEGMENTS, modelBreakdown } from '../dashboardModel';
+import { MODEL_SEGMENTS, cacheSavingsRate, modelBreakdown } from '../dashboardModel';
 import { Legend, TooltipRow, useChartTooltip } from './useChartTooltip';
 
 function ModelTooltip({ row }: { row: ModelUsageRow }) {
@@ -18,6 +18,7 @@ function ModelTooltip({ row }: { row: ModelUsageRow }) {
       ))}
       <TooltipRow label="Total" value={formatInteger(row.totalTokens)} />
       <TooltipRow label="Coste estimado" value={formatCost(row.costUsd)} />
+      <TooltipRow label="Ahorro por caché" value={formatCost(row.cacheSavingsUsd)} />
       <TooltipRow label="Ejecuciones" value={String(row.runs)} />
     </div>
   );
@@ -27,6 +28,18 @@ const breakdownLabel = (row: ModelUsageRow) =>
   modelBreakdown(row)
     .map((segment) => `${segment.label} ${formatPercent(segment.percent / 100)}`)
     .join(', ');
+
+/** "Tasa de ahorro por prompt-cache: 75 % (ahorro 3,00 US$)"; nothing when the cache saved nothing. */
+function CacheSavingsLine({ row }: { row: ModelUsageRow }) {
+  const rate = cacheSavingsRate(row);
+  if (rate === null || row.cacheSavingsUsd <= 0) return null;
+  return (
+    <p className="mt-1 font-mono text-[0.6875rem] text-fg-subtle">
+      Tasa de ahorro por prompt-cache: <span className="text-fg-muted">{formatPercent(rate)}</span> (
+      {formatCost(row.cacheSavingsUsd)} ahorrados)
+    </p>
+  );
+}
 
 export const ModelLegend = () => (
   <Legend items={MODEL_SEGMENTS.map(({ label, color }) => ({ label, color }))} />
@@ -66,6 +79,7 @@ export function ModelTokensChart({ rows }: { rows: ModelUsageRow[] }) {
                 />
               ))}
             </div>
+            <CacheSavingsLine row={row} />
           </div>
         ))}
         {tooltip}

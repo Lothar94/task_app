@@ -8,19 +8,27 @@ import { ExportAgents } from '../application/agents/ExportAgents.js';
 import { ImportAgents } from '../application/agents/ImportAgents.js';
 import { GetAgent, ListAgents } from '../application/agents/QueryAgents.js';
 import { SetAgentCollaborators } from '../application/agents/SetAgentCollaborators.js';
+import { SetAgentEnabled } from '../application/agents/SetAgentEnabled.js';
 import { UpdateAgent } from '../application/agents/UpdateAgent.js';
 import type { AgentRuntime } from '../application/ports/AgentRuntime.js';
+import type { EventPublisher, EventSubscriber } from '../application/ports/EventBus.js';
 import type { InstructionWriter } from '../application/ports/InstructionWriter.js';
+import type { McpServerCatalog } from '../application/ports/McpServerCatalog.js';
 import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
+import { AgentActivityNotifier } from '../application/fleet/AgentActivityNotifier.js';
+import { GetAgentActivity } from '../application/fleet/GetAgentActivity.js';
 import { GetFleetStatus } from '../application/fleet/GetFleetStatus.js';
+import { GetAgentRuntimeInfo } from '../application/runtime/GetAgentRuntimeInfo.js';
 import { SearchOrganization } from '../application/search/SearchOrganization.js';
 import { ResolveProjectOrganization } from '../application/projects/ResolveProjectOrganization.js';
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
 import { ResumeProject } from '../application/projects/ResumeProject.js';
+import { GetBudget } from '../application/metrics/GetBudget.js';
 import { GetUsageDashboard } from '../application/metrics/GetUsageDashboard.js';
+import { ModelPriceTable, type ModelPriceEntry } from '../application/metrics/ModelPriceTable.js';
 import { CreateProject } from '../application/projects/CreateProject.js';
 import { GetProject, ListProjects } from '../application/projects/QueryProjects.js';
 import { ArchiveProject } from '../application/projects/ArchiveProject.js';
@@ -35,6 +43,7 @@ import { GetTask, GetTaskConversation, GetTaskTree } from '../application/tasks/
 import { DequeueTask } from '../application/tasks/DequeueTask.js';
 import { EnqueueTask } from '../application/tasks/EnqueueTask.js';
 import { ReorderQueue } from '../application/tasks/ReorderQueue.js';
+import { RetryTask } from '../application/tasks/RetryTask.js';
 import { StartTask } from '../application/tasks/StartTask.js';
 import { TaskQueue } from '../application/tasks/TaskQueue.js';
 import { UpdateTask } from '../application/tasks/UpdateTask.js';
@@ -76,7 +85,17 @@ export interface ContainerOptions {
   /** Version of the app, shown by the fleet status. */
   appVersion: string;
   reservedPorts?: number[];
+  /** Price table of the usage dashboard and the budget; defaults to the built-in estimates. */
+  modelPrices?: readonly ModelPriceEntry[];
+  /** MCP servers agents may be given; defaults to none. */
+  mcpServerCatalog?: McpServerCatalog;
+  /** Monthly spending limit in USD; defaults to none. */
+  monthlyBudgetUsd?: number | null;
+  /** Window in which task changes collapse into one `agent.activity` event per organization. */
+  agentActivityCoalesceMs?: number;
 }
+
+const EMPTY_MCP_CATALOG: McpServerCatalog = { list: async () => [] };
 
 interface Infrastructure {
   ids: UuidGenerator;
@@ -138,13 +157,47 @@ function createOrganizationUseCases(
 function createAgentTransferUseCases(
   organizations: SqliteOrganizationRepository,
   agents: SqliteAgentRepository,
-  ids: UuidGenerator,
-  clock: SystemClock,
+  { ids, clock, runtime }: { ids: UuidGenerator; clock: SystemClock; runtime: AgentRuntime },
 ) {
   return {
     exportAgents: new ExportAgents(organizations, agents, clock),
-    importAgents: new ImportAgents(organizations, agents, ids, clock),
+    importAgents: new ImportAgents(organizations, agents, runtime, ids, clock),
   };
+}
+
+/** Wires the edition of an agent sheet: profile, collaborators, enabled state and runtime support. */
+function createAgentSettingsUseCases(
+  agents: SqliteAgentRepository,
+  clock: SystemClock,
+  { runtime, mcpServerCatalog = EMPTY_MCP_CATALOG }: ContainerOptions,
+) {
+  return {
+    updateAgent: new UpdateAgent(agents, runtime, clock),
+    setAgentCollaborators: new SetAgentCollaborators(agents, clock),
+    setAgentEnabled: new SetAgentEnabled(agents, clock),
+    getAgentRuntimeInfo: new GetAgentRuntimeInfo(runtime, mcpServerCatalog),
+  };
+}
+
+interface ActivitySources {
+  organizations: SqliteOrganizationRepository;
+  projects: SqliteProjectRepository;
+  tasks: SqliteTaskRepository;
+  agents: SqliteAgentRepository;
+  clock: SystemClock;
+  events: EventPublisher & EventSubscriber;
+}
+
+/** Wires the live activity of the org chart and its coalesced `agent.activity` events. */
+function createAgentActivity(
+  { organizations, projects, tasks, agents, clock, events }: ActivitySources,
+  { logger, agentActivityCoalesceMs }: ContainerOptions,
+) {
+  const getAgentActivity = new GetAgentActivity(organizations, projects, tasks, agents, clock);
+  new AgentActivityNotifier(projects, getAgentActivity, events, logger, agentActivityCoalesceMs).watch(
+    events,
+  );
+  return { getAgentActivity };
 }
 
 function createProjectMemberAndArchiveUseCases(
@@ -179,9 +232,31 @@ function createTelemetrySupport(
   };
 }
 
+interface UsageSources {
+  organizations: SqliteOrganizationRepository;
+  tasks: SqliteTaskRepository;
+  runs: SqliteTaskRunRepository;
+  agents: SqliteAgentRepository;
+  projects: SqliteProjectRepository;
+  clock: SystemClock;
+}
+
+/** Wires the read-only usage views: project telemetry and the dashboard with its price table. */
+function createUsageUseCases(
+  { organizations, tasks, runs, agents, projects, clock }: UsageSources,
+  { modelPrices, monthlyBudgetUsd = null }: ContainerOptions,
+) {
+  const prices = new ModelPriceTable(modelPrices);
+  return {
+    getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
+    getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock, prices),
+    getBudget: new GetBudget(organizations, projects, tasks, runs, clock, prices, monthlyBudgetUsd),
+  };
+}
+
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
-  const { db, instructionWriter, skillCatalog } = options;
+  const { db, instructionWriter, skillCatalog, runtime } = options;
   const clock = new SystemClock();
   const ids = new UuidGenerator();
   const events = new InMemoryEventBus();
@@ -208,15 +283,14 @@ export function createContainer(options: ContainerOptions) {
     recoverInterruptedTasks: new RecoverInterruptedTasks(tasks, recorder, ids, clock),
     useCases: {
       ...createOrganizationUseCases(organizations, ids, clock),
-      createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, ids, clock),
+      createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, runtime, ids, clock),
       draftAgentInstructions,
       listSkills: new ListSkills(skillCatalog),
-      updateAgent: new UpdateAgent(agents, clock),
       deleteAgent: new DeleteAgent(agents, projects, tasks, clock),
       listAgents: new ListAgents(organizations, agents),
       getAgent: new GetAgent(agents),
-      ...createAgentTransferUseCases(organizations, agents, ids, clock),
-      setAgentCollaborators: new SetAgentCollaborators(agents, clock),
+      ...createAgentTransferUseCases(organizations, agents, { ids, clock, runtime }),
+      ...createAgentSettingsUseCases(agents, clock, options),
       createProject: new CreateProject(
         organizations,
         projects,
@@ -235,14 +309,15 @@ export function createContainer(options: ContainerOptions) {
       startTask: new StartTask(projects, tasks, launcher, queue),
       enqueueTask: new EnqueueTask(projects, tasks, recorder, queue),
       dequeueTask: new DequeueTask(tasks, recorder, queue),
+      retryTask: new RetryTask(projects, tasks, recorder, queue),
       reorderQueue: new ReorderQueue(projects, queue),
       getTask: new GetTask(tasks),
       getTaskTree: new GetTaskTree(projects, tasks, runs),
-      getProjectsTelemetry: new GetProjectsTelemetry(organizations, tasks, runs, agents, projects, clock),
       resumeProject: new ResumeProject(projects, tasks, recorder, queue),
-      getUsageDashboard: new GetUsageDashboard(organizations, tasks, runs, agents, projects, clock),
+      ...createUsageUseCases({ organizations, tasks, runs, agents, projects, clock }, options),
       searchOrganization: new SearchOrganization(organizations, projects, tasks, agents),
       getFleetStatus: new GetFleetStatus(organizations, projects, tasks, agents, clock, options.appVersion),
+      ...createAgentActivity({ organizations, projects, tasks, agents, clock, events }, options),
       resolveProjectOrganization: new ResolveProjectOrganization(projects),
       ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),

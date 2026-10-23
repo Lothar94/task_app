@@ -58,6 +58,7 @@ export class ExportAgents {
 function toExportedAgent(agent: Agent, namesInExport: ReadonlyMap<string, string>): ExportedAgent {
   const { name, role, description, instructions, model, effort, modelSelection } = agent.toSnapshot();
   const { allowedTools, skills, permissionMode, maxTurns } = agent.toSnapshot();
+  const { temperature, maxOutputTokens, mcpServers } = agent.toSnapshot();
   const collaborators = agent.collaboratorIds.flatMap((id) => namesInExport.get(id) ?? []);
   return {
     name,
@@ -71,6 +72,9 @@ function toExportedAgent(agent: Agent, namesInExport: ReadonlyMap<string, string
     skills: [...skills],
     permissionMode,
     maxTurns,
+    temperature,
+    maxOutputTokens,
+    mcpServers: [...mcpServers],
     collaborators,
   };
 }

@@ -6,21 +6,14 @@ import { describe, expect, it } from 'vitest';
 import { migrate } from '../../src/infrastructure/persistence/sqlite/migrations.js';
 import { openDatabase } from '../../src/infrastructure/persistence/sqlite/openDatabase.js';
 
-/** Builds a database at the schema that existed before auto model selection (HEAD~ migrations), then seeds it. */
+/** Last schema version before auto model selection (whose migrations are versions 12 and 13). */
+const PRE_FEATURE_VERSION = 11;
+
+/** Builds a database at the schema that existed before auto model selection. */
 function legacyFile(): string {
   const file = join(mkdtempSync(join(tmpdir(), 'fleet-auto-')), 'fleet.db');
   const db = new Database(file);
-  migrate(db);
-  const columns = (table: string) => (db.pragma(`table_info(${table})`) as { name: string }[]).map((c) => c.name);
-  // Sanity: this helper must run against the pre-feature schema; skipped logic below handles post-feature.
-  if (columns('agents').includes('model_selection')) {
-    db.exec('ALTER TABLE agents DROP COLUMN model_selection');
-    db.exec('ALTER TABLE tasks DROP COLUMN model_choice_model');
-    db.exec('ALTER TABLE tasks DROP COLUMN model_choice_effort');
-    // The feature adds two migrations (agents column, tasks columns).
-    const version = db.pragma('user_version', { simple: true }) as number;
-    db.pragma(`user_version = ${version - 2}`);
-  }
+  migrate(db, PRE_FEATURE_VERSION);
   db.close();
   return file;
 }

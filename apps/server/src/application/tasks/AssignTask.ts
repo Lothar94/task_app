@@ -30,6 +30,7 @@ export class AssignTask {
     const { projects, agents, tasks, recorder, launcher, queue, ids, clock } = this.deps;
     const project = requireActiveProject(projects, projectId);
     const agent = requireAgent(agents, input.agentId);
+    agent.ensureCanReceiveTasks();
     if (!project.hasMember(agent.id)) {
       throw new ValidationError(`"${agent.name}" is not a member of this project`);
     }

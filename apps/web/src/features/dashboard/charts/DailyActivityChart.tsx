@@ -1,7 +1,7 @@
-import type { DailyActivity } from '@fleet/shared';
+import type { ActivityGranularity, DailyActivity } from '@fleet/shared';
 import { EmptyState } from '../../../components/ui';
-import { formatDay, formatInteger, formatTokens } from '../../../lib/format';
-import { peakDay } from '../dashboardModel';
+import { formatInteger, formatTokens } from '../../../lib/format';
+import { activityLabel, activityTitle, peakDay } from '../dashboardModel';
 import { TooltipRow, useChartTooltip } from './useChartTooltip';
 
 const SERIES_COLOR = 'var(--series-1)';
@@ -15,10 +15,10 @@ function niceMax(value: number): number {
   return step * magnitude;
 }
 
-function DayTooltip({ day }: { day: DailyActivity }) {
+function DayTooltip({ day, granularity }: { day: DailyActivity; granularity: ActivityGranularity }) {
   return (
     <div className="space-y-1">
-      <p className="font-semibold text-fg">{formatDay(day.date)}</p>
+      <p className="font-semibold text-fg">{activityTitle(day.date, granularity)}</p>
       <TooltipRow color="var(--series-1)" label="Tokens" value={formatInteger(day.totalTokens)} />
       <TooltipRow label="Tareas completadas" value={String(day.completed)} />
       <TooltipRow label="Tareas fallidas" value={String(day.failed)} />
@@ -27,7 +27,13 @@ function DayTooltip({ day }: { day: DailyActivity }) {
 }
 
 /** Legend for the card header: the series and the peak day. */
-export function DailyLegend({ days }: { days: DailyActivity[] }) {
+export function DailyLegend({
+  days,
+  granularity,
+}: {
+  days: DailyActivity[];
+  granularity: ActivityGranularity;
+}) {
   const peak = peakDay(days);
   return (
     <p className="label-mono flex flex-wrap items-center gap-x-4 gap-y-1 normal-case text-fg-muted">
@@ -37,15 +43,21 @@ export function DailyLegend({ days }: { days: DailyActivity[] }) {
       </span>
       {peak && (
         <span>
-          Pico: {formatTokens(peak.totalTokens)} ({formatDay(peak.date)})
+          Pico: {formatTokens(peak.totalTokens)} ({activityLabel(peak.date, granularity)})
         </span>
       )}
     </p>
   );
 }
 
-/** Tokens consumed per day (single series); hover a day for its task outcomes. */
-export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
+/** Tokens consumed per day or hour (single series); hover a bar for its task outcomes. */
+export function DailyActivityChart({
+  days,
+  granularity,
+}: {
+  days: DailyActivity[];
+  granularity: ActivityGranularity;
+}) {
   const { show, hide, tooltip } = useChartTooltip();
   if (days.every((day) => day.totalTokens === 0)) {
     return <EmptyState>Sin tokens registrados en este periodo.</EmptyState>;
@@ -83,7 +95,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
               <div
                 key={day.date}
                 className="group flex h-full min-w-0 flex-1 items-end hover:bg-surface-hover"
-                onMouseMove={(event) => show(event, <DayTooltip day={day} />)}
+                onMouseMove={(event) => show(event, <DayTooltip day={day} granularity={granularity} />)}
               >
                 <div
                   data-peak={day === peak || undefined}
@@ -105,7 +117,7 @@ export function DailyActivityChart({ days }: { days: DailyActivity[] }) {
             key={day.date}
             className="min-w-0 flex-1 text-center font-mono text-[0.6875rem] whitespace-nowrap text-fg-subtle"
           >
-            {index % labelEvery === 0 ? formatDay(day.date) : ''}
+            {index % labelEvery === 0 ? activityLabel(day.date, granularity) : ''}
           </span>
         ))}
       </div>

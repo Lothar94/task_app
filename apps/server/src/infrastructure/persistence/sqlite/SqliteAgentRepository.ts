@@ -17,6 +17,10 @@ interface AgentRow {
   skills: string;
   permission_mode: AgentPermissionMode;
   max_turns: number;
+  temperature: number | null;
+  max_output_tokens: number | null;
+  mcp_servers: string;
+  enabled: number;
   created_at: string;
   updated_at: string;
 }
@@ -63,17 +67,20 @@ export class SqliteAgentRepository implements AgentRepository {
     this.db
       .prepare(
         `INSERT INTO agents (id, organization_id, name, role, description, instructions, model, effort, model_selection, allowed_tools, skills,
-           permission_mode, max_turns, created_at, updated_at)
+           permission_mode, max_turns, temperature, max_output_tokens, mcp_servers, enabled, created_at, updated_at)
          VALUES (@id, @organizationId, @name, @role, @description, @instructions, @model, @effort, @modelSelection, @allowedTools, @skills,
-           @permissionMode, @maxTurns, @createdAt, @updatedAt)
+           @permissionMode, @maxTurns, @temperature, @maxOutputTokens, @mcpServers, @enabled, @createdAt, @updatedAt)
          ON CONFLICT(id) DO UPDATE SET name = @name, role = @role, description = @description,
            instructions = @instructions, model = @model, effort = @effort, model_selection = @modelSelection, allowed_tools = @allowedTools,
-           skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, updated_at = @updatedAt`,
+           skills = @skills, permission_mode = @permissionMode, max_turns = @maxTurns, temperature = @temperature,
+           max_output_tokens = @maxOutputTokens, mcp_servers = @mcpServers, enabled = @enabled, updated_at = @updatedAt`,
       )
       .run({
         ...snapshot,
         allowedTools: JSON.stringify(snapshot.allowedTools),
         skills: JSON.stringify(snapshot.skills),
+        mcpServers: JSON.stringify(snapshot.mcpServers),
+        enabled: snapshot.enabled ? 1 : 0,
         createdAt: snapshot.createdAt.toISOString(),
         updatedAt: snapshot.updatedAt.toISOString(),
       });
@@ -103,6 +110,10 @@ export class SqliteAgentRepository implements AgentRepository {
       skills: JSON.parse(row.skills) as string[],
       permissionMode: row.permission_mode,
       maxTurns: row.max_turns,
+      temperature: row.temperature,
+      maxOutputTokens: row.max_output_tokens,
+      mcpServers: JSON.parse(row.mcp_servers) as string[],
+      enabled: row.enabled === 1,
       collaboratorIds: this.collaboratorIdsOf(row.id),
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),

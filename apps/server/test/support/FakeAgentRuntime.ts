@@ -1,3 +1,4 @@
+import type { AgentRuntimeSupportDto } from '@fleet/shared';
 import type {
   AgentRunRequest,
   AgentRuntime,
@@ -11,6 +12,8 @@ export class FakeAgentRuntime implements AgentRuntime {
   readonly requests: AgentRunRequest[] = [];
   /** Agents (by name) that call one tool taking this many milliseconds before finishing. */
   readonly toolDelaysMs: Record<string, number> = {};
+  /** Like the Claude runtime by default; tests flip the flags to exercise other runtimes. */
+  readonly supports: AgentRuntimeSupportDto = { temperature: false, maxOutputTokens: true };
 
   constructor(private readonly behaviours: Record<string, AgentBehaviour>) {}
 

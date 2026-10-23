@@ -2,7 +2,7 @@ import type { ProjectAlertKind } from '@fleet/shared';
 import type { Task } from '../../domain/task/Task.js';
 
 const SESSION_LIMIT = /usage limit|hit your limit|5[- ]hour limit|session limit|rate limit/i;
-const TOKEN_LIMIT =
+export const TOKEN_LIMIT =
   /max_tokens|token limit|context (window|length)|prompt is too long|maximum context|max[_ ]budget|budget (limit|exceeded)|(exceeded|over) .*budget|over budget/i;
 
 /** Tells whether a failure reason is a recoverable limit (retrying later can succeed). */

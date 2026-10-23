@@ -1,10 +1,12 @@
 import { Agent, type AgentProfile } from '../../domain/agent/Agent.js';
 import type { AgentRepository } from '../ports/AgentRepository.js';
+import type { RuntimeCapabilities } from '../ports/AgentRuntime.js';
 import type { Clock } from '../ports/Clock.js';
 import type { IdGenerator } from '../ports/IdGenerator.js';
 import type { OrganizationRepository } from '../ports/OrganizationRepository.js';
 import { requireAgentsOfOrganization, requireOrganization } from '../shared/lookups.js';
 import type { DraftAgentInstructions } from './DraftAgentInstructions.js';
+import { ensureRuntimeSupports } from './ensureRuntimeSupports.js';
 import { ensureUniqueAgentName } from './ensureUniqueAgentName.js';
 
 export interface CreateAgentCommand {
@@ -21,6 +23,7 @@ export class CreateAgent {
     private readonly organizations: OrganizationRepository,
     private readonly agents: AgentRepository,
     private readonly draftInstructions: DraftAgentInstructions,
+    private readonly runtime: RuntimeCapabilities,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
   ) {}
@@ -32,6 +35,7 @@ export class CreateAgent {
     instructionsGuidance,
   }: CreateAgentCommand): Promise<Agent> {
     requireOrganization(this.organizations, organizationId);
+    ensureRuntimeSupports(this.runtime, profile);
     ensureUniqueAgentName(this.agents, organizationId, profile.name);
     requireAgentsOfOrganization(this.agents, organizationId, collaboratorIds);
     const instructions =

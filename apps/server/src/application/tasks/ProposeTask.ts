@@ -31,6 +31,7 @@ export class ProposeTask {
     const project = requireActiveProject(this.projects, proposer.projectId);
     const proposingAgent = requireAgent(this.agents, proposer.agentId);
     const assignee = this.resolveAssignee(proposingAgent, request.assigneeName);
+    assignee.ensureCanReceiveTasks();
     if (!project.hasMember(assignee.id)) {
       throw new ValidationError(`"${assignee.name}" is not a member of this project`);
     }
