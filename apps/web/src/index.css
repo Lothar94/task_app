@@ -47,6 +47,14 @@
 
   /* Tier-3 elevation: popovers and dialogs. */
   --shadow-float: 0 8px 24px -4px rgb(0 0 0 / 0.65), 0 0 0 1px rgb(255 255 255 / 0.12);
+
+  /* Marching dashes of a live SVG edge (dash pattern 6 4: one period every 10 units). */
+  --animate-march: march 0.8s linear infinite;
+  @keyframes march {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
 }
 
 :root {
