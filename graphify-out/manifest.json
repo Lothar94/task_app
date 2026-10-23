@@ -1,0 +1,1658 @@
+{
+  "/home/lpalma/repos/task_app/eslint.config.js": {
+    "mtime": 1791873469.5932686,
+    "hash": "e12ee35491d4e662b7e4f8884189c165"
+  },
+  "/home/lpalma/repos/task_app/apps/server/vitest.config.ts": {
+    "mtime": 1791873469.5883234,
+    "hash": "082845e6609df869f268be17ccd786f7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/DeleteAgent.ts": {
+    "mtime": 1791964313.35105,
+    "hash": "64e94c4fe81a16c756866ea11e227bf8"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/QueryAgents.ts": {
+    "mtime": 1791964313.35105,
+    "hash": "12c738b50c4c0dfea1a7d44a4dd3bbc7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/SetAgentCollaborators.ts": {
+    "mtime": 1791964313.35105,
+    "hash": "ba0247d6c6572b4e89e1b887d23db57b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/ensureUniqueAgentName.ts": {
+    "mtime": 1791964313.351386,
+    "hash": "4d73bd1402dd94a417f9f9004e309ac7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/DraftAgentInstructions.ts": {
+    "mtime": 1791966265.7185712,
+    "hash": "5d782d4218f81d261790d8b9fb9e4b4b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/CreateAgent.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "34944a713b5cf49be4a97fa2bf5fdc15"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/ExportAgents.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "0656924ace9b27b0141f15a44caa72e3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/ImportAgents.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "cdb4977507e55bbee1f003508cd4fc55"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/agents/UpdateAgent.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "c1c07cc5655eb1789672bdf937d2473d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/metrics/GetTaskExecution.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "16b8eac97ef139ceb95c02559ddc3552"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/metrics/toolTiming.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "b1bc0e75c0d49565914fa7be1965d6da"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/metrics/GetUsageDashboard.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "60021a18098dc624e484776d28ece0c6"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/metrics/buildDashboard.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "6411fb66bf921fd7747e41e35b44a8b3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/metrics/usageMath.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "feddda5abfbd10e3c5f2b3389fa20321"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/Clock.ts": {
+    "mtime": 1791873469.5833554,
+    "hash": "d7d01c82185d337849f6944230c85780"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/ConversationRepository.ts": {
+    "mtime": 1791873469.5833554,
+    "hash": "bc9ab00cc902b7389fc17b38c5419e1a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/EventBus.ts": {
+    "mtime": 1791873469.5833554,
+    "hash": "0f769c28cc9fbcaa249967949cfec0ef"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/IdGenerator.ts": {
+    "mtime": 1791873469.5833554,
+    "hash": "b03b5f039b38b595f2e53e006cde91bb"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/WorkspaceProvisioner.ts": {
+    "mtime": 1791873469.5833554,
+    "hash": "d299dbdb2f557d4db0ebf3129cf885d7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/TaskRepository.ts": {
+    "mtime": 1791894328.671921,
+    "hash": "f85a8e866f7643f466653bbad18f1a14"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/OrganizationRepository.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "b8fff8120b1c6ca7f19db37a72064da8"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/ProjectRepository.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "ae3fee2913c5e0f8c3f21bd2dd81a97c"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/InstructionWriter.ts": {
+    "mtime": 1791966265.7187247,
+    "hash": "910ae5885ce0bdd3694b2c92217ee0ad"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/SkillCatalog.ts": {
+    "mtime": 1791966265.7187247,
+    "hash": "d86d7409c29b7367167136eb3c6dce0b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/PluginRegistry.ts": {
+    "mtime": 1791969070.8091753,
+    "hash": "81a7a10cacfc5bbe61d8d5a909bc7a17"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/SkillWorkspace.ts": {
+    "mtime": 1791969070.8091753,
+    "hash": "98819df5c3dcdb02b618cf2b21ce1083"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/AgentRepository.ts": {
+    "mtime": 1792067025.0574057,
+    "hash": "9cc666df538f7bbabea9fe2dc9c3eb94"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/GitWorkspace.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "9946f6af66164cc2ea5078e25159c86d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/TaskGitSnapshotRepository.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "324c94d8ba90c2b1f22805ebb8d4a063"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/TaskRunRepository.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "1c1a95ce000e9d4e5c7c77fac4f4a9fc"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/AgentRuntime.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "e0c8f748176636a4d5bfd0049bc65d4e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/ports/Logger.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "fb550bac6df5be64e100fba517383421"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/CreateProject.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "e5184f503cd7de8f62c140b1174063af"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/QueryProjects.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "65d02139308591491c593ae0387874d3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/ArchiveProject.ts": {
+    "mtime": 1792084590.942319,
+    "hash": "50d18f52fde36a09eafa957dac5ecdf1"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/SetProjectMembers.ts": {
+    "mtime": 1792084590.942319,
+    "hash": "5d5ecc27caaf0fbf0c62b6a9b0a9c8ee"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/UnarchiveProject.ts": {
+    "mtime": 1792084590.942319,
+    "hash": "cdc6d189594d1954e64725f672ae6fcf"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/GetProjectsTelemetry.ts": {
+    "mtime": 1792515313.0853233,
+    "hash": "5b19c7f3c40719fad0bf445c59a709a7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/ResumeProject.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "6944fbea2a85a984b88549915adf8bfc"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/buildProjectsTelemetry.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "418da4b129e9ab8c44a16b1771443cd8"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/ResolveProjectOrganization.ts": {
+    "mtime": 1792566993.0977132,
+    "hash": "5bae5fd5070cd3e4189c4121733e9888"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/projects/classifyFailure.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "f6b56fe0f959fde1267fe8637b0d1e9a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/security/processSafetyPolicy.ts": {
+    "mtime": 1791873469.583968,
+    "hash": "229964bbdb94ed53da2aad0c5bed6431"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/shared/dtos.ts": {
+    "mtime": 1792084590.942319,
+    "hash": "d800777dc11deb8c3f90faf7fb0f85be"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/shared/lookups.ts": {
+    "mtime": 1792084590.9439366,
+    "hash": "ba496aef02b848875a03d1aa60080c61"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/QueryTasks.ts": {
+    "mtime": 1791873469.5844393,
+    "hash": "8efe7e5a71ba96dabdbdd21420217d8a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/RunningTasks.ts": {
+    "mtime": 1791873469.5844393,
+    "hash": "eb31a42d416c5ace9d77863ad8976b83"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskExecutor.ts": {
+    "mtime": 1791873469.5844393,
+    "hash": "52506144035429db051e235c82d81483"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskLauncher.ts": {
+    "mtime": 1791873469.5844393,
+    "hash": "03c318e76e5652a58066d1dfe3ac918b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskRecorder.ts": {
+    "mtime": 1791873469.5844393,
+    "hash": "aeb0b4e8a5b8970f402bb5f93bdf0334"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/CancelTask.ts": {
+    "mtime": 1791894328.6723423,
+    "hash": "ee54996d28158aba17508a3e68f4b57b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/DequeueTask.ts": {
+    "mtime": 1791894328.6724076,
+    "hash": "d7d25f6cf745e6b1fe2e6e350f4aef06"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskQueue.ts": {
+    "mtime": 1791894328.6726747,
+    "hash": "2ccfba2cc82474e2314bc4e7daf75f78"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/EnqueueTask.ts": {
+    "mtime": 1792084590.9441996,
+    "hash": "ff79034f77697d82aeb0dbb68b3f0a3c"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/ReorderQueue.ts": {
+    "mtime": 1792084590.9441996,
+    "hash": "c136978183d5801727422aa9dc7ded8e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/SendFollowUp.ts": {
+    "mtime": 1792084590.9444191,
+    "hash": "38c13f6fd35e8188b3369766bc6eb43d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/StartTask.ts": {
+    "mtime": 1792084590.9445276,
+    "hash": "78c1f50c9091d27bd2ff8d2d7015d183"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskDelegationGateway.ts": {
+    "mtime": 1792145612.354763,
+    "hash": "d02e80bfbf7d73957ab6b866097dd3b1"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/GitScope.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "1b01de027b1afa3961ec6a9814e59cd0"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/QueryTaskGit.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "9112cbc25a5a5e9fba6ce2b4476a23fa"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/RecoverInterruptedTasks.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "2520ada38143178b77f80b4cee123c8b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/TaskGitTracker.ts": {
+    "mtime": 1792515313.0863235,
+    "hash": "fc5138dcac6f03b70f5df46bf19cea9b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/AgentBriefing.ts": {
+    "mtime": 1792566993.0981135,
+    "hash": "43185063c1dc9a5f8d86cd2f155cfa94"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/resolveRunModel.ts": {
+    "mtime": 1792566993.0981135,
+    "hash": "aeff2fa8e34aca750630659db73bc99e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/AssignTask.ts": {
+    "mtime": 1792749018.5274036,
+    "hash": "34dcf7dac07eb746397d8ba9c41647de"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/DelegateSubtask.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "e55cfc2e975298b9c4cad8927af5c7e6"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/ProposeTask.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "1e32603481520a625d852cb84e12037f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/RunTask.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "3ccf60bf2e4e6a1e8309ca19630de6dc"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/tasks/UpdateTask.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "b505c960dde4d77a89df10e496f05731"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/organizations/CreateOrganization.ts": {
+    "mtime": 1791964313.351386,
+    "hash": "a5fb0f8195a8756c165a0c829ff3edae"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/organizations/QueryOrganizations.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "fc7e147a2a7bab5fc99f919424d822cc"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/organizations/RenameOrganization.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "a64e81c91ab0cb5db8fe004be3cd50b1"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/organizations/ensureUniqueOrganizationName.ts": {
+    "mtime": 1791964313.3525288,
+    "hash": "afbfc8239d9180f6f0424f25b1bfc06d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/skills/ListSkills.ts": {
+    "mtime": 1791966265.718998,
+    "hash": "ddb70da9f6da7b28bea10f23ed153a3f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/fleet/GetFleetStatus.ts": {
+    "mtime": 1792566993.097661,
+    "hash": "e98e8ad06c6565f1a5415aa694f458e1"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/fleet/buildFleetStatus.ts": {
+    "mtime": 1792566993.0977132,
+    "hash": "403fca4febcdb2a7363051c7bec04353"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/search/SearchOrganization.ts": {
+    "mtime": 1792566993.0977132,
+    "hash": "b64d1b105e45416280ef9107b30505dd"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/application/search/matchSearch.ts": {
+    "mtime": 1792566993.0978444,
+    "hash": "38e27384ac1338cd058e0be07a38e81d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/agent/Agent.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "2e58bbcaa95b97e93b7328ff109e4484"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/conversation/ConversationMessage.ts": {
+    "mtime": 1791873469.585115,
+    "hash": "7c7db7883118f99b82eb874d1528f430"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/errors/DomainError.ts": {
+    "mtime": 1791873469.585115,
+    "hash": "e09c4712be77a4c54447e6f7d564f4b3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/project/Project.ts": {
+    "mtime": 1792084590.9447896,
+    "hash": "fe27ddf5fa0c14b6dccb40618114da04"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/shared/guards.ts": {
+    "mtime": 1792566993.0986295,
+    "hash": "a8d5886e2673bed87d82943859e310eb"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/task/TaskRun.ts": {
+    "mtime": 1792515313.0873234,
+    "hash": "9225f06b8f44280c00be94bcb3723ec7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/task/Task.ts": {
+    "mtime": 1792566993.098797,
+    "hash": "1aec1eef40856f57adc92b916d0d1bd9"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/domain/organization/Organization.ts": {
+    "mtime": 1791964313.3553677,
+    "hash": "a417a628138612d4872572ca9d16d779"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/events/InMemoryEventBus.ts": {
+    "mtime": 1791873469.5856864,
+    "hash": "5162a761cef5aa1eaf15e1262b548a5e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteConversationRepository.ts": {
+    "mtime": 1791873469.585892,
+    "hash": "d54865093b9e5f5b80200ca04de20677"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/openDatabase.ts": {
+    "mtime": 1791873469.585892,
+    "hash": "6adda879fc5b075e4031b0c4ea73a71b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteOrganizationRepository.ts": {
+    "mtime": 1791964313.3553677,
+    "hash": "e20bb98d27dc5ea2d00c95622b6b6b6b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteProjectRepository.ts": {
+    "mtime": 1792084590.9449463,
+    "hash": "65382db4da6a14ed98b2c7717e16d4bd"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteTaskGitSnapshotRepository.ts": {
+    "mtime": 1792515313.0873234,
+    "hash": "e3cb6d91fbe287a78c2d2681f5dfff8a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteTaskRunRepository.ts": {
+    "mtime": 1792515313.0873234,
+    "hash": "75bfb9fe75b116db319c494c17b3ade4"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteTaskRepository.ts": {
+    "mtime": 1792566993.098797,
+    "hash": "d1a1e10eda63517bb871c2a2cef430ef"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/SqliteAgentRepository.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "bae0d11114eb6bb88cb71972eb3aace9"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/persistence/sqlite/migrations.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "c7c45d9be4a7586d59537ebcc3c98d84"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/runtime/claude/ClaudeInstructionWriter.ts": {
+    "mtime": 1791966265.7200038,
+    "hash": "53c1ff489c04647857ee1a52977363c9"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/runtime/claude/SdkMessageMapper.ts": {
+    "mtime": 1792515313.0883234,
+    "hash": "84d22500539810dd777353f3cfff77d3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/runtime/claude/FleetToolServer.ts": {
+    "mtime": 1792566993.0993576,
+    "hash": "d3c34186e8e36bcd408c25ad41a4cbbf"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/runtime/claude/ClaudeAgentRuntime.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "bda82a5e2baca2e196ccc72521fbbb30"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/runtime/claude/buildSdkOptions.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "4993ea2902c69147a7d5f61d48b44373"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/FileSystemWorkspaceProvisioner.ts": {
+    "mtime": 1791873469.5867305,
+    "hash": "ba16a8530df70952f500952252a37574"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/SystemClock.ts": {
+    "mtime": 1791873469.5867305,
+    "hash": "25bbddd5546b4d7431676cbe5d13016f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/UuidGenerator.ts": {
+    "mtime": 1791873469.5867305,
+    "hash": "f599fdbf7d5efdf0881d8fed3f6ffaa2"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/ClaudePluginRegistry.ts": {
+    "mtime": 1791969070.8107462,
+    "hash": "0203875b1a9c41807f5065d19219f7e8"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/FileSystemSkillCatalog.ts": {
+    "mtime": 1791969070.8108952,
+    "hash": "b6d4a6985fd6d8dc4e8493b38bef03f3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/FileSystemSkillWorkspace.ts": {
+    "mtime": 1791969070.8108952,
+    "hash": "dbd50cc53864c5bf8fbc304aa9a8b43b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/GitCliWorkspace.ts": {
+    "mtime": 1792515313.0883234,
+    "hash": "1d6ca465e3fab585f5ee9f5c9334525c"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/infrastructure/system/ConsoleLogger.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "6e06d8447e31782349c7d849f5f0fb49"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/errorHandler.ts": {
+    "mtime": 1791894328.673262,
+    "hash": "3ddd42da8d4aba68d2f1ce67a820f54e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/createHttpServer.ts": {
+    "mtime": 1792566993.0995755,
+    "hash": "1dbe54308f2412474ebe0eb3f69cc482"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/eventFilter.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "24f48414d4742deb9ba103b2a7092343"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/schemas.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "f48af98c8f27ec33d0facd61e53758ab"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/organizationRoutes.ts": {
+    "mtime": 1791964313.3565092,
+    "hash": "4045c0799886e2c8ffa13e8cc6b7cc3d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/skillRoutes.ts": {
+    "mtime": 1791966265.720547,
+    "hash": "b66386f092fbd2e4c9be50cee28be6bb"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/projectRoutes.ts": {
+    "mtime": 1792515313.0883234,
+    "hash": "0eedfe268d4757f99a4f6a319a922960"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/eventRoutes.ts": {
+    "mtime": 1792566993.0995755,
+    "hash": "417dd1e744366748a98a511492b6348d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/agentRoutes.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "8e47a5d1dc1017947a98b1e11826306d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/dashboardRoutes.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "ab1b6374e47e3e1e86460e945808c389"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/shellRoutes.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "83803d4303f6149f83f75a079375164b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/interfaces/http/routes/taskRoutes.ts": {
+    "mtime": 1792749018.5284035,
+    "hash": "43725dc4ff4d4fa77b935c960845d7a0"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/main/claudeRuntimeConfig.ts": {
+    "mtime": 1791881521.553625,
+    "hash": "14dd9d93c2adc585f24ee2e733236b56"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/main/config.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "4323f631427fa9342423da179bdb3e07"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/main/container.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "6920276b7c58a5ad28f1248d1c91f3ee"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/main/seed.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "59ae90757bb64fd64fd9aa6d1f97d4fa"
+  },
+  "/home/lpalma/repos/task_app/apps/server/src/main/server.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "2ce74331d15ba66da47445f5e8502b84"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentInstructions.test.ts": {
+    "mtime": 1791966265.7216184,
+    "hash": "0f6fdc197b4173d5c936a17b5a3a47ae"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/delegation.test.ts": {
+    "mtime": 1791966265.7220058,
+    "hash": "1d1458b5b0fb24876dd99519d98714dd"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/ClaudePluginRegistry.test.ts": {
+    "mtime": 1791969070.8116727,
+    "hash": "94cbb339b382b1406c1cc4ce0a4f3dcb"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/FileSystemSkillCatalog.test.ts": {
+    "mtime": 1791969070.812089,
+    "hash": "f3984e2e0029b919c68564033b14c11d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/FileSystemSkillWorkspace.test.ts": {
+    "mtime": 1791969070.8122475,
+    "hash": "8ec6f2f0b1315fe0da087fa3187e8315"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/pluginSkills.test.ts": {
+    "mtime": 1791969070.8128388,
+    "hash": "b5886eca8602e48f68131cc27c88d8d6"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/pluginSkillsQa.test.ts": {
+    "mtime": 1791969070.8129559,
+    "hash": "5ed681b4ea795614314a2ff8ebe08a84"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/proposeTaskQa.test.ts": {
+    "mtime": 1792145612.3558383,
+    "hash": "17d1acd3b156e03580fa9f77a0cf4ddf"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/GitCliWorkspace.test.ts": {
+    "mtime": 1792515313.0883234,
+    "hash": "81ebc843004b426dda4ae1e09ebd3792"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/GitCliWorkspaceReadOnly.test.ts": {
+    "mtime": 1792515313.0883234,
+    "hash": "3b297d2af082376463abbb9277d86e08"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/autoModelToolsQa.test.ts": {
+    "mtime": 1792566993.0998704,
+    "hash": "0d6349301bb8b2f381b4143965c27536"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentExport.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "db40a78a3c04e035ab933e3df13d9565"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentExportQa.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "a42208f4f1fd31b17a56773a821e2e4f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentImport.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "d0a10be21a02f9287dba504d9715d4f7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentImportQa.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "a7c0e2e4f48a376338ce1875ff50eef8"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentSkills.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "3e458238ce9981398464342071a5dd1e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/agentSkillsQa.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "30763f38c4f2fb68619794c7026ca515"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/autoModelMigrationQa.test.ts": {
+    "mtime": 1792749018.5294034,
+    "hash": "2a0919e3124594792b04a77f4891180b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/autoModelSelectionQa.test.ts": {
+    "mtime": 1792749018.5304036,
+    "hash": "300a4b3a33d98ba11f47eb5c278f6214"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/http.test.ts": {
+    "mtime": 1792749018.5304036,
+    "hash": "14d02ed60866fef805eccb8834222afd"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/migrations.test.ts": {
+    "mtime": 1792749018.5304036,
+    "hash": "da2fa8a08682ac86d4bda960409e7639"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/modelSelection.test.ts": {
+    "mtime": 1792749018.5307052,
+    "hash": "19db04802709448285f90ec9d1b0aed9"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/organizations.test.ts": {
+    "mtime": 1792749018.5307484,
+    "hash": "0456264ddfb6a2b646c6ddd7c1b3a50b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/organizationsQa.test.ts": {
+    "mtime": 1792749018.5307882,
+    "hash": "61a8fd9ad9ee5d7cc358e7bdd6ac9a2e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/projectArchive.test.ts": {
+    "mtime": 1792749018.5308285,
+    "hash": "b743c081e9ee323682b2fbc1e34bf94f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/projectArchiveQa.test.ts": {
+    "mtime": 1792749018.5308714,
+    "hash": "6d988315214506e82e6120cfda91c15b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/projectTelemetry.test.ts": {
+    "mtime": 1792749018.5309103,
+    "hash": "25ac70eeaa2907687732bb0adc105f3b"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/projectTelemetryQa.test.ts": {
+    "mtime": 1792749018.530949,
+    "hash": "04b20283167fc9c17241006858809217"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/proposeTask.test.ts": {
+    "mtime": 1792749018.5309873,
+    "hash": "42b7f153f2e9907a8d584f963c02d220"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/shellEndpoints.test.ts": {
+    "mtime": 1792749018.5310335,
+    "hash": "5d678d299b3856019b40babee096329e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/shellEndpointsQa.test.ts": {
+    "mtime": 1792749018.531084,
+    "hash": "a8db0c27ea5e8a36a34f795466e3ff85"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/taskPlanning.test.ts": {
+    "mtime": 1792749018.5311427,
+    "hash": "0452e8ef65d34b8eb1f656e9e3de6043"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/taskPlanningQa.test.ts": {
+    "mtime": 1792749018.5311954,
+    "hash": "fe0cd5451248ea7940a54154fd11e270"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/integration/taskTelemetry.test.ts": {
+    "mtime": 1792749018.5312493,
+    "hash": "40f9d6cf134893d460df6acfcf65e357"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/support/fakeClaudeConfig.ts": {
+    "mtime": 1791969070.8130667,
+    "hash": "787fbf510a1dac8c76289fa7aa83589a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/support/FakeGitWorkspace.ts": {
+    "mtime": 1792515313.0893235,
+    "hash": "9ed0e784642c3980c60859e58278905a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/support/FakeAgentRuntime.ts": {
+    "mtime": 1792749018.5313003,
+    "hash": "71aba4ed566425721e7ed79d1eb63a26"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/support/testFleet.ts": {
+    "mtime": 1792749018.531339,
+    "hash": "3c938ec5fe70cbe8e521a6bcc019a328"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/processSafetyPolicy.test.ts": {
+    "mtime": 1791873469.5883234,
+    "hash": "b4490c28338da88a73669baf0594e517"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/Organization.test.ts": {
+    "mtime": 1791964313.3623862,
+    "hash": "44a4b2e5bc1c5db640c192de00352773"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/Project.test.ts": {
+    "mtime": 1792084590.9463189,
+    "hash": "77ee3560dbcc7dea4a222b8e48738d0d"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/GetTaskExecution.test.ts": {
+    "mtime": 1792515313.0903234,
+    "hash": "0b5d14dd5a8f6d303cc2307c7de7a1f2"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/buildProjectsTelemetry.test.ts": {
+    "mtime": 1792515313.0903234,
+    "hash": "d38b33571573bb5455b65dd07e502350"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/classifyFailure.test.ts": {
+    "mtime": 1792515313.0903234,
+    "hash": "536a4414094bc4578e452f304a6c03f7"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/toolTiming.test.ts": {
+    "mtime": 1792515313.0903234,
+    "hash": "ef6ac106a5ed0c830aa54c9b1e059f77"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/Agent.test.ts": {
+    "mtime": 1792566993.10134,
+    "hash": "2403efc6c6b574b4fb6ffe77c101c82f"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/AgentBriefing.test.ts": {
+    "mtime": 1792566993.10138,
+    "hash": "9ac8e3e652a93ff783965e94d1527dad"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/DelegateSubtask.test.ts": {
+    "mtime": 1792566993.101408,
+    "hash": "718476922377e44333057e41211488d3"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/Task.test.ts": {
+    "mtime": 1792566993.101767,
+    "hash": "e18b904b0367f81b7753fe753fda2ef5"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/buildFleetStatus.test.ts": {
+    "mtime": 1792566993.1018229,
+    "hash": "f61fa02b6f161e04adad4b8a5a891d2c"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/matchSearch.test.ts": {
+    "mtime": 1792566993.10187,
+    "hash": "ce3af6f3bdc57cb9fd2088226d4fefdd"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/resolveRunModel.test.ts": {
+    "mtime": 1792566993.1018958,
+    "hash": "f2b6a4eb138ed52b8913b1b47e7cc8ef"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/TaskGit.test.ts": {
+    "mtime": 1792749018.5313823,
+    "hash": "4f3ee412a05105c30e599a7ad0c41693"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/buildDashboard.test.ts": {
+    "mtime": 1792749018.5314035,
+    "hash": "544b93882e752cfb903e41f199181b5a"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/buildSdkOptions.test.ts": {
+    "mtime": 1792749018.531724,
+    "hash": "8234b884446ebedc5ee7ef2c09d658b1"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/config.test.ts": {
+    "mtime": 1792749018.5317707,
+    "hash": "54303ad30ec7ee9d080eb39a9ab9ce7e"
+  },
+  "/home/lpalma/repos/task_app/apps/server/test/unit/eventFilter.test.ts": {
+    "mtime": 1792749018.5318027,
+    "hash": "fd9361dc0cfc2440e81dd8fdd9b59a8a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/vite.config.ts": {
+    "mtime": 1791873469.5932686,
+    "hash": "05dc6060616476f01949bf1f38e2cdfc"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/main.tsx": {
+    "mtime": 1791964313.3682764,
+    "hash": "8b7bf90749c71f410406de18415f9de6"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/App.tsx": {
+    "mtime": 1792566993.1021094,
+    "hash": "bd8fceea775e8ff0baa26d2239a6fc7d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/httpClient.ts": {
+    "mtime": 1791873469.5890079,
+    "hash": "6e57893e2b2afe35f52e5a3e50926939"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/organizationsApi.ts": {
+    "mtime": 1791964313.3644943,
+    "hash": "258f318a678b53dd496d9a95ee9b3572"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/skillsApi.ts": {
+    "mtime": 1791966265.723246,
+    "hash": "0c2cf8a7ff37128a2977dcde0b0cba76"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/projectsApi.ts": {
+    "mtime": 1792515313.0913234,
+    "hash": "22f7933a8b32af8ea56bff0245e0670d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/shellApi.ts": {
+    "mtime": 1792566993.1021607,
+    "hash": "09f1a720de9c223508c684637720f161"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/agentsApi.ts": {
+    "mtime": 1792749018.5318398,
+    "hash": "2f704493c29bba2a34d0473ca998ca25"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/dashboardApi.ts": {
+    "mtime": 1792749018.5318677,
+    "hash": "198ffa01646273f9294305ad2c10b2d6"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/queryKeys.ts": {
+    "mtime": 1792749018.5320399,
+    "hash": "5b50e0449fd8c2649f87f5989aa53c0d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/api/tasksApi.ts": {
+    "mtime": 1792749018.5320892,
+    "hash": "5d50941179a42e95800a790e227afc40"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/Accordion.test.tsx": {
+    "mtime": 1792515313.0913234,
+    "hash": "c93d65f62eb766fec1b6ec53e426c345"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/Accordion.tsx": {
+    "mtime": 1792515313.0913234,
+    "hash": "99d36b7d5d7d7b885743d4a046890ff0"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/Dialog.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "a526f53c763abf683badb22cb56b709e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/ErrorBoundary.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "aa62bf29693fa4b569a5dd75c1000582"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/Markdown.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "3ff8a99929479b58a0289d4dee3230aa"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/StatTile.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "495ebd9b8b58ba40fd4e9a084e79fe36"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/Tabs.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "ca74486ad38222acec73e0e28792513f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/ui.test.tsx": {
+    "mtime": 1792515313.0923235,
+    "hash": "c86c7079e28e20decd3479b2caae5e98"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/components/ui.tsx": {
+    "mtime": 1792566993.1023684,
+    "hash": "b6a001d81bdec9c13aaee9530b5a2512"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/SkillsField.test.tsx": {
+    "mtime": 1791969070.8144612,
+    "hash": "3c23c923ae90ad4727034f58f66b6bee"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ExportButtons.tsx": {
+    "mtime": 1791994362.9492447,
+    "hash": "5c9119d18fa676196ae44c3d330b4db4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ExportToolbar.test.tsx": {
+    "mtime": 1791994362.9492447,
+    "hash": "fb3474385721e070bbaac68736f531f0"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentExport.test.ts": {
+    "mtime": 1791994362.9497473,
+    "hash": "f83182649305ede8c7798db6190eae98"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/useAgentExportSelection.ts": {
+    "mtime": 1791994362.949815,
+    "hash": "465887539397b1ac18cb0223ec37f953"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ImportButton.tsx": {
+    "mtime": 1792067025.062152,
+    "hash": "3e8e5761bb0d33c4fe97a017f24f892d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ImportDialog.tsx": {
+    "mtime": 1792067025.062152,
+    "hash": "0c76d18f83157a7dbf0b82e381a2e8f2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ImportDialogView.test.tsx": {
+    "mtime": 1792067025.062152,
+    "hash": "ad4c71182a38e3bc1a77a5808088fdfb"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentAvatar.test.ts": {
+    "mtime": 1792515313.0923235,
+    "hash": "9f078667a9fda950c7aef074d7ccee8b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentAvatar.tsx": {
+    "mtime": 1792515313.0933235,
+    "hash": "fb98fac2f782915906f3e6caf3606c6a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentEditorPage.tsx": {
+    "mtime": 1792515313.0933235,
+    "hash": "0d9706abb95cc26f3da88fc578d58857"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentSection.tsx": {
+    "mtime": 1792515313.0933235,
+    "hash": "e89fd1307716a053a214eabd282b3305"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ExportToolbar.tsx": {
+    "mtime": 1792515313.0933235,
+    "hash": "e0210d52a82cd50707a9a095d09cc8a0"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/ImportDialogView.tsx": {
+    "mtime": 1792515313.0943234,
+    "hash": "76b43e3b91b74315fed53b74e20a6859"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/InstructionsField.tsx": {
+    "mtime": 1792515313.0943234,
+    "hash": "cbf3014159a7fa0c917f66685ef17586"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/SkillsField.tsx": {
+    "mtime": 1792515313.0943234,
+    "hash": "2ffd16f989680218fc85d77793cda494"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentSheetModel.test.ts": {
+    "mtime": 1792515313.0943234,
+    "hash": "d8bbd8e49bfa19d798e027c15a49fe9d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentSheetModel.ts": {
+    "mtime": 1792515313.0943234,
+    "hash": "c15ceeb502c230c2e2709973b0aa97e7"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentDetailPage.tsx": {
+    "mtime": 1792566993.1028683,
+    "hash": "f5019328a92d1e1f3448e08f200eee4b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentForm.tsx": {
+    "mtime": 1792566993.103214,
+    "hash": "50d24d693f3cd9f04d0d99e321f56d9c"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentFormModelSelectionQa.test.tsx": {
+    "mtime": 1792566993.1032548,
+    "hash": "d9a38e7bed860dbdd35003dbe71b56bd"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentFormModel.test.ts": {
+    "mtime": 1792566993.1041822,
+    "hash": "05fcaaf554356a9dbf9e5e1a496f6dd3"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentFormModel.ts": {
+    "mtime": 1792566993.1041822,
+    "hash": "759a70f2240b427abd8cd527c0713386"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentImport.test.ts": {
+    "mtime": 1792566993.1041822,
+    "hash": "b51035a1d5a1e4063398e6cd465e95a5"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentImport.ts": {
+    "mtime": 1792566993.1041822,
+    "hash": "31f0b69ad4bf32a184a1e62c3034634a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentLabels.test.ts": {
+    "mtime": 1792566993.104523,
+    "hash": "aab70ac0d676052c01b3a9c99e4e79d4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentLabels.ts": {
+    "mtime": 1792566993.1045532,
+    "hash": "c80f34016a8344dcdc02688b2d163302"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentSheet.tsx": {
+    "mtime": 1792749018.5320892,
+    "hash": "4560d8e26a895d2732798104be7e1cf4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/AgentsPage.tsx": {
+    "mtime": 1792749018.5321796,
+    "hash": "86517953814b65d7da9db5a239ffb23c"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/FleetTiles.tsx": {
+    "mtime": 1792749018.5321796,
+    "hash": "f73625a9f8e066b17bd95e1a5a818254"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentExport.ts": {
+    "mtime": 1792749018.5321796,
+    "hash": "435889b4095a6684016dc9e8e627bf90"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/agentQueries.ts": {
+    "mtime": 1792749018.5321796,
+    "hash": "6d1ed67b6947eff89ed7e1fb833944db"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/diagram/agentGraphLayout.test.ts": {
+    "mtime": 1791873469.5904982,
+    "hash": "4f42e20aa5ea3f191b54efba5fd692b5"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/diagram/agentGraphLayout.ts": {
+    "mtime": 1792515313.0953236,
+    "hash": "0a03b81dd65e7b1e2ce729b968df6782"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/agents/diagram/AgentGraph.tsx": {
+    "mtime": 1792749018.5321796,
+    "hash": "a1848ba3a0982bd7fd0c3d80d225115c"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/timeAgo.ts": {
+    "mtime": 1791873469.5910559,
+    "hash": "a977346ebe21d9409c54f8c0ab03a52d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/AgentUsageTable.tsx": {
+    "mtime": 1792749018.5321796,
+    "hash": "62f2ecd4b4c9e116fc9af926dcc37734"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/DashboardPage.tsx": {
+    "mtime": 1792749018.5324035,
+    "hash": "d5fe953c3a3106a823f7bafc3322fc12"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/ErrorList.tsx": {
+    "mtime": 1792749018.5332346,
+    "hash": "10a0549694dfa9f5c5a80509a641476b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/Headline.tsx": {
+    "mtime": 1792749018.533527,
+    "hash": "190fe537d6bfe1ee9fab19664d04cc56"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/ModelUsageTable.tsx": {
+    "mtime": 1792749018.533527,
+    "hash": "c2e3838a6fce4c0c4cda3fc39639315b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/dashboardModel.test.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "fc11db45cac1496bb75a5d3ee98f50bc"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/dashboardModel.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "180e3de66fda777705b10a0a563d159e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/dashboardQueries.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "bd27d91b1aba9c381edf9ac3565d8d73"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/charts/OutcomeBar.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "084a34ecbe1a3e414ec95216eb3b71a6"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/charts/useChartTooltip.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "2d2854da06deaa4c3260756c5638fa0e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/charts/DailyActivityChart.tsx": {
+    "mtime": 1792749018.5338204,
+    "hash": "8d3993a9db4da49bd4fc240632d781c0"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/dashboard/charts/ModelTokensChart.tsx": {
+    "mtime": 1792749018.5338204,
+    "hash": "46efb0eb7364ca079bb093dfe55bb244"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectForm.tsx": {
+    "mtime": 1791873469.5910559,
+    "hash": "6fac8e7c153542ec66c013172023d0ef"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectArchive.test.tsx": {
+    "mtime": 1792084590.9496791,
+    "hash": "1a3d62cbbfa1b5311bdbc67d2e698152"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectMembers.test.tsx": {
+    "mtime": 1792084590.9496791,
+    "hash": "8badabf747cf55eab058027a69a0ef9d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ActiveSubtaskRow.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "109ba4ce4fd8fbd0004d46b79d9da7f7"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectArchive.tsx": {
+    "mtime": 1792515313.0973234,
+    "hash": "4d2c1ae9a691c8e842c50f241864f86d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectListControls.tsx": {
+    "mtime": 1792515313.0973234,
+    "hash": "ca8658917409a4beff34aec901de41eb"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectMembers.tsx": {
+    "mtime": 1792515313.0973234,
+    "hash": "28a90698a96d4a3d4219dde9f21fa059"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectPage.tsx": {
+    "mtime": 1792515313.0973234,
+    "hash": "ad3b53ffaeb85f023fb4abb905f6b1cc"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectStats.tsx": {
+    "mtime": 1792515313.0973234,
+    "hash": "8b5c2a666e1f885a7e44c9eebdf9ca53"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectTelemetryCells.tsx": {
+    "mtime": 1792515313.0983233,
+    "hash": "177b43f741b7fa387daa2c714e258e28"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectTiles.tsx": {
+    "mtime": 1792515313.0983233,
+    "hash": "0d64de23c5f7826fd301a941a2360f6f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectsPageQa.test.tsx": {
+    "mtime": 1792515313.0983233,
+    "hash": "c44f36d1e0e86934950e51ffcd175760"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ResumeProjectDialog.test.tsx": {
+    "mtime": 1792515313.0983233,
+    "hash": "a1c38565f7d85b84a7f0a10280bab749"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ResumeProjectDialog.tsx": {
+    "mtime": 1792515313.0983233,
+    "hash": "bdb1cf20a01f40409aabed44e49a8200"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/projectAlertLabels.ts": {
+    "mtime": 1792515313.0983233,
+    "hash": "3824752991a3fcb334b12b34683860f9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/projectListModel.test.ts": {
+    "mtime": 1792515313.0983233,
+    "hash": "f1397b60271b78a8a6ca4db18451def9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/projectListModel.ts": {
+    "mtime": 1792515313.0983233,
+    "hash": "1775b301f541c159d1732cb0b04fb05e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/projectQueries.ts": {
+    "mtime": 1792515313.0993235,
+    "hash": "ad2362904fc3a435eeaa61106381e658"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ExecutionStack.tsx": {
+    "mtime": 1792563812.1906502,
+    "hash": "7771ebb4e839b93eaef30d977fb62a18"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectInspection.tsx": {
+    "mtime": 1792563812.191885,
+    "hash": "a8e560e8bbf4d347eded960ddbba18d6"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectTable.test.tsx": {
+    "mtime": 1792563812.191976,
+    "hash": "6a3568bf881098cf7d58d57beec1fe1e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectTable.tsx": {
+    "mtime": 1792563812.1920283,
+    "hash": "07bd81bdcb17e60d8e467d3c9d0e4cb1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectsPage.tsx": {
+    "mtime": 1792563812.1920717,
+    "hash": "24b1e9598bd47e24455b2d2537e372d8"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/SwarmTopology.tsx": {
+    "mtime": 1792563812.1920948,
+    "hash": "b0aefc35d043eeac83bbfc0d52a573e1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/inspectionModel.ts": {
+    "mtime": 1792563812.1921453,
+    "hash": "4a810406e75e1f666cfe24f7e7ffe8b7"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectInspection.test.tsx": {
+    "mtime": 1792566993.1049917,
+    "hash": "2deedb58666a67ac2f27f2afd41f1de9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/ProjectInspectionQa.test.tsx": {
+    "mtime": 1792566993.1051414,
+    "hash": "8169f9130d52ac8100d08296241a7274"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/projects/inspectionModel.test.ts": {
+    "mtime": 1792566993.1051838,
+    "hash": "f293b178dfdb4da0f9de0b876c325c64"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/queueModel.test.ts": {
+    "mtime": 1791894328.6772618,
+    "hash": "a92b242ad327212ac6ded533ea5be1c9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/queueModel.ts": {
+    "mtime": 1791894328.6772618,
+    "hash": "b9d3c1ac37575548340baaa24009a7d1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskFormModel.test.ts": {
+    "mtime": 1791894328.677627,
+    "hash": "77fc4b683511efa84b08370f014b1d52"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/planningEdgeCases.test.ts": {
+    "mtime": 1792145612.3577569,
+    "hash": "04717c9f4edf2518c2015d7be8b82a25"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskBrief.test.tsx": {
+    "mtime": 1792401860.9586914,
+    "hash": "dd79fb109578843ea8ec71695861811b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ConversationHeader.test.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "91b4a49d1faf448d96755c63b6d4af9d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ConversationHeader.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "a8a98daf782f41799a7e86c996751739"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ConversationPanel.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "c7b1a18db748f1e98b15e39e9a0d3c61"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ConversationView.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "0438c2c91a05d864f03a4d4530da450b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/DiffView.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "e5bc9ac2ad692178038e5ce87dcdd2e7"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ExecutionMetrics.tsx": {
+    "mtime": 1792515313.0993235,
+    "hash": "bb1e32796aa4f8e378153f104caffdd9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/FollowUpForm.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "ad833249d2b62999cea523eeb394817b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/GitContextSection.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "0b8e3c5fd04561da5fd17c3fc1087d43"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/InspectorSection.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "4ae92c72721350b4e6af963474ca33af"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/LabelFields.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "181fa31099e3bbb63980c1cc86191640"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ProposalNote.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "69b0764f0bf177d0f5f0d99d65c9674e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/QueueCard.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "64634bee259bd8607191e906c43d7959"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ResultActions.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "e3df65691799ea1fcbcb63793bdcf724"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ResultPanel.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "1015689abb0672e2857536cfca288670"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskBrief.tsx": {
+    "mtime": 1792515313.1003234,
+    "hash": "ea7541e6222510cfb1912a7ce688b30d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskEditForm.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "f865d6fe4a6f530dc4f21a3e04aa7ade"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskInspector.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "e71e2ca3d8066fdd94a3dfdb6a42120a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskLabels.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "e168076785fb96d5cfe212c5fbec51a2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskList.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "9b0d3a0630449c787cdcb2b80da00cac"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskPanelToggles.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "7410b939b84dd700611ce8d063c8095a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskStatusBadge.test.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "d18fd750cc818c7fb8e3977d2a9824de"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskStatusBadge.tsx": {
+    "mtime": 1792515313.1013234,
+    "hash": "db5d7365e02c0cd2af945804ad8c3075"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskTree.tsx": {
+    "mtime": 1792515313.1023235,
+    "hash": "9d1bc1388846257eab2087953a35925b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/conversationModel.test.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "18d595de7e72b331457185086a161280"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/conversationModel.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "811fb4acee518c28208d36827c2aa71b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/diffModel.test.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "0fe6794db27fa7bc4f3fde3e5083db36"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/diffModel.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "031348f4898d9f17d36485f6338771d2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/executionModel.test.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "1cdef2e9a4f12c7d07c92207fc2e319a"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/executionModel.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "20c4e3556ae1e065a212b29af39a9d41"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/gitContextModel.test.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "44257ae9e7cabb146687746fd369d728"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/gitContextModel.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "4304addfc3874928cc92c35d4398b97b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/stickToBottom.test.ts": {
+    "mtime": 1792515313.1023235,
+    "hash": "581a08ead11e863b9911e32a45e21895"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/stickToBottom.ts": {
+    "mtime": 1792515313.1033235,
+    "hash": "a988680cbd3b0afe5f4c0052a1e2ccef"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskLabel.tsx": {
+    "mtime": 1792515313.1033235,
+    "hash": "7dbf18974695f26f04719eef584ea7ce"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskListModel.ts": {
+    "mtime": 1792515313.1033235,
+    "hash": "c56bb483d284ca3985e6e3f02373d4f9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskPanelStyles.ts": {
+    "mtime": 1792515313.1033235,
+    "hash": "6032b4ff8ea2b91bd5fa50ee39f41cc9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskTreeModel.ts": {
+    "mtime": 1792515313.1033235,
+    "hash": "a5b067733b735430c671411ef46d2ff3"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/telemetryViews.test.tsx": {
+    "mtime": 1792515313.1033235,
+    "hash": "34006c3d815b3f20802cf27a567eb3ed"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/useInspectorDrawer.ts": {
+    "mtime": 1792515313.1043234,
+    "hash": "319b4a0ded030f59e7d31263f60abee4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/useMastheadHeight.ts": {
+    "mtime": 1792515313.1043234,
+    "hash": "e472fa52ec9fb49a6ba0dc317f0956e6"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/AssignTaskForm.tsx": {
+    "mtime": 1792566993.1058,
+    "hash": "bccd473be9c2d12db3a1d011a6a3c555"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/AssignTaskFormModelChoiceQa.test.tsx": {
+    "mtime": 1792566993.1059391,
+    "hash": "3dfee0e9d96bdb5aa94a256f4587da79"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ModelChoiceFields.test.tsx": {
+    "mtime": 1792566993.105964,
+    "hash": "0f71258a5af7784e7b4f80774e811114"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/ModelChoiceFields.tsx": {
+    "mtime": 1792566993.105984,
+    "hash": "eb49ea38dbadb156e5588a30a3ef1b7f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskModelChoice.tsx": {
+    "mtime": 1792566993.1060073,
+    "hash": "2fa89dd97e9c5634d5894023e0e1690e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskPage.tsx": {
+    "mtime": 1792566993.1062677,
+    "hash": "2c6de6132cbfd94ce8b9b1311192ba66"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/TaskWorkspace.tsx": {
+    "mtime": 1792566993.1064894,
+    "hash": "b0cdbe3fb5bc7da261832f3cb2b6f952"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/modelChoice.test.ts": {
+    "mtime": 1792566993.1065128,
+    "hash": "052880790c01ece0ec74236b00416078"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskFormModel.ts": {
+    "mtime": 1792566993.1065514,
+    "hash": "bef866cf4d58f37fb8fa5921b9fd8d45"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskListModel.test.ts": {
+    "mtime": 1792566993.106793,
+    "hash": "ea0dddef8f8ece7d99a3fa3fd2e9f258"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskTreeModel.test.ts": {
+    "mtime": 1792566993.1068263,
+    "hash": "4163721b9cae3082fe58807f8f7b725e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/tasks/taskQueries.ts": {
+    "mtime": 1792749018.534372,
+    "hash": "8717b3a8170330a75c7f911f87524bc4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/theme/theme.test.ts": {
+    "mtime": 1791881176.0107698,
+    "hash": "3c0e5e4b33846e55abb1f214e428bf4e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/theme/theme.ts": {
+    "mtime": 1791881176.0107698,
+    "hash": "48c6c8a9c808fbde1d3486b105478f81"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/theme/useTheme.ts": {
+    "mtime": 1791881176.0107698,
+    "hash": "08ea340e7849ed24bc7956109b98e3b2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/theme/ThemeToggle.tsx": {
+    "mtime": 1792515313.1043234,
+    "hash": "f222073a174c8998a64b0da8e8a81bb1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/OrganizationContext.tsx": {
+    "mtime": 1791964313.36573,
+    "hash": "cd439bbc8bceb64efd6c3094792ac392"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/organizationModel.test.ts": {
+    "mtime": 1791964313.3663843,
+    "hash": "69e15b19d35392cf024133ef6682a995"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/organizationModel.ts": {
+    "mtime": 1791964313.3664787,
+    "hash": "0d0ed3d3cbc32487ba4fcd106668ecd1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/organizationQueries.ts": {
+    "mtime": 1791964313.3665745,
+    "hash": "43aa8f31b63f19a4bdd47a0b2493b48b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/OrganizationNameForm.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "59def44673ebf6e235ffb7933a1042ae"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/OrganizationSelect.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "63e345d9d188c927948e7069d1091db9"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/organizations/OrganizationsPage.tsx": {
+    "mtime": 1792515313.0963235,
+    "hash": "ad1c00b04e2ef4baa30f3d64ee8296e4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/FleetStatusBar.test.tsx": {
+    "mtime": 1792566993.1052036,
+    "hash": "b31908b624daa120d6edad60fb9b1a30"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/FleetStatusBar.tsx": {
+    "mtime": 1792566993.105222,
+    "hash": "38ebd119389a05bbdf7d960ef5ee17aa"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/FleetStatusBarQa.test.tsx": {
+    "mtime": 1792566993.1052525,
+    "hash": "ed639209e1829c1d39ec43b219a2ad63"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/GlobalSearch.test.tsx": {
+    "mtime": 1792566993.1052747,
+    "hash": "3e7943bfd82fcee9349b1315993d25f2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/GlobalSearch.tsx": {
+    "mtime": 1792566993.1052914,
+    "hash": "f60e19fc48341a6834d67e19540247ad"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/GlobalSearchQa.test.tsx": {
+    "mtime": 1792566993.1053193,
+    "hash": "a51951e73feeb3f37b655827b36a02fa"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/NotificationCenter.test.tsx": {
+    "mtime": 1792566993.105341,
+    "hash": "ef71754fe61bd4e87aec61deb5748f8b"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/NotificationCenter.tsx": {
+    "mtime": 1792566993.1053617,
+    "hash": "4c303a0b5bd6f88ce9558e3382b0b4f1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/NotificationCenterQa.test.tsx": {
+    "mtime": 1792566993.1053832,
+    "hash": "f33c2d8d165db957d6984cad7acdd085"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/NotificationItem.tsx": {
+    "mtime": 1792566993.1054013,
+    "hash": "78857843c42ff874dff7c6fc904d687d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/NotificationPanel.tsx": {
+    "mtime": 1792566993.1054168,
+    "hash": "4c9560da29fb7bb242305eec6cc5a2da"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/SearchCombobox.tsx": {
+    "mtime": 1792566993.1054375,
+    "hash": "cad832c36d08591ffd7de0c3c7bafe74"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/SearchResults.tsx": {
+    "mtime": 1792566993.1054568,
+    "hash": "951830f91f01718d06e4551c743d2185"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationModelQa.test.ts": {
+    "mtime": 1792566993.1055088,
+    "hash": "145d1779c157ab61793e4a3ec544cd81"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationStorage.test.ts": {
+    "mtime": 1792566993.1055255,
+    "hash": "7d91b29cc85b700327447fde98441f83"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationStorage.ts": {
+    "mtime": 1792566993.105543,
+    "hash": "1d5664894029beebadf5396ab11feb4e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationStorageQa.test.ts": {
+    "mtime": 1792566993.1055665,
+    "hash": "e3e392a21c3d69e357eaba3238a969c4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/searchModel.test.ts": {
+    "mtime": 1792566993.1056032,
+    "hash": "8e8322fd985b417a9ee1a911fe0a0358"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/searchModel.ts": {
+    "mtime": 1792566993.105624,
+    "hash": "2e73f43a0808e6f02292f81d0bd24662"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/searchModelQa.test.ts": {
+    "mtime": 1792566993.1056435,
+    "hash": "e53ccc1f5e7740868829d4e84e51a108"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useFleetStatus.ts": {
+    "mtime": 1792566993.1056595,
+    "hash": "7a576e88ab0950e812f1ee59b55ed693"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useGlobalSearch.ts": {
+    "mtime": 1792566993.1056757,
+    "hash": "2edb32b611e042b555b2662deeb514a5"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useNotifications.ts": {
+    "mtime": 1792566993.105693,
+    "hash": "745a7531caeb64240b6d077de3150a21"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useSearchCombobox.ts": {
+    "mtime": 1792566993.1057432,
+    "hash": "62046cf71f144bd29e5ca53489e2ff3d"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useSearchShortcut.ts": {
+    "mtime": 1792566993.1057582,
+    "hash": "2a359891fb76951c36bc8a7fd72d7e5e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationTestData.ts": {
+    "mtime": 1792581109.0496488,
+    "hash": "861326d406eb764e11b97fe66381701f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationModel.test.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "90d552f23f81b8310ef1254e1bd62f56"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/notificationModel.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "f1cd080edb155461f07a8698eeb50f1e"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useOrganizationEvents.test.tsx": {
+    "mtime": 1792749018.5338204,
+    "hash": "5fe61328b317742ba433f88e15156ef1"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/features/shell/useOrganizationEvents.ts": {
+    "mtime": 1792749018.5338204,
+    "hash": "7e002141fd464ee2367b9d3939c95baf"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useNow.ts": {
+    "mtime": 1791873469.5929844,
+    "hash": "83def49deac5fc58ea418ee725a689a4"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useStoredChoice.ts": {
+    "mtime": 1791873469.5929844,
+    "hash": "aba070a97b48fd9ea47698c1ae2bd384"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useProjectsLiveTelemetryQa.test.tsx": {
+    "mtime": 1792515313.1043234,
+    "hash": "aadafbd711417d64b3c587a4430b7ef2"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useDebouncedValue.ts": {
+    "mtime": 1792566993.1068263,
+    "hash": "7d42fdbc501c51b6636e7dcd6185aa7f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useFleetEvents.ts": {
+    "mtime": 1792749018.534372,
+    "hash": "96980f0cb21ea65ea62ac5edc5f6e77f"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useProjectsLiveTelemetry.test.tsx": {
+    "mtime": 1792749018.534372,
+    "hash": "a665f37398d61ea7642d52c734e4f142"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/hooks/useProjectsLiveTelemetry.ts": {
+    "mtime": 1792749018.534372,
+    "hash": "b7e769eced600007e2de9ac4671d0217"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/lib/format.test.ts": {
+    "mtime": 1791873469.5929844,
+    "hash": "38ef51aa7ef685f3ba6582baef65c701"
+  },
+  "/home/lpalma/repos/task_app/apps/web/src/lib/format.ts": {
+    "mtime": 1792749018.535012,
+    "hash": "8d377a470d639acc3b360f1e92c32c96"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/conversation.ts": {
+    "mtime": 1791873469.5938258,
+    "hash": "b6f066640458ce0da5258dee9f070ec7"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/organizations.ts": {
+    "mtime": 1791964313.368489,
+    "hash": "ee63b2e7861c31303d8ec0574f854cdf"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/projects.ts": {
+    "mtime": 1792084590.9515333,
+    "hash": "f64deb9f5079066b72c251a093e19521"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/projectTelemetry.ts": {
+    "mtime": 1792515313.1193235,
+    "hash": "dd0a7ea483514a7f844606799e51d65f"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/telemetry.ts": {
+    "mtime": 1792515313.1193235,
+    "hash": "2a2df83e73ea5d29e5123ddff08390be"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/shell.ts": {
+    "mtime": 1792566993.1073246,
+    "hash": "3301d27503578d2531bdc9d91d647d21"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/tasks.ts": {
+    "mtime": 1792566993.1073685,
+    "hash": "0c05fae3ea283113d31d9c1771958d8e"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/agents.ts": {
+    "mtime": 1792749018.535012,
+    "hash": "e88f658096986d968883751f7edc0e67"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/events.ts": {
+    "mtime": 1792749018.535012,
+    "hash": "03ba0a39321a9c98b0ebc504e35bac76"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/index.ts": {
+    "mtime": 1792749018.535012,
+    "hash": "0b4f97327bdd9b855352e9a89b0768d9"
+  },
+  "/home/lpalma/repos/task_app/packages/shared/src/metrics.ts": {
+    "mtime": 1792749018.535012,
+    "hash": "951f3c25c6420f4e437e55ce2eaacb18"
+  },
+  "/home/lpalma/repos/task_app/pnpm-workspace.yaml": {
+    "mtime": 1791873469.594355,
+    "hash": "f53a83de120c7190a346b17c8aab9d26"
+  },
+  "/home/lpalma/repos/task_app/README.md": {
+    "mtime": 1792067025.0542872,
+    "hash": "4c243ee5ded4e76f22d783c5d9e6a099"
+  },
+  "/home/lpalma/repos/task_app/apps/web/index.html": {
+    "mtime": 1792515313.0913234,
+    "hash": "4bc3d28e853ad5062db1777b2fee4584"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/DESIGN.md": {
+    "mtime": 1792515313.1058269,
+    "hash": "35318d26c00d2770aa0ca7ab83f5b666"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/agentes_y_organigrama_de_flota/code.html": {
+    "mtime": 1792515313.1060555,
+    "hash": "e431a3e8ca8df0937b17d149bc5a9957"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/dashboard_de_m_tricas_y_flota/code.html": {
+    "mtime": 1792515313.1093235,
+    "hash": "7e68a5c470ff08eaa557fda971de102b"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/detalle_de_tarea_chat_de_ejecuci_n/code.html": {
+    "mtime": 1792515313.1123235,
+    "hash": "41627cf1baf97133aedf02e886047ab1"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/proyectos/code.html": {
+    "mtime": 1792515313.1173236,
+    "hash": "047cf246d521a87adac0bf6427a1f667"
+  },
+  "/home/lpalma/repos/task_app/docs/qa/auto-model-selection.md": {
+    "mtime": 1792566993.1069286,
+    "hash": "ea10891c39c2a95e2a92521f28072427"
+  },
+  "/home/lpalma/repos/task_app/docs/qa/global-shell.md": {
+    "mtime": 1792566993.1070707,
+    "hash": "cca63fa5cc5ccce597e86b8195313ebd"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/agentes_y_organigrama_de_flota/screen.png": {
+    "mtime": 1792515313.1083236,
+    "hash": "952a571130b16e82f5157400c413fdb2"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/dashboard_de_m_tricas_y_flota/screen.png": {
+    "mtime": 1792515313.1113236,
+    "hash": "fc6fa2feef35fc66f73c150553054f3f"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/detalle_de_tarea_chat_de_ejecuci_n/screen.png": {
+    "mtime": 1792515313.1163235,
+    "hash": "5807fc6a816133c54c2dc17d0cf53b2d"
+  },
+  "/home/lpalma/repos/task_app/docs/design/obsidian-fleet/proyectos/screen.png": {
+    "mtime": 1792515313.1193235,
+    "hash": "059b55fddcd85a2d204767da878eaebc"
+  }
+}
