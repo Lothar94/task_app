@@ -5,10 +5,12 @@ import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/Claude
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
 import { ClaudeUserMcpServers } from '../infrastructure/runtime/claude/ClaudeUserMcpServers.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
+import { ClaudeOAuthPlanUsageSource } from '../infrastructure/system/ClaudeOAuthPlanUsageSource.js';
 import { ClaudePluginRegistry } from '../infrastructure/system/ClaudePluginRegistry.js';
 import { FileSystemSkillCatalog } from '../infrastructure/system/FileSystemSkillCatalog.js';
 import { FileSystemSkillWorkspace } from '../infrastructure/system/FileSystemSkillWorkspace.js';
 import { ConsoleLogger } from '../infrastructure/system/ConsoleLogger.js';
+import { SystemClock } from '../infrastructure/system/SystemClock.js';
 import { claudeRuntimeConfig } from './claudeRuntimeConfig.js';
 import { loadConfig } from './config.js';
 import { createContainer } from './container.js';
@@ -35,6 +37,10 @@ async function main(): Promise<void> {
       plugins,
     ),
     logger,
+    planUsageSource: new ClaudeOAuthPlanUsageSource(
+      join(config.claudeConfigDir, '.credentials.json'),
+      new SystemClock(),
+    ),
     maxDelegationDepth: config.maxDelegationDepth,
     appVersion: config.appVersion,
     reservedPorts: config.reservedPorts,

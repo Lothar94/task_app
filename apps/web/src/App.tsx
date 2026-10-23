@@ -10,6 +10,7 @@ import { OrganizationsPage } from './features/organizations/OrganizationsPage';
 import { useCurrentOrganization } from './features/organizations/OrganizationContext';
 import { ProjectPage } from './features/projects/ProjectPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
+import { PlanUsageIndicator } from './features/planUsage/PlanUsageIndicator';
 import { GlobalSearch } from './features/shell/GlobalSearch';
 import { FleetStatusBar } from './features/shell/FleetStatusBar';
 import { NotificationCenter } from './features/shell/NotificationCenter';
@@ -50,6 +51,7 @@ function Layout() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <GlobalSearch />
+          <PlanUsageIndicator />
           <NotificationCenter />
           <NavLink to="/organizations" className={navLinkClass}>
             <Building2 aria-hidden className="size-4" />

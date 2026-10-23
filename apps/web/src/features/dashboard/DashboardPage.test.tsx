@@ -5,12 +5,15 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dashboardApi } from '../../api/dashboardApi';
+import { planUsageApi } from '../../api/planUsageApi';
+import { planUsage } from '../planUsage/planUsageFixtures';
 import { dashboard, modelRow, totals } from './dashboardFixtures';
 import { DashboardPage } from './DashboardPage';
 
 vi.mock('../organizations/OrganizationContext', () => ({ useCurrentOrganization: () => ({ id: 'org' }) }));
 vi.mock('../projects/projectQueries', () => ({ useProjects: () => ({ data: [] }) }));
 vi.mock('../../api/dashboardApi', () => ({ dashboardApi: { get: vi.fn() } }));
+vi.mock('../../api/planUsageApi', () => ({ planUsageApi: { get: vi.fn() } }));
 
 const agentRow = (
   agentId: string,
@@ -28,6 +31,7 @@ const agentRow = (
 });
 
 const get = vi.mocked(dashboardApi.get);
+const getPlanUsage = vi.mocked(planUsageApi.get);
 
 const mount = () =>
   render(
@@ -41,6 +45,7 @@ const mount = () =>
 beforeEach(() => {
   localStorage.clear();
   get.mockResolvedValue(dashboard());
+  getPlanUsage.mockResolvedValue(planUsage());
 });
 afterEach(() => {
   cleanup();
@@ -48,6 +53,14 @@ afterEach(() => {
 });
 
 describe('DashboardPage', () => {
+  it('shows the Claude limits above the dashboard, even while it fails', async () => {
+    get.mockRejectedValue(new Error('boom'));
+    mount();
+    const card = (await screen.findByRole('heading', { name: 'Límites de uso de Claude' })).closest('section');
+    expect(await within(card as HTMLElement).findByRole('meter', { name: 'Sesión (5 h)' })).toBeTruthy();
+    expect(await screen.findByText(/boom/)).toBeTruthy();
+  });
+
   it('offers 24 h before 7 days and queries one day when chosen', async () => {
     mount();
     const labels = screen.getAllByRole('radio').map((radio) => radio.textContent);

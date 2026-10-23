@@ -9,6 +9,7 @@ import type { AgentBrief, InstructionWriter } from '../../src/application/ports/
 import { type ContainerOptions, createContainer } from '../../src/main/container.js';
 import { type AgentBehaviour, FakeAgentRuntime } from './FakeAgentRuntime.js';
 import { FakeGitWorkspace } from './FakeGitWorkspace.js';
+import { FakePlanUsageSource } from './FakePlanUsageSource.js';
 
 export class FakeInstructionWriter implements InstructionWriter {
   readonly briefs: AgentBrief[] = [];
@@ -77,7 +78,7 @@ export function createTestFleet(
   catalogSkills: SkillDto[] = [],
   extraOptions: Pick<
     ContainerOptions,
-    'mcpServerCatalog' | 'monthlyBudgetUsd' | 'agentActivityCoalesceMs'
+    'mcpServerCatalog' | 'monthlyBudgetUsd' | 'agentActivityCoalesceMs' | 'planUsageSource'
   > = {},
 ) {
   const runtime = new FakeAgentRuntime(behaviours);
@@ -90,6 +91,7 @@ export function createTestFleet(
     instructionWriter,
     ...skillSupport,
     logger: silentLogger,
+    planUsageSource: new FakePlanUsageSource(),
     git,
     maxDelegationDepth,
     appVersion: TEST_APP_VERSION,
