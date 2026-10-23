@@ -5,6 +5,7 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { queryKeys } from '../api/queryKeys';
+import { activityEvent } from '../features/agents/agentTestData';
 import { TELEMETRY_REFETCH_INTERVAL_MS, useProjectsLiveTelemetry } from './useProjectsLiveTelemetry';
 
 class FakeEventSource {
@@ -118,6 +119,12 @@ describe('useProjectsLiveTelemetry', () => {
     source.emit(messageEvent('other', '2026-10-20T09:59:00.000Z'));
     expect(invalidate).not.toHaveBeenCalled();
     expect(queryClient.getQueryData<ProjectsTelemetryDto>(key)).toBe(snapshot);
+  });
+
+  it('ignores agent activity snapshots', () => {
+    const { source } = mount();
+    source.emit(activityEvent());
+    expect(invalidate).not.toHaveBeenCalled();
   });
 
   it('closes the stream and drops pending refetches on unmount', () => {
