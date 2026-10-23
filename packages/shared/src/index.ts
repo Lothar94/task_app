@@ -9,3 +9,4 @@ export * from './telemetry.js';
 export * from './projectTelemetry.js';
 export * from './shell.js';
 export * from './fleetActivity.js';
+export * from './planUsage.js';
