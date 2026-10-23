@@ -21,5 +21,7 @@ export const queryKeys = {
   dashboard: (organizationId: string, projectId: string | null, days: number | null) =>
     ['dashboard', organizationId, projectId, days] as const,
   search: (organizationId: string, query: string) => ['search', organizationId, query] as const,
+  /** Claude subscription limits: belong to the machine's account, not to an organization. */
+  planUsage: ['plan-usage'] as const,
   fleetStatus: (organizationId: string) => ['fleet-status', organizationId] as const,
 };
