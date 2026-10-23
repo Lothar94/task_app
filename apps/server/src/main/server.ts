@@ -3,6 +3,7 @@ import { createHttpServer } from '../interfaces/http/createHttpServer.js';
 import { openDatabase } from '../infrastructure/persistence/sqlite/openDatabase.js';
 import { ClaudeInstructionWriter } from '../infrastructure/runtime/claude/ClaudeInstructionWriter.js';
 import { ClaudeAgentRuntime } from '../infrastructure/runtime/claude/ClaudeAgentRuntime.js';
+import { ClaudeUserMcpServers } from '../infrastructure/runtime/claude/ClaudeUserMcpServers.js';
 import { SdkMessageMapper } from '../infrastructure/runtime/claude/SdkMessageMapper.js';
 import { ClaudePluginRegistry } from '../infrastructure/system/ClaudePluginRegistry.js';
 import { FileSystemSkillCatalog } from '../infrastructure/system/FileSystemSkillCatalog.js';
@@ -22,9 +23,10 @@ async function main(): Promise<void> {
   }
 
   const plugins = new ClaudePluginRegistry(config.claudeConfigDir);
+  const mcpServers = new ClaudeUserMcpServers(config.claudeUserConfigFile, logger);
   const container = createContainer({
     db: openDatabase(config.databasePath),
-    runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), claudeRuntimeConfig(config)),
+    runtime: new ClaudeAgentRuntime(new SdkMessageMapper(), mcpServers, logger, claudeRuntimeConfig(config)),
     instructionWriter: new ClaudeInstructionWriter(config.claudeExecutablePath),
     skillCatalog: new FileSystemSkillCatalog(config.userSkillsDir, plugins),
     skillWorkspace: new FileSystemSkillWorkspace(
@@ -37,6 +39,7 @@ async function main(): Promise<void> {
     appVersion: config.appVersion,
     reservedPorts: config.reservedPorts,
     modelPrices: config.modelPrices,
+    mcpServerCatalog: mcpServers,
   });
 
   const recovered = container.recoverInterruptedTasks.execute();

@@ -8,14 +8,17 @@ import { ExportAgents } from '../application/agents/ExportAgents.js';
 import { ImportAgents } from '../application/agents/ImportAgents.js';
 import { GetAgent, ListAgents } from '../application/agents/QueryAgents.js';
 import { SetAgentCollaborators } from '../application/agents/SetAgentCollaborators.js';
+import { SetAgentEnabled } from '../application/agents/SetAgentEnabled.js';
 import { UpdateAgent } from '../application/agents/UpdateAgent.js';
 import type { AgentRuntime } from '../application/ports/AgentRuntime.js';
 import type { InstructionWriter } from '../application/ports/InstructionWriter.js';
+import type { McpServerCatalog } from '../application/ports/McpServerCatalog.js';
 import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
 import { GetFleetStatus } from '../application/fleet/GetFleetStatus.js';
+import { GetAgentRuntimeInfo } from '../application/runtime/GetAgentRuntimeInfo.js';
 import { SearchOrganization } from '../application/search/SearchOrganization.js';
 import { ResolveProjectOrganization } from '../application/projects/ResolveProjectOrganization.js';
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
@@ -80,7 +83,11 @@ export interface ContainerOptions {
   reservedPorts?: number[];
   /** Price table of the usage dashboard; defaults to the built-in estimates. */
   modelPrices?: readonly ModelPriceEntry[];
+  /** MCP servers agents may be given; defaults to none. */
+  mcpServerCatalog?: McpServerCatalog;
 }
+
+const EMPTY_MCP_CATALOG: McpServerCatalog = { list: async () => [] };
 
 interface Infrastructure {
   ids: UuidGenerator;
@@ -142,12 +149,25 @@ function createOrganizationUseCases(
 function createAgentTransferUseCases(
   organizations: SqliteOrganizationRepository,
   agents: SqliteAgentRepository,
-  ids: UuidGenerator,
-  clock: SystemClock,
+  { ids, clock, runtime }: { ids: UuidGenerator; clock: SystemClock; runtime: AgentRuntime },
 ) {
   return {
     exportAgents: new ExportAgents(organizations, agents, clock),
-    importAgents: new ImportAgents(organizations, agents, ids, clock),
+    importAgents: new ImportAgents(organizations, agents, runtime, ids, clock),
+  };
+}
+
+/** Wires the edition of an agent sheet: profile, collaborators, enabled state and runtime support. */
+function createAgentSettingsUseCases(
+  agents: SqliteAgentRepository,
+  clock: SystemClock,
+  { runtime, mcpServerCatalog = EMPTY_MCP_CATALOG }: ContainerOptions,
+) {
+  return {
+    updateAgent: new UpdateAgent(agents, runtime, clock),
+    setAgentCollaborators: new SetAgentCollaborators(agents, clock),
+    setAgentEnabled: new SetAgentEnabled(agents, clock),
+    getAgentRuntimeInfo: new GetAgentRuntimeInfo(runtime, mcpServerCatalog),
   };
 }
 
@@ -213,7 +233,7 @@ function createUsageUseCases(
 
 /** Composition root: the only place that knows every concrete implementation. */
 export function createContainer(options: ContainerOptions) {
-  const { db, instructionWriter, skillCatalog } = options;
+  const { db, instructionWriter, skillCatalog, runtime } = options;
   const clock = new SystemClock();
   const ids = new UuidGenerator();
   const events = new InMemoryEventBus();
@@ -240,15 +260,14 @@ export function createContainer(options: ContainerOptions) {
     recoverInterruptedTasks: new RecoverInterruptedTasks(tasks, recorder, ids, clock),
     useCases: {
       ...createOrganizationUseCases(organizations, ids, clock),
-      createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, ids, clock),
+      createAgent: new CreateAgent(organizations, agents, draftAgentInstructions, runtime, ids, clock),
       draftAgentInstructions,
       listSkills: new ListSkills(skillCatalog),
-      updateAgent: new UpdateAgent(agents, clock),
       deleteAgent: new DeleteAgent(agents, projects, tasks, clock),
       listAgents: new ListAgents(organizations, agents),
       getAgent: new GetAgent(agents),
-      ...createAgentTransferUseCases(organizations, agents, ids, clock),
-      setAgentCollaborators: new SetAgentCollaborators(agents, clock),
+      ...createAgentTransferUseCases(organizations, agents, { ids, clock, runtime }),
+      ...createAgentSettingsUseCases(agents, clock, options),
       createProject: new CreateProject(
         organizations,
         projects,

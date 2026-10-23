@@ -75,3 +75,17 @@ describe('loadConfig model prices', () => {
     expect(() => loadConfig({ MODEL_PRICING_FILE: '/nope/prices.json' })).toThrow(/Invalid MODEL_PRICING_FILE/);
   });
 });
+
+describe('loadConfig user MCP servers', () => {
+  it('reads ~/.claude.json by default', () => {
+    expect(loadConfig({}).claudeUserConfigFile).toBe(join(homedir(), '.claude.json'));
+  });
+
+  it('follows CLAUDE_CONFIG_DIR like Claude Code', () => {
+    expect(loadConfig({ CLAUDE_CONFIG_DIR: '/cfg' }).claudeUserConfigFile).toBe('/cfg/.claude.json');
+  });
+
+  it('honours CLAUDE_USER_CONFIG_FILE', () => {
+    expect(loadConfig({ CLAUDE_USER_CONFIG_FILE: '/tmp/x.json' }).claudeUserConfigFile).toBe('/tmp/x.json');
+  });
+});

@@ -35,7 +35,7 @@ describe('agent-proposed tasks', () => {
     app = await createHttpServer({
       useCases: fleet.useCases,
       events: fleet.events,
-      logger: { info: () => undefined, error: () => undefined },
+      logger: { info: () => undefined, warn: () => undefined, error: () => undefined },
       allowedOrigin: '*',
     });
     const { cto, members, project } = await createTeamProject(fleet, ['Dev']);

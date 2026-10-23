@@ -5,6 +5,10 @@ export class ConsoleLogger implements Logger {
     console.log(`[fleet] ${message}`);
   }
 
+  warn(message: string): void {
+    console.warn(`[fleet] ${message}`);
+  }
+
   error(message: string, error: unknown): void {
     console.error(`[fleet] ${message}`, error);
   }

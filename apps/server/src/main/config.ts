@@ -25,6 +25,8 @@ export interface AppConfig {
   userSkillsDir: string;
   /** Claude Code's config directory, where installed plugins and their enabled state are read. */
   claudeConfigDir: string;
+  /** Claude Code's user config (`.claude.json`), where the user's MCP servers are read. */
+  claudeUserConfigFile: string;
   claudeExecutablePath?: string;
   /** Cap on the characters of a Bash output that stay in an agent's context. */
   bashMaxOutputChars: number;
@@ -62,11 +64,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     appVersion: readAppVersion(),
     claudeConfigDir,
     userSkillsDir: env.USER_SKILLS_DIR ?? join(claudeConfigDir, 'skills'),
+    claudeUserConfigFile: userConfigFileOf(env),
     reservedPorts: [port, portOf(allowedOrigin)],
     bashMaxOutputChars: Number(env.AGENT_BASH_MAX_OUTPUT ?? DEFAULT_BASH_MAX_OUTPUT_CHARS),
     modelPrices: modelPricesOf(env),
     ...optionalSettings(env),
   };
+}
+
+/**
+ * CLAUDE_USER_CONFIG_FILE, or where Claude Code keeps `.claude.json`: CLAUDE_CONFIG_DIR when it is
+ * set, otherwise the home directory.
+ */
+function userConfigFileOf(env: NodeJS.ProcessEnv): string {
+  return env.CLAUDE_USER_CONFIG_FILE ?? join(env.CLAUDE_CONFIG_DIR ?? homedir(), '.claude.json');
 }
 
 function modelPricesOf(env: NodeJS.ProcessEnv): ModelPriceEntry[] {

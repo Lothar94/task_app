@@ -160,6 +160,10 @@ const MIGRATIONS: readonly string[] = [
   `ALTER TABLE agents ADD COLUMN model_selection TEXT NOT NULL DEFAULT 'fixed';`,
   `ALTER TABLE tasks ADD COLUMN model_choice_model TEXT;
    ALTER TABLE tasks ADD COLUMN model_choice_effort TEXT;`,
+  `ALTER TABLE agents ADD COLUMN temperature REAL;
+   ALTER TABLE agents ADD COLUMN max_output_tokens INTEGER;
+   ALTER TABLE agents ADD COLUMN mcp_servers TEXT NOT NULL DEFAULT '[]';
+   ALTER TABLE agents ADD COLUMN enabled INTEGER NOT NULL DEFAULT 1;`,
 ];
 
 /** Migrations (by version) that rebuild tables referenced by foreign keys, so they run with FKs disabled. */

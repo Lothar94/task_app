@@ -3,8 +3,10 @@ import type { HookCallbackMatcher } from '@anthropic-ai/claude-agent-sdk';
 import type { AgentRunRequest } from '../../src/application/ports/AgentRuntime.js';
 import {
   buildSdkOptions,
+  selectMcpServers,
   type ClaudeRuntimeConfig,
 } from '../../src/infrastructure/runtime/claude/buildSdkOptions.js';
+import type { UserMcpServerConfig } from '../../src/infrastructure/runtime/claude/ClaudeUserMcpServers.js';
 import { FLEET_TOOL_NAMES } from '../../src/infrastructure/runtime/claude/FleetToolServer.js';
 
 function requestWith(overrides: Partial<AgentRunRequest> = {}): AgentRunRequest {
@@ -19,6 +21,8 @@ function requestWith(overrides: Partial<AgentRunRequest> = {}): AgentRunRequest 
     pluginPaths: [],
     permissionMode: 'dontAsk',
     maxTurns: 5,
+    maxOutputTokens: null,
+    mcpServers: [],
     workspacePath: '/workspace',
     resumeSessionId: null,
     signal: new AbortController().signal,
@@ -144,6 +148,53 @@ describe('buildSdkOptions', () => {
       const options = build({ skills: ['graphify'], skillsDirectory: null });
       expect(options.skills).toEqual(['graphify']);
       expect(options).not.toHaveProperty('additionalDirectories');
+    });
+  });
+
+  describe('output cap', () => {
+    it('passes maxOutputTokens to Claude Code through its environment', () => {
+      expect(build({ maxOutputTokens: 4096 }).env?.CLAUDE_CODE_MAX_OUTPUT_TOKENS).toBe('4096');
+    });
+
+    it('sets nothing when the agent has no cap', () => {
+      vi.stubEnv('CLAUDE_CODE_MAX_OUTPUT_TOKENS', undefined);
+      expect(build({ maxOutputTokens: null }).env).not.toHaveProperty('CLAUDE_CODE_MAX_OUTPUT_TOKENS');
+    });
+  });
+
+  describe('user MCP servers', () => {
+    const github: UserMcpServerConfig = { type: 'stdio', command: 'gh-mcp', env: { TOKEN: 'secret' } };
+    const docs: UserMcpServerConfig = { type: 'http', url: 'https://docs.example/mcp' };
+
+    it('loads the given servers next to the fleet server and allows all their tools', () => {
+      const options = buildSdkOptions(requestWith(), {}, new AbortController(), { github, docs });
+
+      expect(Object.keys(options.mcpServers ?? {})).toEqual(['github', 'docs', 'fleet']);
+      expect(options.mcpServers?.github).toEqual(github);
+      expect(options.allowedTools).toEqual([
+        'Read',
+        'Bash',
+        'mcp__other__tool',
+        'mcp__github',
+        'mcp__docs',
+        ...FLEET_TOOL_NAMES,
+      ]);
+      expect(options.strictMcpConfig).toBe(true);
+    });
+
+    it('selects the configured servers and reports the unknown ones', () => {
+      expect(selectMcpServers(['docs', 'ghost', 'github'], { github, docs })).toEqual({
+        servers: { docs, github },
+        missing: ['ghost'],
+      });
+    });
+
+    it('never lets a user server replace the fleet server or match inherited properties', () => {
+      const fleet: UserMcpServerConfig = { type: 'stdio', command: 'evil' };
+      expect(selectMcpServers(['fleet', 'toString', '__proto__'], { fleet })).toEqual({
+        servers: {},
+        missing: ['fleet', 'toString', '__proto__'],
+      });
     });
   });
 });

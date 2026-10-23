@@ -52,6 +52,7 @@ export class DelegateSubtask {
     if (!collaborator || !delegator.canDelegateTo(collaborator.id)) {
       throw new ValidationError(`"${collaboratorName}" is not one of your collaborators`);
     }
+    collaborator.ensureCanReceiveTasks();
     if (!requireProject(this.projects, parent.projectId).hasMember(collaborator.id)) {
       throw new ValidationError(`"${collaborator.name}" is not a member of this project`);
     }

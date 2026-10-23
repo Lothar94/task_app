@@ -1,6 +1,7 @@
 import type { CanUseTool, HookCallback, Options } from '@anthropic-ai/claude-agent-sdk';
 import { findUnsafeProcessCommand } from '../../../application/security/processSafetyPolicy.js';
 import type { AgentRunRequest } from '../../../application/ports/AgentRuntime.js';
+import type { UserMcpServerConfig } from './ClaudeUserMcpServers.js';
 import { createFleetToolServer, FLEET_SERVER_NAME, FLEET_TOOL_NAMES } from './FleetToolServer.js';
 
 export interface ClaudeRuntimeConfig {
@@ -36,8 +37,29 @@ export const guardProcessCommands: HookCallback = async (input) => {
   };
 };
 
+export interface SelectedMcpServers {
+  servers: Record<string, UserMcpServerConfig>;
+  /** Names the agent was given that are not configured (or would shadow the fleet server). */
+  missing: string[];
+}
+
+/** The agent's MCP servers that exist in the user's config, in the agent's order. */
+export function selectMcpServers(
+  names: readonly string[],
+  available: Readonly<Record<string, UserMcpServerConfig>>,
+): SelectedMcpServers {
+  const servers: Record<string, UserMcpServerConfig> = {};
+  const missing: string[] = [];
+  for (const name of names) {
+    const config = name !== FLEET_SERVER_NAME && Object.hasOwn(available, name) ? available[name] : undefined;
+    if (config) servers[name] = config;
+    else missing.push(name);
+  }
+  return { servers, missing };
+}
+
 /** `env` replaces the subprocess environment, so the process one is inherited explicitly. */
-function environmentFor(config: ClaudeRuntimeConfig): Record<string, string> {
+function environmentFor(config: ClaudeRuntimeConfig, request: AgentRunRequest): Record<string, string> {
   const inherited = Object.fromEntries(
     Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
   );
@@ -47,6 +69,10 @@ function environmentFor(config: ClaudeRuntimeConfig): Record<string, string> {
     ENABLE_CLAUDEAI_MCP_SERVERS: 'false',
     CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
     ...(config.bashMaxOutputChars ? { BASH_MAX_OUTPUT_LENGTH: String(config.bashMaxOutputChars) } : {}),
+    // The SDK has no option for it: Claude Code reads the cap of each response from the environment.
+    ...(request.maxOutputTokens !== null
+      ? { CLAUDE_CODE_MAX_OUTPUT_TOKENS: String(request.maxOutputTokens) }
+      : {}),
   };
 }
 
@@ -67,7 +93,8 @@ function settingsFor(config: ClaudeRuntimeConfig): NonNullable<Options['settings
 
 /**
  * Builds the SDK options of a run keeping the model's base context small: only the built-in
- * tools the agent may use are defined, and no memory or foreign MCP servers are loaded. Skills are
+ * tools the agent may use are defined, and no memory is loaded. Besides the fleet server, only the
+ * user's MCP servers given to the agent (`mcpServers`, already selected) are loaded and allowed. Skills are
  * off unless the agent was assigned some: then only those are enabled, the `Skill` tool is added,
  * and the user's skills are found through `skillsDirectory` (never through the `user` setting
  * source, which would also load the user's hooks, permissions and plugins). Plugin skills load their
@@ -77,7 +104,9 @@ export function buildSdkOptions(
   request: AgentRunRequest,
   config: ClaudeRuntimeConfig,
   abortController: AbortController,
+  mcpServers: Readonly<Record<string, UserMcpServerConfig>> = {},
 ): Options {
+  const mcpServerTools = Object.keys(mcpServers).map((name) => `${MCP_TOOL_PREFIX}${name}`);
   const hasSkills = request.skills.length > 0;
   const withSkillTool = (tools: string[]) => (hasSkills ? [...new Set([...tools, SKILL_TOOL])] : tools);
   return {
@@ -88,7 +117,7 @@ export function buildSdkOptions(
     permissionMode: request.permissionMode,
     allowDangerouslySkipPermissions: request.permissionMode === 'bypassPermissions',
     tools: withSkillTool(request.allowedTools.filter((tool) => !tool.startsWith(MCP_TOOL_PREFIX))),
-    allowedTools: withSkillTool([...request.allowedTools, ...FLEET_TOOL_NAMES]),
+    allowedTools: withSkillTool([...request.allowedTools, ...mcpServerTools, ...FLEET_TOOL_NAMES]),
     ...(request.permissionMode === 'acceptEdits' ? { canUseTool: denyUnlistedTool } : {}),
     systemPrompt: { type: 'preset', preset: 'claude_code', append: request.systemPromptAppendix },
     settingSources: ['project'],
@@ -99,9 +128,9 @@ export function buildSdkOptions(
       ? { plugins: request.pluginPaths.map((path) => ({ type: 'local' as const, path })) }
       : {}),
     strictMcpConfig: true,
-    env: environmentFor(config),
+    env: environmentFor(config, request),
     hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [guardProcessCommands] }] },
-    mcpServers: { [FLEET_SERVER_NAME]: createFleetToolServer(request.delegation) },
+    mcpServers: { ...mcpServers, [FLEET_SERVER_NAME]: createFleetToolServer(request.delegation) },
     abortController,
     ...(request.resumeSessionId ? { resume: request.resumeSessionId } : {}),
     ...(config.executablePath ? { pathToClaudeCodeExecutable: config.executablePath } : {}),

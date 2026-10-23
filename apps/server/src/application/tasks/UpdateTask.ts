@@ -21,7 +21,7 @@ export class UpdateTask {
     const task = requireRootTask(this.tasks, taskId);
     const project = requireActiveProject(this.projects, task.projectId);
     const { agentId, title, description, milestone, tags } = input;
-    if (agentId !== undefined) this.requireProjectMember(project, agentId);
+    if (agentId !== undefined) this.requireAssignee(task, project, agentId);
     if (agentId !== undefined || title !== undefined || description !== undefined) {
       task.edit({ agentId, title, description });
     }
@@ -30,10 +30,12 @@ export class UpdateTask {
     return task;
   }
 
-  private requireProjectMember(project: Project, agentId: string): void {
+  /** A project member; reassigning to a different agent also requires it to be enabled. */
+  private requireAssignee(task: Task, project: Project, agentId: string): void {
     const agent = requireAgent(this.agents, agentId);
     if (!project.hasMember(agent.id)) {
       throw new ValidationError(`"${agent.name}" is not a member of this project`);
     }
+    if (agent.id !== task.agentId) agent.ensureCanReceiveTasks();
   }
 }
