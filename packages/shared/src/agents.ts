@@ -39,6 +39,14 @@ export interface AgentDto {
   skills: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
+  /** Sampling temperature (AGENT_TEMPERATURE_RANGE); null uses the runtime default. */
+  temperature: number | null;
+  /** Cap on the output tokens of each model response (1..AGENT_MAX_OUTPUT_TOKENS); null uses the runtime default. */
+  maxOutputTokens: number | null;
+  /** Names of the MCP servers of the catalog (GET /api/agent-runtime) the agent may use. */
+  mcpServers: string[];
+  /** Disabled agents keep their history but cannot receive new tasks (see PUT /api/agents/:id/enabled). */
+  enabled: boolean;
   collaboratorIds: string[];
   createdAt: string;
   updatedAt: string;
@@ -57,6 +65,12 @@ export interface AgentInput {
   skills: string[];
   permissionMode: AgentPermissionMode;
   maxTurns: number;
+  /** Optional for older clients and export files: omitted means null. */
+  temperature?: number | null;
+  /** Optional for older clients and export files: omitted means null. */
+  maxOutputTokens?: number | null;
+  /** Optional for older clients and export files: omitted means []. */
+  mcpServers?: string[];
 }
 
 export const DEFAULT_AGENT_TOOLS = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Bash', 'TodoWrite'];
@@ -152,4 +166,46 @@ export interface AgentImportResultDto {
   skipped: string[];
   /** Agents imported under a different name (`rename`). */
   renamed: { from: string; to: string }[];
+}
+
+/** Inclusive bounds of `temperature`. */
+export const AGENT_TEMPERATURE_RANGE = { min: 0, max: 1 } as const;
+/** Upper bound of `maxOutputTokens`. */
+export const AGENT_MAX_OUTPUT_TOKENS = 128000;
+/** MCP server names: letters, digits, `_` and `-`, as in Claude Code's config. */
+export const MCP_SERVER_NAME_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+export const MAX_AGENT_MCP_SERVERS = 20;
+
+/**
+ * Body of `PUT /api/agents/:id/enabled` → AgentDto. Disabling never touches tasks already assigned;
+ * while disabled the agent cannot be the assignee of a new task, a delegation or a proposal
+ * (409 CONFLICT) and is left out of the collaborators listed to delegating agents.
+ */
+export interface AgentEnabledInput {
+  enabled: boolean;
+}
+
+export const MCP_TRANSPORTS = ['stdio', 'http', 'sse'] as const;
+export type McpTransport = (typeof MCP_TRANSPORTS)[number];
+
+/**
+ * An MCP server configured for the user (Claude Code's user config). Only its name and transport
+ * are exposed: commands, URLs, env and headers may hold secrets and never leave the server.
+ */
+export interface McpServerDto {
+  name: string;
+  transport: McpTransport;
+}
+
+/** Agent settings the runtime honours; unsupported ones are rejected when non-null (400 VALIDATION). */
+export interface AgentRuntimeSupportDto {
+  temperature: boolean;
+  maxOutputTokens: boolean;
+}
+
+/** `GET /api/agent-runtime`: what the agent sheet can edit. */
+export interface AgentRuntimeInfoDto {
+  supports: AgentRuntimeSupportDto;
+  /** Catalog of MCP servers agents may be given, by name. */
+  mcpServers: McpServerDto[];
 }
