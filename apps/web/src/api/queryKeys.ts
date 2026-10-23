@@ -2,6 +2,10 @@ export const queryKeys = {
   organizations: ['organizations'] as const,
   agents: (organizationId: string) => ['agents', organizationId] as const,
   skills: ['skills'] as const,
+  agentRuntime: ['agent-runtime'] as const,
+  /** Kept current by `agent.activity` SSE events (useOrganizationEvents). */
+  agentActivity: (organizationId: string) => ['agent-activity', organizationId] as const,
+  budget: (organizationId: string) => ['budget', organizationId] as const,
   agent: (id: string) => ['agent', id] as const,
   projects: (organizationId: string) => ['projects', organizationId] as const,
   projectsTelemetry: (organizationId: string) => ['projects-telemetry', organizationId] as const,

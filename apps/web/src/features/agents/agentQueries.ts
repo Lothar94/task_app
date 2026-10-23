@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { agentsApi, type InstructionsBrief } from '../../api/agentsApi';
 import { skillsApi } from '../../api/skillsApi';
 import { queryKeys } from '../../api/queryKeys';
+import { newestActivity } from './agentActivityModel';
 import { downloadJson, exportFileName } from './agentExport';
 import { useCurrentOrganization } from '../organizations/OrganizationContext';
 
@@ -72,3 +73,18 @@ export function useImportAgents() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents(organizationId) }),
   });
 }
+
+/** Live state of the organization's agents: a REST snapshot kept current by SSE (useOrganizationEvents). */
+export function useAgentActivity() {
+  const queryClient = useQueryClient();
+  const { id: organizationId } = useCurrentOrganization();
+  const queryKey = queryKeys.agentActivity(organizationId);
+  return useQuery({
+    queryKey,
+    queryFn: async () =>
+      newestActivity(await agentsApi.activity(organizationId), queryClient.getQueryData(queryKey)),
+  });
+}
+
+export const useAgentRuntime = () =>
+  useQuery({ queryKey: queryKeys.agentRuntime, queryFn: agentsApi.runtime, staleTime: 60_000 });

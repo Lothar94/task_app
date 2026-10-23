@@ -1,10 +1,13 @@
 import type {
+  AgentActivityDto,
   AgentDto,
+  AgentEnabledInput,
   AgentExportDto,
   AgentExportRequest,
   AgentImportRequest,
   AgentImportResultDto,
   AgentInput,
+  AgentRuntimeInfoDto,
 } from '@fleet/shared';
 import { request } from './httpClient';
 
@@ -27,6 +30,11 @@ export const agentsApi = {
   ) => request<AgentDto>(`/organizations/${organizationId}/agents`, { method: 'POST', body: input }),
   update: (id: string, input: AgentInput) =>
     request<AgentDto>(`/agents/${id}`, { method: 'PUT', body: input }),
+  setEnabled: (id: string, input: AgentEnabledInput) =>
+    request<AgentDto>(`/agents/${id}/enabled`, { method: 'PUT', body: input }),
+  runtime: () => request<AgentRuntimeInfoDto>('/agent-runtime'),
+  activity: (organizationId: string) =>
+    request<AgentActivityDto>(`/organizations/${organizationId}/agent-activity`),
   setCollaborators: (id: string, collaboratorIds: string[]) =>
     request<AgentDto>(`/agents/${id}/collaborators`, { method: 'PUT', body: { collaboratorIds } }),
   draftInstructions: (brief: InstructionsBrief) =>
