@@ -11,12 +11,15 @@ import { SetAgentCollaborators } from '../application/agents/SetAgentCollaborato
 import { SetAgentEnabled } from '../application/agents/SetAgentEnabled.js';
 import { UpdateAgent } from '../application/agents/UpdateAgent.js';
 import type { AgentRuntime } from '../application/ports/AgentRuntime.js';
+import type { EventPublisher, EventSubscriber } from '../application/ports/EventBus.js';
 import type { InstructionWriter } from '../application/ports/InstructionWriter.js';
 import type { McpServerCatalog } from '../application/ports/McpServerCatalog.js';
 import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
 import type { Logger } from '../application/ports/Logger.js';
+import { AgentActivityNotifier } from '../application/fleet/AgentActivityNotifier.js';
+import { GetAgentActivity } from '../application/fleet/GetAgentActivity.js';
 import { GetFleetStatus } from '../application/fleet/GetFleetStatus.js';
 import { GetAgentRuntimeInfo } from '../application/runtime/GetAgentRuntimeInfo.js';
 import { SearchOrganization } from '../application/search/SearchOrganization.js';
@@ -85,6 +88,8 @@ export interface ContainerOptions {
   modelPrices?: readonly ModelPriceEntry[];
   /** MCP servers agents may be given; defaults to none. */
   mcpServerCatalog?: McpServerCatalog;
+  /** Window in which task changes collapse into one `agent.activity` event per organization. */
+  agentActivityCoalesceMs?: number;
 }
 
 const EMPTY_MCP_CATALOG: McpServerCatalog = { list: async () => [] };
@@ -169,6 +174,27 @@ function createAgentSettingsUseCases(
     setAgentEnabled: new SetAgentEnabled(agents, clock),
     getAgentRuntimeInfo: new GetAgentRuntimeInfo(runtime, mcpServerCatalog),
   };
+}
+
+interface ActivitySources {
+  organizations: SqliteOrganizationRepository;
+  projects: SqliteProjectRepository;
+  tasks: SqliteTaskRepository;
+  agents: SqliteAgentRepository;
+  clock: SystemClock;
+  events: EventPublisher & EventSubscriber;
+}
+
+/** Wires the live activity of the org chart and its coalesced `agent.activity` events. */
+function createAgentActivity(
+  { organizations, projects, tasks, agents, clock, events }: ActivitySources,
+  { logger, agentActivityCoalesceMs }: ContainerOptions,
+) {
+  const getAgentActivity = new GetAgentActivity(organizations, projects, tasks, agents, clock);
+  new AgentActivityNotifier(projects, getAgentActivity, events, logger, agentActivityCoalesceMs).watch(
+    events,
+  );
+  return { getAgentActivity };
 }
 
 function createProjectMemberAndArchiveUseCases(
@@ -294,6 +320,7 @@ export function createContainer(options: ContainerOptions) {
       ...createUsageUseCases({ organizations, tasks, runs, agents, projects, clock }, options),
       searchOrganization: new SearchOrganization(organizations, projects, tasks, agents),
       getFleetStatus: new GetFleetStatus(organizations, projects, tasks, agents, clock, options.appVersion),
+      ...createAgentActivity({ organizations, projects, tasks, agents, clock, events }, options),
       resolveProjectOrganization: new ResolveProjectOrganization(projects),
       ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),

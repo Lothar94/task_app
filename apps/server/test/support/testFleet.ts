@@ -75,7 +75,7 @@ export function createTestFleet(
   maxDelegationDepth = 4,
   reservedPorts: number[] = [],
   catalogSkills: SkillDto[] = [],
-  extraOptions: Pick<ContainerOptions, 'mcpServerCatalog'> = {},
+  extraOptions: Pick<ContainerOptions, 'mcpServerCatalog' | 'agentActivityCoalesceMs'> = {},
 ) {
   const runtime = new FakeAgentRuntime(behaviours);
   const instructionWriter = new FakeInstructionWriter();
