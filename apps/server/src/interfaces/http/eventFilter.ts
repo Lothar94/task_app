@@ -10,7 +10,9 @@ export type ProjectOrganizationLookup = (projectId: string) => string | null;
 
 /**
  * Builds the predicate of one SSE connection. Both criteria are combinable; the organization of each
- * project is resolved once per connection since a project never changes organization.
+ * project is resolved once per connection since a project never changes organization. Organization
+ * events (`agent.activity`) belong to no project: they pass the filter of their organization and
+ * unfiltered connections, never a project filter.
  */
 export function createEventFilter(
   { projectId, organizationId }: EventFilterCriteria,
@@ -29,7 +31,13 @@ export function createEventFilter(
     return owner === organizationId;
   };
 
-  return (event) =>
-    (!projectId || event.projectId === projectId) &&
-    (!organizationId || belongsToOrganization(event.projectId));
+  return (event) => {
+    if (event.type === 'agent.activity') {
+      return !projectId && (!organizationId || event.organizationId === organizationId);
+    }
+    return (
+      (!projectId || event.projectId === projectId) &&
+      (!organizationId || belongsToOrganization(event.projectId))
+    );
+  };
 }

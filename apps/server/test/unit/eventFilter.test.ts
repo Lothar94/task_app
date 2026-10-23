@@ -55,3 +55,30 @@ describe('createEventFilter', () => {
     expect(accepts(event('p9'))).toBe(true);
   });
 });
+
+describe('createEventFilter with agent.activity', () => {
+  const activity = (organizationId: string): FleetEvent => ({
+    type: 'agent.activity',
+    organizationId,
+    activity: { organizationId, agents: [], delegations: [], generatedAt: '2026-10-23T10:00:00.000Z' },
+  });
+
+  it('reaches unfiltered connections', () => {
+    expect(createEventFilter({}, lookup())(activity('orgA'))).toBe(true);
+  });
+
+  it('passes the filter of its own organization only, without resolving projects', () => {
+    const organizationOf = lookup();
+    const accepts = createEventFilter({ organizationId: 'orgA' }, organizationOf);
+    expect(accepts(activity('orgA'))).toBe(true);
+    expect(accepts(activity('orgB'))).toBe(false);
+    expect(organizationOf).not.toHaveBeenCalled();
+  });
+
+  it('never passes a project filter', () => {
+    expect(createEventFilter({ projectId: 'p1' }, lookup())(activity('orgA'))).toBe(false);
+    expect(createEventFilter({ projectId: 'p1', organizationId: 'orgA' }, lookup())(activity('orgA'))).toBe(
+      false,
+    );
+  });
+});
