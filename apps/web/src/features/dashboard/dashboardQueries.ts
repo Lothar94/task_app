@@ -14,3 +14,13 @@ export function useDashboard(query: DashboardQuery) {
     placeholderData: keepPreviousData,
   });
 }
+
+/** Month-to-date spending against the monthly limit (MONTHLY_BUDGET_USD). */
+export function useBudget() {
+  const { id: organizationId } = useCurrentOrganization();
+  return useQuery({
+    queryKey: queryKeys.budget(organizationId),
+    queryFn: () => dashboardApi.budget(organizationId),
+    refetchInterval: REFRESH_MS,
+  });
+}

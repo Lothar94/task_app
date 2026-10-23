@@ -1,4 +1,4 @@
-import type { DashboardDto } from '@fleet/shared';
+import type { BudgetDto, DashboardDto } from '@fleet/shared';
 import { request } from './httpClient';
 
 export interface DashboardQuery {
@@ -7,6 +7,7 @@ export interface DashboardQuery {
 }
 
 export const dashboardApi = {
+  budget: (organizationId: string) => request<BudgetDto>(`/organizations/${organizationId}/budget`),
   get: (organizationId: string, { projectId, days }: DashboardQuery) => {
     const params = new URLSearchParams();
     if (projectId) params.set('projectId', projectId);

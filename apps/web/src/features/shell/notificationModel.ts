@@ -51,7 +51,7 @@ const toNotification = (task: TaskDto, kind: NotificationKind, now: string): Fle
 
 /** Notifications after an event, newest first and capped. Unchanged input is returned as is. */
 export function applyFleetEvent(items: FleetNotification[], event: FleetEvent, now: string): FleetNotification[] {
-  if (event.type === 'task.message_appended') return items;
+  if (event.type === 'task.message_appended' || event.type === 'agent.activity') return items;
   const current = dropResolvedProposal(items, event.task);
   const kind = notificationKindOf(event);
   if (kind === null || current.some((item) => item.id === notificationId(event.task.id, kind))) return current;

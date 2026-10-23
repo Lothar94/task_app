@@ -28,6 +28,7 @@ function applyEvent(queryClient: QueryClient, event: FleetEvent): void {
     appendMessage(queryClient, event.message);
     return;
   }
+  if (event.type === 'agent.activity') return;
   queryClient.setQueryData(queryKeys.task(event.task.id), event.task);
   void queryClient.invalidateQueries({ queryKey: queryKeys.taskTree(event.projectId) });
   if (event.type === 'task.updated') invalidateTelemetry(queryClient, event.task);

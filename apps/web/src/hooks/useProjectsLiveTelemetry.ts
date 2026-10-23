@@ -49,7 +49,7 @@ export function useProjectsLiveTelemetry(organizationId: string, projectIds: str
     const source = new EventSource('/api/events');
     source.onmessage = (message: MessageEvent<string>) => {
       const event = JSON.parse(message.data) as FleetEvent;
-      if (!known.has(event.projectId)) return;
+      if (event.type === 'agent.activity' || !known.has(event.projectId)) return;
       if (event.type === 'task.message_appended') {
         bumpLastActivity(queryClient, organizationId, event.projectId, event.message.createdAt);
       } else refetchThrottled();
