@@ -3,6 +3,7 @@ import { ChartColumn, Layers, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Card, ErrorMessage, Loading, PageHeader, SegmentedControl, Select } from '../../components/ui';
 import { useStoredChoice } from '../../hooks/useStoredChoice';
+import { PlanUsageCard } from '../planUsage/PlanUsageCard';
 import { projectOptionLabel } from '../projects/projectListModel';
 import { useProjects } from '../projects/projectQueries';
 import { AgentUsageTable } from './AgentUsageTable';
@@ -115,13 +116,16 @@ export function DashboardPage() {
           />
         }
       />
-      {dashboard.isPending ? (
-        <Loading />
-      ) : dashboard.error ? (
-        <ErrorMessage error={dashboard.error} />
-      ) : (
-        <DashboardContent data={dashboard.data} />
-      )}
+      <div className="space-y-6">
+        <PlanUsageCard />
+        {dashboard.isPending ? (
+          <Loading />
+        ) : dashboard.error ? (
+          <ErrorMessage error={dashboard.error} />
+        ) : (
+          <DashboardContent data={dashboard.data} />
+        )}
+      </div>
     </>
   );
 }
