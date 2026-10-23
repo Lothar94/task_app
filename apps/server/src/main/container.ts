@@ -14,6 +14,7 @@ import type { AgentRuntime } from '../application/ports/AgentRuntime.js';
 import type { EventPublisher, EventSubscriber } from '../application/ports/EventBus.js';
 import type { InstructionWriter } from '../application/ports/InstructionWriter.js';
 import type { McpServerCatalog } from '../application/ports/McpServerCatalog.js';
+import { PlanUsageUnavailableError, type PlanUsageSource } from '../application/ports/PlanUsageSource.js';
 import type { SkillCatalog } from '../application/ports/SkillCatalog.js';
 import type { SkillWorkspace } from '../application/ports/SkillWorkspace.js';
 import { ListSkills } from '../application/skills/ListSkills.js';
@@ -22,6 +23,7 @@ import { AgentActivityNotifier } from '../application/fleet/AgentActivityNotifie
 import { GetAgentActivity } from '../application/fleet/GetAgentActivity.js';
 import { GetFleetStatus } from '../application/fleet/GetFleetStatus.js';
 import { GetAgentRuntimeInfo } from '../application/runtime/GetAgentRuntimeInfo.js';
+import { GetPlanUsage } from '../application/usage/GetPlanUsage.js';
 import { SearchOrganization } from '../application/search/SearchOrganization.js';
 import { ResolveProjectOrganization } from '../application/projects/ResolveProjectOrganization.js';
 import { GetProjectsTelemetry } from '../application/projects/GetProjectsTelemetry.js';
@@ -79,6 +81,8 @@ export interface ContainerOptions {
   skillCatalog: SkillCatalog;
   skillWorkspace: SkillWorkspace;
   logger: Logger;
+  /** Where the Claude plan usage limits are read from; defaults to a source that is always unavailable. */
+  planUsageSource?: PlanUsageSource;
   /** Read-only git access to workspaces; defaults to the git CLI. */
   git?: GitWorkspace;
   maxDelegationDepth: number;
@@ -96,6 +100,9 @@ export interface ContainerOptions {
 }
 
 const EMPTY_MCP_CATALOG: McpServerCatalog = { list: async () => [] };
+const NO_PLAN_USAGE_SOURCE: PlanUsageSource = {
+  fetch: () => Promise.reject(new PlanUsageUnavailableError('no_credentials', 'No plan usage source configured')),
+};
 
 interface Infrastructure {
   ids: UuidGenerator;
@@ -318,6 +325,7 @@ export function createContainer(options: ContainerOptions) {
       searchOrganization: new SearchOrganization(organizations, projects, tasks, agents),
       getFleetStatus: new GetFleetStatus(organizations, projects, tasks, agents, clock, options.appVersion),
       ...createAgentActivity({ organizations, projects, tasks, agents, clock, events }, options),
+      getPlanUsage: new GetPlanUsage(options.planUsageSource ?? NO_PLAN_USAGE_SOURCE, clock),
       resolveProjectOrganization: new ResolveProjectOrganization(projects),
       ...telemetryUseCases,
       getTaskConversation: new GetTaskConversation(tasks, conversations),
